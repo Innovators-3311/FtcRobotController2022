@@ -12,7 +12,7 @@ import java.util.List;
 @Autonomous(name = "Cone sleeve parking", group = "Autonomous")
 public class DetectConeSleeve extends LinearOpMode
 {
-    private static int coneNumber;
+    private static int coneNumber = 10;
 
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
@@ -41,32 +41,29 @@ public class DetectConeSleeve extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
+        waitForStart();
         initVuforia();
         initTfod();
+//        ConeDetection();
+//    }
+//
+//    public void ConeDetection()
+//    {
 
-        /**
-         * Activate TensorFlow Object Detection before we wait for the start command.
-         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-         **/
-        if (tfod != null)
-        {
+
+        int count = 0;
+
+        if (tfod != null) {
             tfod.activate();
 
-            // The TensorFlow software will scale the input images from the camera to a lower resolution.
-            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
-            // If your target is at distance greater than 50 cm (20") you can increase the magnification value
-            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
-            // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1.0, 16.0/9.0);
+            tfod.setZoom(1.0, 16.0 / 9.0);
         }
 
         /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start op mode");
-        telemetry.update();
-        waitForStart();
+//        telemetry.addData("String", "%s", "DetectConeSleeveMethode...");
+//        telemetry.update();
+//        waitForStart();
 
         if (opModeIsActive())
         {
@@ -85,15 +82,16 @@ public class DetectConeSleeve extends LinearOpMode
                         // Note: "Image number" refers to the randomized image orientation/number
                         for (Recognition recognition : updatedRecognitions)
                         {
-                            double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
-                            double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-                            double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
-                            double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
+                            double col = (recognition.getLeft() + recognition.getRight()) / 2;
+                            double row = (recognition.getTop() + recognition.getBottom()) / 2;
+                            double width = Math.abs(recognition.getRight() - recognition.getLeft());
+                            double height = Math.abs(recognition.getTop() - recognition.getBottom());
 
-                            telemetry.addData(""," ");
-                            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
-                            telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
-                            telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+//                            telemetry.addData(""," ");
+//                            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+//                            telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
+//                            telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+
 
                             String object = recognition.getLabel();
                             telemetry.addData("Label", "%s", object);
@@ -125,15 +123,32 @@ public class DetectConeSleeve extends LinearOpMode
                                 }
                             }
 
-                            telemetry.addData("Image", "%d", this.coneNumber);
+                            count++;
+                            telemetry.addData("print", "%s", "print");
+                            telemetry.update();
+                            telemetry.addData("number", "%d", this.coneNumber);
                             telemetry.update();
                         }
                         telemetry.update();
                     }
+                    else
+                    {
+                        telemetry.addData("false2", "%s", "reconation null");
+                        telemetry.update();
+                    }
                 }
+                else
+                {
+                    telemetry.addData("false1", "%s", "tfod null");
+                    telemetry.update();
+                }
+
             }
         }
+        //return coneNumber;
     }
+
+
     /**
      * Initialize the Vuforia localization engine.
      */
