@@ -50,6 +50,7 @@ public class Localizer {
     private boolean targetVisible                = false;
     private double lastT       = 0;
 
+
     public Localizer(HardwareMap hardwareMap) {
         runtime.reset();
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
