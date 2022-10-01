@@ -43,7 +43,7 @@ public class Localizer {
     public double heading   = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation            = null;
-    private VuforiaLocalizer vuforia             = null;
+//    private VuforiaLocalizer vuforia             = null;
     private VuforiaTrackables targets            = null;
     private WebcamName webcamName                = null;
     private List<VuforiaTrackable> allTrackables = null;
@@ -53,16 +53,20 @@ public class Localizer {
 
     public Localizer(HardwareMap hardwareMap) {
         runtime.reset();
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = webcamName; //Indicates which camera to use.
-        parameters.useExtendedTracking = false; // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
-        vuforia = ClassFactory.getInstance().createVuforia(parameters); // Initiates Vuforia.
-        targets = this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
+//        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+//
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+//
+//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+//        parameters.cameraName = webcamName; //Indicates which camera to use.
+//        parameters.useExtendedTracking = false; // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
+//        targets = this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
+        if (VuforiaInit.getInstance(hardwareMap).getVuforia() == null)
+        {
+            identifyTarget(3, "nonononononnonon", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+        }
+        targets = VuforiaInit.getInstance(hardwareMap).getVuforia().loadTrackablesFromAsset("PowerPlay");
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
 
@@ -75,9 +79,9 @@ public class Localizer {
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 90, 0));
 
-        for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
-        }
+//        for (VuforiaTrackable trackable : allTrackables) {
+//            ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
+//        }
 
         targets.activate();
     }

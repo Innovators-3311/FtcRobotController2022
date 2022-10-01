@@ -17,16 +17,16 @@ public class AutonomousOpMode extends LinearOpMode
     @Override
     public void runOpMode()
     {
-        //localizer = new Localizer(hardwareMap);
+        localizer = new Localizer(hardwareMap);
         detectConeSleeve = new DetectConeSleeve(hardwareMap);
         waitForStart();
         detectConeSleeve.detectSleeve(telemetry);
         while (opModeIsActive())
         {
-
-//            localizer.displayTelemetry(telemetry);
-//            localizer.handleTracking();
+            localizer.displayTelemetry(telemetry);
+            localizer.handleTracking();
             telemetry.update();
         }
     }
+
 }

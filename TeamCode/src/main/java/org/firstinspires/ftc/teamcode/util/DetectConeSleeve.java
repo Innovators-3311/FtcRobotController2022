@@ -9,25 +9,26 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 public class DetectConeSleeve
 {
-    private static int coneNumber = 10;
+    private static int coneNumber = -1;
 
     private VuforiaInit vuforiaInit;
     private TFlowInit tFlowInit;
 
     public DetectConeSleeve(HardwareMap hardwareMap)
     {
-        vuforiaInit = new VuforiaInit(hardwareMap);
-        tFlowInit = new TFlowInit(hardwareMap, vuforiaInit.vuforia);
+//        vuforiaInit = VuforiaInit.getInstance(hardwareMap);
+        //vuforiaInit = new VuforiaInit(hardwareMap);
+        tFlowInit = new TFlowInit(hardwareMap, VuforiaInit.getInstance(hardwareMap).getVuforia());
     }
 
 
     public void detectSleeve(Telemetry telemetry)
     {
 
-        telemetry.addData("String", "%s", "Vuforia and tensor flow intiated");
+        telemetry.addData("String", "%s", "Vuforia and tensor flow initated");
         telemetry.update();
 
-        if ( tFlowInit.getTfod() != null)
+        if (tFlowInit.getTfod() != null)
         {
             tFlowInit.getTfod().activate();
 
