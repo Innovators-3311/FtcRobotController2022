@@ -28,20 +28,20 @@ public class DetectConeSleeve
         telemetry.addData("String", "%s", "Vuforia and tensor flow initated");
         telemetry.update();
 
-        if (tFlowInit.getTfod() != null)
-        {
-            tFlowInit.getTfod().activate();
-
-
-            tFlowInit.getTfod().setZoom(1.0, 16.0/9.0);
-        }
+//        if (tFlowInit.getTfod() != null)
+//        {
+//            tFlowInit.getTfod().activate();
+//
+//
+//            tFlowInit.getTfod().setZoom(1.0, 16.0/9.0);
+//        }
         boolean flag = true;
+        boolean flag2 = true;
         while (flag)
         {
             if (tFlowInit.getTfod() != null)
             {
-                telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
-                telemetry.update();
+                //telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tFlowInit.getTfod().getUpdatedRecognitions();
@@ -53,7 +53,7 @@ public class DetectConeSleeve
                     for (Recognition recognition : updatedRecognitions)
                     {
                         telemetry.addData("String", "%s", "for (Recognition recognition : updatedRecognitions)");
-                        telemetry.update();
+
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;
                         double width = Math.abs(recognition.getRight() - recognition.getLeft());
