@@ -9,10 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.util.Localizer;
 
 
-@TeleOp(name="Basic drive", group="Basic drive")
+@TeleOp(name="Basic drive inno", group="Basic drive")
 public class InnoTeleOp extends OpMode
 {
-    private HardwareMap hardwareMap;
 
     private Localizer localizer = null;
     public void init() {

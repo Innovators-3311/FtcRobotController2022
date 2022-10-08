@@ -23,13 +23,12 @@ public class ConeSleeveDetector
 
     public void activateTfod()
     {
-        if (tFlowInit.getTfod() != null)
-        {
+        if (tFlowInit.getTfod() != null) {
             tFlowInit.getTfod().activate();
+
             tFlowInit.getTfod().setZoom(1.0, 16.0/9.0);
         }
     }
-
 
     public void detectSleeve(Telemetry telemetry)
     {

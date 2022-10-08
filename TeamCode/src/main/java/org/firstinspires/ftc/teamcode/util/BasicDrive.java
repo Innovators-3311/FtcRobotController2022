@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Basic drive2", group="Basic drive")
+@TeleOp(name="Basic drive", group="Basic drive")
 public class BasicDrive extends LinearOpMode
 
 {
@@ -39,8 +39,8 @@ public class BasicDrive extends LinearOpMode
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        waitForStart();
-//        runtime.reset();
+        waitForStart();
+        runtime.reset();
 
         sleep(1000);
 
@@ -55,9 +55,10 @@ public class BasicDrive extends LinearOpMode
             double turn = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.right_stick_x;
+            
 
-            leftPower = drive - turn - strafe;
-            rightPower = drive + turn + strafe;
+            leftPower = drive + turn + strafe;
+            rightPower = drive - turn - strafe;
             leftBackPower = drive + turn - strafe;
             rightBackPower = drive - turn + strafe;
 
@@ -68,10 +69,10 @@ public class BasicDrive extends LinearOpMode
                 max = Math.max(Math.abs(rightBackPower), max);
 
                 //divide everything by highest power to keep proper ratios of strafe, org.firstinspires.ftc.teamcode.drive, and turn
-                leftPower /= 0.5;
-                rightPower /= 0.5;
-                leftBackPower /= 0.5;
-                rightBackPower /= 0.5;
+                leftPower /= 1;
+                rightPower /= 1;
+                leftBackPower /= 1;
+                rightBackPower /= 1;
             }
 
             // Send calculated power to wheels

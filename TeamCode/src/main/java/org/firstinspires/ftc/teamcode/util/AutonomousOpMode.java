@@ -8,12 +8,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class AutonomousOpMode extends LinearOpMode
 {
     private ConeSleeveDetector detectConeSleeve;
-    private Localizer localizer = null;
+    //private Localizer localizer;
 
     @Override
     public void runOpMode()
     {
-        localizer = new Localizer(hardwareMap);
+     //  localizer = new Localizer(hardwareMap);
         detectConeSleeve = new ConeSleeveDetector(hardwareMap);
 
         // Start VuForia background process looking for vumarks in camera field of view. Activate
@@ -26,10 +26,13 @@ public class AutonomousOpMode extends LinearOpMode
 
         detectConeSleeve.detectSleeve(telemetry);
 
+
+
         while (opModeIsActive())
         {
-            localizer.displayTelemetry(telemetry);
-            localizer.handleTracking();
+//            telemetry.addData("Location", "%d", parkingLocation);
+      //      localizer.displayTelemetry(telemetry);
+        //g    localizer.handleTracking();
             telemetry.update();
         }
     }
