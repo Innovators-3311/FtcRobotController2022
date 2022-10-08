@@ -31,7 +31,7 @@ public class VuforiaInit
 
 
         this.vuforia = ClassFactory.getInstance().createVuforia(parameters);
-        this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
+      //  this.vuforia.loadTrackablesFromFile("PowerPlay"); // loads images
     }
 
     public static VuforiaInit getInstance(HardwareMap hardwareMap)

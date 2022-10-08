@@ -7,18 +7,27 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
-public class DetectConeSleeve
+public class ConeSleeveDetector
 {
     private static int coneNumber = -1;
 
-    private VuforiaInit vuforiaInit;
-    private TFlowInit tFlowInit;
+    public VuforiaInit vuforiaInit;
+    public TFlowInit tFlowInit;
 
-    public DetectConeSleeve(HardwareMap hardwareMap)
+    public ConeSleeveDetector(HardwareMap hardwareMap)
     {
 //        vuforiaInit = VuforiaInit.getInstance(hardwareMap);
         //vuforiaInit = new VuforiaInit(hardwareMap);
         tFlowInit = new TFlowInit(hardwareMap, VuforiaInit.getInstance(hardwareMap).getVuforia());
+    }
+
+    public void activateTfod()
+    {
+        if (tFlowInit.getTfod() != null)
+        {
+            tFlowInit.getTfod().activate();
+            tFlowInit.getTfod().setZoom(1.0, 16.0/9.0);
+        }
     }
 
 
@@ -41,7 +50,8 @@ public class DetectConeSleeve
         {
             if (tFlowInit.getTfod() != null)
             {
-                //telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
+                telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
+                telemetry.update();
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tFlowInit.getTfod().getUpdatedRecognitions();
@@ -49,10 +59,12 @@ public class DetectConeSleeve
                 {
                     telemetry.addData("String", "%s", "if (updatedRecognitions != null)");
                     telemetry.addData("# Objects Detected", updatedRecognitions.size());
+                    telemetry.update();
 
                     for (Recognition recognition : updatedRecognitions)
                     {
                         telemetry.addData("String", "%s", "for (Recognition recognition : updatedRecognitions)");
+                        telemetry.update();
 
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;

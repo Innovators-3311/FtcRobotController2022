@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Basic drive", group="Basic drive")
+@TeleOp(name="Basic drive2", group="Basic drive")
 public class BasicDrive extends LinearOpMode
 
 {
