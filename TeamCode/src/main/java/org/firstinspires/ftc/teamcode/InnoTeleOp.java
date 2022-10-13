@@ -7,14 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.util.Localizer;
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 
-@TeleOp(name="Basic drive inno", group="Basic drive")
+@TeleOp(name="Basic drive", group="Basic drive")
 public class InnoTeleOp extends OpMode
 {
-
+    MecanumDriveBase mecanumDriveBase;
     private Localizer localizer = null;
     public void init() {
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         telemetry.addData("Status", "Initialized");
         localizer = new Localizer(hardwareMap);
         double max;
@@ -23,6 +25,7 @@ public class InnoTeleOp extends OpMode
     public void loop() {
         localizer.displayTelemetry(telemetry);
         localizer.handleTracking();
+        mecanumDriveBase.gamepadController(gamepad1);
         telemetry.update();
     }
 }

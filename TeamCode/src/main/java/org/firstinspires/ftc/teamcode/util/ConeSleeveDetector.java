@@ -49,22 +49,13 @@ public class ConeSleeveDetector
         {
             if (tFlowInit.getTfod() != null)
             {
-                telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
-                telemetry.update();
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tFlowInit.getTfod().getUpdatedRecognitions();
                 if (updatedRecognitions != null)
                 {
-                    telemetry.addData("String", "%s", "if (updatedRecognitions != null)");
-                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
-                    telemetry.update();
-
                     for (Recognition recognition : updatedRecognitions)
                     {
-                        telemetry.addData("String", "%s", "for (Recognition recognition : updatedRecognitions)");
-                        telemetry.update();
-
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;
                         double width = Math.abs(recognition.getRight() - recognition.getLeft());
@@ -111,6 +102,7 @@ public class ConeSleeveDetector
                             }
                         }
                         telemetry.addData("Detected: ", "%d", coneNumber);
+                        telemetry.update();
                     }
                 }
 

@@ -66,9 +66,9 @@ public class Localizer {
         {
             identifyTarget(3, "nonononononnonon", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
         }
-        targets = VuforiaInit.getInstance(hardwareMap).getVuforia().loadTrackablesFromAsset("PowerPlay");
-        allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(targets);
+//        targets = VuforiaInit.getInstance(hardwareMap).getVuforia().loadTrackablesFromAsset("PowerPlay");
+//        allTrackables = new ArrayList<VuforiaTrackable>();
+//        allTrackables.addAll(targets);
 
         identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
         identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);

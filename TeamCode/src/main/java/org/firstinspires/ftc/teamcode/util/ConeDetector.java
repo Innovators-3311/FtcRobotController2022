@@ -1,16 +1,20 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-public class ConeDetector
+@Autonomous(name = "Detect sleeve", group = "Autonomous")
+public class ConeDetector extends LinearOpMode
 {
 
     /*
@@ -42,7 +46,7 @@ public class ConeDetector
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+            "ATCNswP/////AAABmboo62E3M0RLvUoBrala8GQowW4hvn2lz0v4xIUqDcerBojdZbFDT7KxueF7R6JgJY9tQ+gV9sHXv6aOcnznTsupwlzsqujeV1pIN0j5/uZNqLkxZCORToVMVD/kd8XY5y58Pnml+lS3pqkZee6pSUTNWfmWgJAu/oKPGVrOm5GwCPObOM9Mx3NSbWeRVSiKcaN9o6QyqV+Knuf2xYpF87rKiH0pbWGRIFSy8JgVQ6dabuIoDCKbXpDeTwK3PJ2VtgON+8PA2TIIn95Yq8UmBYJRJc6kDyvCDyCnKJ63oPRfzth3P8DM4IchQd69ccU6vqeto4JNQbPZh5JB5KRXFS8CcmQJLkSRcHDIP92eIhv/";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -58,87 +62,50 @@ public class ConeDetector
 
     private int coneNumber = -1;
 
-    HardwareMap mHardwareMap;
-
-    public ConeDetector(HardwareMap hardwareMap)
+    @Override
+    public void runOpMode()
     {
-        mHardwareMap = hardwareMap;
-        initVuforia();
-        initTfod();
-    }
+        initVuforia(hardwareMap);
+        initTfod(hardwareMap);
 
-    void activeTfod()
-    {
-        tfod.activate();
+        waitForStart();
+
+        while (opModeIsActive())
+        {
+            detectSleeve(telemetry, hardwareMap);
+        }
     }
 
     /**
      * Initialize the Vuforia localization engine.
      */
-    private void initVuforia()
-    {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-    }
-
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod()
-    {
-        int tfodMonitorViewId = mHardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", mHardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
-        tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 300;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-
-        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
-        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
-    }
-
-    public void detectSleeve(Telemetry telemetry)
+    public void detectSleeve(Telemetry telemetry, HardwareMap hardwareMap)
     {
 
         telemetry.addData("String", "%s", "Vuforia and tensor flow initated");
         telemetry.update();
 
-//        if (tFlowInit.getTfod() != null)
-//        {
-//            tFlowInit.getTfod().activate();
-//
-//
-//            tFlowInit.getTfod().setZoom(1.0, 16.0/9.0);
-//        }
+        if (tfod != null)
+        {
+            tfod.activate();
+            telemetry.addData("","&s", "activate");
+            tfod.setZoom(1.0, 16.0/9.0);
+        }
         boolean flag = true;
         boolean flag2 = true;
-        while (flag) {
-            if (tfod != null) {
-                telemetry.addData("String", "%s", "if (tFlowInit.getTfod() != null)");
-                telemetry.update();
+        while (flag)
+        {
+            if (tfod != null)
+            {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("String", "%s", "if (updatedRecognitions != null)");
-                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
-                    telemetry.update();
+                if (updatedRecognitions != null)
+                {
 
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData("String", "%s", "for (Recognition recognition : updatedRecognitions)");
-                        telemetry.update();
-
+                    for (Recognition recognition : updatedRecognitions)
+                    {
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;
                         double width = Math.abs(recognition.getRight() - recognition.getLeft());
@@ -151,35 +118,41 @@ public class ConeDetector
 
                         String object = recognition.getLabel();
 
-                        switch (object) {
-                            case "1 Bolt": {
+                        switch (object)
+                        {
+                            case "1 Bolt":
+                            {
                                 this.coneNumber = 1;
                                 telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
 
-                            case "2 Bulb": {
+                            case "2 Bulb":
+                            {
                                 this.coneNumber = 2;
                                 telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
 
-                            case "3 Panel": {
+                            case "3 Panel":
+                            {
                                 this.coneNumber = 3;
                                 telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
 
-                            default: {
+                            default:
+                            {
                                 this.coneNumber = -1;
                                 telemetry.addData("Cone:", "%d", coneNumber);
                                 break;
                             }
                         }
                         telemetry.addData("Detected: ", "%d", coneNumber);
+                        telemetry.update();
                     }
                 }
 
@@ -187,4 +160,34 @@ public class ConeDetector
         }
     }
 
+    private void initVuforia( HardwareMap hardwareMap)
+    {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod( HardwareMap hardwareMap) {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 300;
+        this.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
 }

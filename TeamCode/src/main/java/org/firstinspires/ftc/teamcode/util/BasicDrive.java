@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,7 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Basic drive", group="Basic drive")
+@TeleOp(name="Basic drive2", group="Basic drive")
+@Disabled
 public class BasicDrive extends LinearOpMode
 
 {
@@ -55,7 +57,7 @@ public class BasicDrive extends LinearOpMode
             double turn = gamepad1.left_stick_x;
             double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.right_stick_x;
-            
+
 
             leftPower = drive + turn + strafe;
             rightPower = drive - turn - strafe;
