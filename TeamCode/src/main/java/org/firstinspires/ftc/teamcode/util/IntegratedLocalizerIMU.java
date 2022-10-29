@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Localizer {
+public class IntegratedLocalizerIMU implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
@@ -35,24 +35,30 @@ public class Localizer {
     final float CAMERA_FORWARD_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
     final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // FIXME
     final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
-    public double y         = 0;
-    public double x         = 0;
-    public double z         = 0;
-    public double yVelocity = 0;
-    public double xVelocity = 0;
-    public double heading   = 0;
+    private double y         = 0;
+    private double x         = 0;
+    private double z         = 0;
+    private double yVelocity = 0;
+    private double xVelocity = 0;
+    private double heading   = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation            = null;
     private VuforiaLocalizer vuforia             = null;
     private VuforiaTrackables targets            = null;
+    private InternalIMUSensor imu;
     private WebcamName webcamName                = null;
     private List<VuforiaTrackable> allTrackables = null;
     private boolean targetVisible                = false;
-    private double lastT       = 0;
+    private double lastT          = 0;
+    private double headingOffSet  = 0;
+    private double imuHeading = 0;
+    private double vuforiaHeading = 0;
 
-    public Localizer(HardwareMap hardwareMap) {
+    public IntegratedLocalizerIMU(HardwareMap hardwareMap) {
         runtime.reset();
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        imu = new InternalIMUSensor(hardwareMap);
+
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -70,9 +76,29 @@ public class Localizer {
         identifyTarget(2, "Blue Audience Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90);
         identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
 
+        /*
+         * Create a transformation matrix describing where the camera is on the robot.
+         *
+         * Info:  The coordinate frame for the robot looks the same as the field.
+         * The robot's "forward" direction is facing out along X axis, with the LEFT side facing out along the Y axis.
+         * Z is UP on the robot.  This equates to a bearing angle of Zero degrees.
+         *
+         * For a WebCam, the default starting orientation of the camera is looking UP (pointing in the Z direction),
+         * with the wide (horizontal) axis of the camera aligned with the X axis, and
+         * the Narrow (vertical) axis of the camera aligned with the Y axis
+         *
+         * But, this example assumes that the camera is actually facing forward out the front of the robot.
+         * So, the "default" camera position requires two rotations to get it oriented correctly.
+         * 1) First it must be rotated +90 degrees around the X axis to get it horizontal (its now facing out the right side of the robot)
+         * 2) Next it must be be rotated +90 degrees (counter-clockwise) around the Z axis to face forward.
+         *
+         * Finally the camera can be translated to its actual mounting position on the robot.
+         *      In this example, it is centered on the robot (left-to-right and front-to-back), and 6 inches above ground level.
+         */
+
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 90, 0));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 0, 0));
 
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
@@ -88,7 +114,8 @@ public class Localizer {
      * @param dx, dy, dz  Target offsets in x,y,z axes
      * @param rx, ry, rz  Target rotations in x,y,z axes
      */
-    void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz) {
+
+    public void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz) {
         VuforiaTrackable aTarget = targets.get(targetIndex);
         aTarget.setName(targetName);
         aTarget.setLocation(OpenGLMatrix.translation(dx, dy, dz)
@@ -105,11 +132,16 @@ public class Localizer {
         telemetry.addData("x velocity", xVelocity);
         telemetry.addData("y velocity", yVelocity);
         telemetry.addData("Heading", heading);
+        telemetry.addData("Heading offset", headingOffSet);
+//        telemetry.addData("heading gyro", integratedGyro.getHeading());
+        telemetry.addData("heading Vuforia",vuforiaHeading);
         telemetry.addData("target visible?", targetVisible);
 
     }
 
     public void handleTracking() {
+        imuHeading = imu.getHeading();
+        this.heading = imuHeading + headingOffSet;
         if ((runtime.seconds() - lastT) < loopSpeedHT) {
             return;
         }
@@ -144,8 +176,22 @@ public class Localizer {
 
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            heading = rotation.thirdAngle;
+            vuforiaHeading = rotation.thirdAngle%360;
+            this.heading = vuforiaHeading;
+            headingOffSet  = vuforiaHeading - imu.getHeading();
             lastT = runtime.seconds();
         }
+        else {
+            heading = (imu.getHeading() + headingOffSet)%360;
+        }
     }
+
+    @Override
+    public double getHeading() {
+        return heading;
+    }
+
+    //    public void gyroCalibrate(){
+//        integratedGyro.calibrate();
+//    }
 }
