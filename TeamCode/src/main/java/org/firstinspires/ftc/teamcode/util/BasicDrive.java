@@ -8,8 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Basic drive2", group="Basic drive")
-@Disabled
+@TeleOp(name="Basic drive", group="Basic drive")
 public class BasicDrive extends LinearOpMode
 
 {
@@ -55,14 +54,14 @@ public class BasicDrive extends LinearOpMode
             double rightBackPower;
 
             double turn = gamepad1.left_stick_x;
-            double drive = -gamepad1.left_stick_y;
+            double drive = gamepad1.left_stick_y;
             double strafe = gamepad1.right_stick_x;
 
 
-            leftPower = drive + turn + strafe;
-            rightPower = drive - turn - strafe;
-            leftBackPower = drive + turn - strafe;
-            rightBackPower = drive - turn + strafe;
+            leftPower = -drive - turn - strafe;
+            rightPower = -drive + turn + strafe;
+            leftBackPower = drive - turn + strafe;
+            rightBackPower = drive + turn - strafe;
 
 
             if (Math.abs(leftPower) > 1 || Math.abs(leftBackPower) > 1 || Math.abs(rightPower) > 1 || Math.abs(rightBackPower) > 1) {

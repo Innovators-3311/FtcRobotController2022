@@ -49,6 +49,7 @@ public class Localizer {
     private List<VuforiaTrackable> allTrackables = null;
     private boolean targetVisible                = false;
     private double lastT       = 0;
+    InitVuforia initVuforia = new InitVuforia();
 
 
     public Localizer(HardwareMap hardwareMap) {
@@ -62,10 +63,17 @@ public class Localizer {
 //        parameters.cameraName = webcamName; //Indicates which camera to use.
 //        parameters.useExtendedTracking = false; // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
 //        targets = this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
-        if (VuforiaInit.getInstance(hardwareMap).getVuforia() == null)
+
+        /**
+         *     Chang code here if you have a problem consult sam
+         */
+        if (initVuforia.getVuforia() == null)
         {
             identifyTarget(3, "nonononononnonon", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
         }
+        /**
+         *  LOOK AT LINE 68 IF YOU HAVE AN ERROR
+         */
 //        targets = VuforiaInit.getInstance(hardwareMap).getVuforia().loadTrackablesFromAsset("PowerPlay");
 //        allTrackables = new ArrayList<VuforiaTrackable>();
 //        allTrackables.addAll(targets);

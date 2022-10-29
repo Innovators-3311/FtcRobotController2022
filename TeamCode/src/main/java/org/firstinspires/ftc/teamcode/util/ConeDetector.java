@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -11,9 +12,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.HashMap;
 import java.util.List;
 
-@Autonomous(name = "Detect sleeve", group = "Autonomous")
+@Autonomous(name = "Cone Detector", group = "Autonomous")
 public class ConeDetector extends LinearOpMode
 {
 
@@ -24,10 +26,19 @@ public class ConeDetector extends LinearOpMode
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_ASSET = "model_unquant.tflite";
+//    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/coneSleeve.tflite";
+//    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/model_unquant.tflite";
+private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/model.tflite";
 
     private static final String[] LABELS = {
+            "0 Zone1",
+            "1 Zone2",
+            "2 Zone3"
+    };
+
+    private static final String[] LABELS2 = {
             "1 Bolt",
             "2 Bulb",
             "3 Panel"
@@ -89,21 +100,29 @@ public class ConeDetector extends LinearOpMode
         if (tfod != null)
         {
             tfod.activate();
-            telemetry.addData("","&s", "activate");
+            telemetry.addData("","%s", "tfod is not null");
+            telemetry.update();
             tfod.setZoom(1.0, 16.0/9.0);
+
         }
         boolean flag = true;
         boolean flag2 = true;
         while (flag)
         {
+//            telemetry.addData("", "%s", "while (flag)");
+//            telemetry.update();
             if (tfod != null)
             {
+//                telemetry.addData("", "%s", "if (tfod != null)");
+//                telemetry.update();
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null)
                 {
-
+//                    telemetry.addData("", "%s", "if (updatedRecognitions != null)");
+                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
+                    telemetry.update();
                     for (Recognition recognition : updatedRecognitions)
                     {
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
@@ -120,7 +139,7 @@ public class ConeDetector extends LinearOpMode
 
                         switch (object)
                         {
-                            case "1 Bolt":
+                            case "0 Zone1":
                             {
                                 this.coneNumber = 1;
                                 telemetry.addData("Cone:", "%d", coneNumber);
@@ -128,7 +147,7 @@ public class ConeDetector extends LinearOpMode
                                 break;
                             }
 
-                            case "2 Bulb":
+                            case "1 Zone2":
                             {
                                 this.coneNumber = 2;
                                 telemetry.addData("Cone:", "%d", coneNumber);
@@ -136,7 +155,7 @@ public class ConeDetector extends LinearOpMode
                                 break;
                             }
 
-                            case "3 Panel":
+                            case "2 Zone3":
                             {
                                 this.coneNumber = 3;
                                 telemetry.addData("Cone:", "%d", coneNumber);
@@ -160,7 +179,7 @@ public class ConeDetector extends LinearOpMode
         }
     }
 
-    private void initVuforia( HardwareMap hardwareMap)
+    private void initVuforia(HardwareMap hardwareMap)
     {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -176,7 +195,8 @@ public class ConeDetector extends LinearOpMode
     /**
      * Initialize the TensorFlow Object Detection engine.
      */
-    private void initTfod( HardwareMap hardwareMap) {
+    private void initTfod( HardwareMap hardwareMap)
+    {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
@@ -187,7 +207,7 @@ public class ConeDetector extends LinearOpMode
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+        //this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS2);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }

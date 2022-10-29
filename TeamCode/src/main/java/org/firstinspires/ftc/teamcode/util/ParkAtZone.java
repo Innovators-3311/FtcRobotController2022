@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @Disabled
 public class ParkAtZone extends OpMode
 {
-    private ConeSleeveDetector coneSleeveDetector = null;
+//    private ConeSleeveDetector coneSleeveDetector = null;
     private DcMotor lf = null;
     private DcMotor rf = null;
     private DcMotor lb = null;
