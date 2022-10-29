@@ -5,16 +5,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.AnglePIDControl;
-import org.firstinspires.ftc.teamcode.util.Localizer;
-import org.firstinspires.ftc.teamcode.util.LocalizerCompass;
-import org.firstinspires.ftc.teamcode.util.LocalizerIMU;
+import org.firstinspires.ftc.teamcode.util.localizers.Localizer;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 public class PacManTurnToPos {
 private double goalHeading = 0;
 private double turnSpeed   = 0;
 private Localizer localizer;
-private  MecanumDriveBase mecanumDriveBase;
+private MecanumDriveBase mecanumDriveBase;
 private AnglePIDControl angleControl;
 CompassSensor                compass;
 

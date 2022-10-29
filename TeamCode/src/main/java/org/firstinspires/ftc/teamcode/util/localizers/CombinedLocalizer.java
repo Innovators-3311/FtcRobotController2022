@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.localizers;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -13,17 +13,19 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
+import org.firstinspires.ftc.teamcode.util.odometry.OdometryPod;
+import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalizerIMU implements Localizer{
+public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
@@ -36,29 +38,45 @@ public class LocalizerIMU implements Localizer{
     final float CAMERA_FORWARD_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
     final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // FIXME
     final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
-    public double y         = 0;
-    public double x         = 0;
-    public double z         = 0;
-    public double yVelocity = 0;
-    public double xVelocity = 0;
-    public double heading   = 0;
+    public double stateTime     = 0;
+    public double y             = 0;
+    public double x             = 0;
+    public double z             = 0;
+    public double yVelocity     = 0;
+    public double xVelocity     = 0;
+    public double heading       = 0;
+    public double headingRate   = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation            = null;
     private VuforiaLocalizer vuforia             = null;
     private VuforiaTrackables targets            = null;
     private GyroSensor gyro;
+    private InternalIMUSensor imu;
+    private OdometryPodsSensor odoPods;
     private WebcamName webcamName                = null;
     private List<VuforiaTrackable> allTrackables = null;
+    VuforiaTrackable trackable;
     private boolean targetVisible                = false;
-    private double lastT          = 0;
-    private double headingOffSet  = 0;
-    private double gyroHeading = 0;
-    private double vuforiaHeading = 0;
+    private double lastT               =  0;
+    private double headingOffSet       =  0;
+    private double gyroHeading         =  0;
 
-    public LocalizerIMU(HardwareMap hardwareMap) {
-        runtime.reset();
+    private double positionUncertainty             = .5;
+    static final double vuforiaPositionUncertainty = .2;
+    private double headingUncertainty              = 5;
+    private double vuforiaHeadingUncertainty       = 5;
+
+    /**
+     * Construct the combined localizer
+     *
+     * @param hardwareMap a hardware map.
+     */
+    public CombinedLocalizer(HardwareMap hardwareMap) {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         gyro = hardwareMap.get(GyroSensor.class, "gyro");
+        imu = new InternalIMUSensor(hardwareMap);
+        odoPods = new OdometryPodsSensor(hardwareMap);
+
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -107,14 +125,18 @@ public class LocalizerIMU implements Localizer{
         targets.activate();
     }
 
-    /***
+    /*** (Vuforia-specific function)
      * Identify a target by naming it, and setting its position and orientation on the field
      * @param targetIndex
      * @param targetName
-     * @param dx, dy, dz  Target offsets in x,y,z axes
-     * @param rx, ry, rz  Target rotations in x,y,z axes
+     * @param dx
+     * @param dy
+     * @param dz
+     * @param rx
+     * @param ry
+     * @param rz
      */
-
+    @Override
     public void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz) {
         VuforiaTrackable aTarget = targets.get(targetIndex);
         aTarget.setName(targetName);
@@ -122,26 +144,66 @@ public class LocalizerIMU implements Localizer{
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, rx, ry, rz)));
     }
 
-
+    @Override
     public void displayTelemetry(Telemetry telemetry) {
-        telemetry.addData("Runtime", runtime.seconds());
-        telemetry.addData("Delta T", runtime.seconds() - lastT);
-        telemetry.addData("x position", x);
-        telemetry.addData("y position", y);
-        telemetry.addData("z position", z);
-        telemetry.addData("x velocity", xVelocity);
-        telemetry.addData("y velocity", yVelocity);
-        telemetry.addData("Heading", heading);
-        telemetry.addData("Heading offset", headingOffSet);
-        telemetry.addData("heading gyro", gyro.getHeading());
-        telemetry.addData("heading Vuforia",vuforiaHeading);
-        telemetry.addData("target visible?", targetVisible);
+        telemetry.addLine("position")
+            .addData("x","%.1f",x)
+            .addData("y","%.1f",y);
+        telemetry.addData("heading","%.1f",heading);
+    }
+    public void measureVelocity() {
 
     }
+    /**
+     * Updates the robot state estimate based on time elapsed.
+     */
+    private void updateState(){
+        double thisTime = runtime.seconds();
+        double deltat = thisTime - stateTime;
+        x += deltat * xVelocity;
+        y += deltat * yVelocity;
+        heading += deltat * headingRate;
+        stateTime = thisTime;
+        positionUncertainty += 0.5 * deltat * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
+        headingUncertainty += 0.5 * deltat * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
+    }
+    public void measureHeading(){
+        if(targetVisible) {
+            double k = headingUncertainty / (headingUncertainty + vuforiaHeadingUncertainty); //Kalman gain for a Kalman filter
+            // express the rotation of the robot in degrees.
+            Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+            double vuforiaHeading = rotation.thirdAngle%360;
+            heading += k*((vuforiaHeading)-heading);
+            headingUncertainty = (1-k)*headingUncertainty;
 
+        }
+    }
+
+    /** Measures the robot position if possible
+     *
+     */
+    public void measurePosition(){
+       if (targetVisible) {
+           //https://kalmanfilter.net/kalman1d.html
+           double k = positionUncertainty/(positionUncertainty+vuforiaPositionUncertainty); //another Kalman gain for a Kalman filter
+           x += k*((lastLocation.getTranslation().get(0)/mmPerInch)-x);
+           y += k*((lastLocation.getTranslation().get(1)/mmPerInch)-y);
+           positionUncertainty = (1-k)*positionUncertainty;
+
+       }
+    }
+
+    /**
+     * Measures changes in state and incorporates them into our state estimates.
+     */
+    private void measureState(){
+        measurePosition();
+        measureHeading();
+    }
+
+    @Override
     public void handleTracking() {
-        gyroHeading = gyro.getHeading();
-        this.heading = gyroHeading + headingOffSet;
+        // X and Y
         if ((runtime.seconds() - lastT) < loopSpeedHT) {
             return;
         }
@@ -159,38 +221,17 @@ public class LocalizerIMU implements Localizer{
                 }
                 break;
             }
-        }
 
-        // Provide feedback as to where the robot is located (if we know).
-        if (targetVisible) {
-            // express position (translation) of robot in inches.
-            VectorF translation = lastLocation.getTranslation();
-            double lastX = x;
-            double lastY = y;
-            double t     = runtime.seconds();
-            x = translation.get(0)/mmPerInch;
-            y = translation.get(1)/mmPerInch;
-            z = translation.get(2)/mmPerInch;
-            xVelocity = (x-lastX) /(t-lastT);
-            yVelocity = (y-lastY) /(t-lastT);
-
-            // express the rotation of the robot in degrees.
-            Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            vuforiaHeading = rotation.thirdAngle%360;
-            this.heading = vuforiaHeading;
-            headingOffSet  = vuforiaHeading - gyro.getHeading();
-            lastT = runtime.seconds();
         }
-        else {
-            heading = (gyro.getHeading() + headingOffSet)%360;
-        }
+        updateState();
+        measureState();
     }
 
     @Override
     public double getHeading() {
-        return heading;
+
+        return 0;
     }
-//    public void gyroCalibrate(){
-//        gyro.calibrate();
-//    }
+
 }
+

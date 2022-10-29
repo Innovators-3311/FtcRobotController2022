@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.localizers;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
+import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntegratedLocalizerIMU implements Localizer {
+public class LocalizerCompass implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
@@ -35,30 +36,29 @@ public class IntegratedLocalizerIMU implements Localizer {
     final float CAMERA_FORWARD_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
     final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // FIXME
     final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
-    private double y         = 0;
-    private double x         = 0;
-    private double z         = 0;
-    private double yVelocity = 0;
-    private double xVelocity = 0;
-    private double heading   = 0;
+    public double y         = 0;
+    public double x         = 0;
+    public double z         = 0;
+    public double yVelocity = 0;
+    public double xVelocity = 0;
+    public double heading   = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation            = null;
     private VuforiaLocalizer vuforia             = null;
     private VuforiaTrackables targets            = null;
-    private InternalIMUSensor imu;
+    private CompassSensor compass;
     private WebcamName webcamName                = null;
     private List<VuforiaTrackable> allTrackables = null;
     private boolean targetVisible                = false;
     private double lastT          = 0;
     private double headingOffSet  = 0;
-    private double imuHeading = 0;
+    private double compassHeading = 0;
     private double vuforiaHeading = 0;
 
-    public IntegratedLocalizerIMU(HardwareMap hardwareMap) {
+    public LocalizerCompass(HardwareMap hardwareMap) {
         runtime.reset();
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        imu = new InternalIMUSensor(hardwareMap);
-
+        compass    = hardwareMap.get(CompassSensor.class, "compass");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -114,7 +114,6 @@ public class IntegratedLocalizerIMU implements Localizer {
      * @param dx, dy, dz  Target offsets in x,y,z axes
      * @param rx, ry, rz  Target rotations in x,y,z axes
      */
-
     public void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz) {
         VuforiaTrackable aTarget = targets.get(targetIndex);
         aTarget.setName(targetName);
@@ -133,15 +132,15 @@ public class IntegratedLocalizerIMU implements Localizer {
         telemetry.addData("y velocity", yVelocity);
         telemetry.addData("Heading", heading);
         telemetry.addData("Heading offset", headingOffSet);
-//        telemetry.addData("heading gyro", integratedGyro.getHeading());
+        telemetry.addData("heading compass",compassHeading);
         telemetry.addData("heading Vuforia",vuforiaHeading);
         telemetry.addData("target visible?", targetVisible);
 
     }
 
     public void handleTracking() {
-        imuHeading = imu.getHeading();
-        this.heading = imuHeading + headingOffSet;
+        compassHeading = compass.getDirection();
+        heading = compassHeading + headingOffSet;
         if ((runtime.seconds() - lastT) < loopSpeedHT) {
             return;
         }
@@ -177,12 +176,11 @@ public class IntegratedLocalizerIMU implements Localizer {
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             vuforiaHeading = rotation.thirdAngle%360;
-            this.heading = vuforiaHeading;
-            headingOffSet  = vuforiaHeading - imu.getHeading();
+            headingOffSet  = Math.abs(vuforiaHeading - compass.getDirection());
             lastT = runtime.seconds();
         }
         else {
-            heading = (imu.getHeading() + headingOffSet)%360;
+            heading = (compass.getDirection() + headingOffSet)%360;
         }
     }
 
@@ -190,8 +188,4 @@ public class IntegratedLocalizerIMU implements Localizer {
     public double getHeading() {
         return heading;
     }
-
-    //    public void gyroCalibrate(){
-//        integratedGyro.calibrate();
-//    }
 }
