@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub", group="Basic drive")
-public class TeleOp extends OpMode
+public class InnoTeleOp extends OpMode
 
 {
     private IntegratedLocalizerIMU localizer        = null;
