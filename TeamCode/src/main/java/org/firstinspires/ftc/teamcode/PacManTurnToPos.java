@@ -23,45 +23,56 @@ CompassSensor                compass;
         this.localizer = localizer;
         this.mecanumDriveBase = mecanumDriveBase;
         this.angleControl = new AnglePIDControl(.05, 0, .003,360);
+        this.angleControl.setTargetValue(0);
     }
 
     public void handlePacMan(Gamepad gamepad, Telemetry telemetry) {
         //makes heading easier for me.
         double heading =  localizer.getHeading();
+        double angleError = 0;
 
         if(Math.abs(gamepad.right_stick_y) < .1 && Math.abs(gamepad.right_stick_x) < .1 &&
                 Math.abs(gamepad.left_stick_y) < .1 && Math.abs(gamepad.left_stick_x) < .1) {
 
             boolean dpad_used = false;
             if (gamepad.dpad_down) {
-                angleControl.setTargetValue(180);
-                mecanumDriveBase.driveMotors(0, angleControl.update(heading), 0, 1);
+                angleError = smartAngleError(heading, 180);
+                mecanumDriveBase.driveMotors(0, -angleControl.update(angleError), 0, 1);
                 dpad_used = true;
             }
             if (gamepad.dpad_up) {
-                angleControl.setTargetValue(0);
-                mecanumDriveBase.driveMotors(0, angleControl.update(heading), 0, 1);
+                angleError = smartAngleError(heading, 0);
+                mecanumDriveBase.driveMotors(0, -angleControl.update(angleError), 0, 1);
                 dpad_used = true;
             }
             if (gamepad.dpad_left) {
-                angleControl.setTargetValue(270);
-                mecanumDriveBase.driveMotors(0, angleControl.update(heading), 0, 1);
+                angleError = smartAngleError(heading, 270);
+                mecanumDriveBase.driveMotors(0, -angleControl.update(angleError), 0, 1);
                 dpad_used = true;
             }
             if (gamepad.dpad_right) {
-                angleControl.setTargetValue(90);
-                mecanumDriveBase.driveMotors(0, angleControl.update(heading), 0, 1);
+                angleError = smartAngleError(heading, 90);
+                mecanumDriveBase.driveMotors(0, -angleControl.update(angleError), 0, 1);
                 dpad_used = true;
             }
-            if (dpad_used && (Math.abs(angleControl.measuredError(heading)) < 5)){
+            if (dpad_used && (Math.abs(angleError) < 5)){
                 mecanumDriveBase.driveMotors(1,0,0,1);
                 telemetry.addData("forward", 0);
             }
+            telemetry.addData("angleError", angleError);
 
-
-            telemetry.addData("targetValue", angleControl.targetValue);
-            telemetry.addData("heading", heading);
-            telemetry.addData("angleError", angleControl.angleError);
         }
+
+    }
+    /**
+     * Computes an Angle Error calculation, accounting for wrap arounds.
+     *
+     * @param a angle a
+     * @param b angle b
+     * @return angle error (a-b, as close to zero as possible)
+     */
+    public double smartAngleError(double a, double b){
+        double diff = a - b;
+        return diff - Math.round(diff/360.0) * 360.0;
     }
 }

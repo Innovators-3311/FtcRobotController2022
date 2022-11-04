@@ -19,7 +19,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
-import org.firstinspires.ftc.teamcode.util.odometry.OdometryPod;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
 import java.util.ArrayList;
@@ -47,20 +46,21 @@ public class CombinedLocalizer implements Localizer {
     public double heading       = 0;
     public double headingRate   = 0;
     private ElapsedTime runtime = new ElapsedTime();
-    private OpenGLMatrix lastLocation            = null;
-    private VuforiaLocalizer vuforia             = null;
-    private VuforiaTrackables targets            = null;
+    private OpenGLMatrix lastLocation               = null;
+    private VuforiaLocalizer vuforia                = null;
+    private VuforiaTrackables targets               = null;
     private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
-    private WebcamName webcamName                = null;
-    private List<VuforiaTrackable> allTrackables = null;
+    private WebcamName webcamName                  = null;
+    private List<VuforiaTrackable> allTrackables   = null;
     VuforiaTrackable trackable;
-    private boolean targetVisible                = false;
-    private double lastT               =  0;
-    private double headingOffSet       =  0;
-    private double gyroHeading         =  0;
+    private boolean targetVisible                  = false;
+    private boolean targetWasVisible                  = false;
 
+    private double lastT                           =  0;
+    private double headingOffSet                   =  0;
+    private double gyroHeading                     =  0;
     private double positionUncertainty             = .5;
     static final double vuforiaPositionUncertainty = .2;
     private double headingUncertainty              = 5;
@@ -75,7 +75,7 @@ public class CombinedLocalizer implements Localizer {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
-        odoPods = new OdometryPodsSensor(hardwareMap);
+//        odoPods = new OdometryPodsSensor(hardwareMap);
 
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -150,39 +150,90 @@ public class CombinedLocalizer implements Localizer {
             .addData("x","%.1f",x)
             .addData("y","%.1f",y);
         telemetry.addData("heading","%.1f",heading);
+        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
+        telemetry.addData("Vuforia Target Visible", targetWasVisible);
     }
     public void measureVelocity() {
+        double[] stateChange = imu.getStateChangeDegrees();
+    }
 
+    /**
+     * Measure the state change from the IMU. Currently, this function only sets x and y velocities
+     * based on the IMU. In practice, we should estimate these valoues. But the IMU implements its
+     * own integration function.
+     */
+    public void measureIMUChange() {
+        double[] stateChange = imu.getStateChangeDegrees();
+        // Converts the robot's heading in its own frame to the field's frame.
+        double fieldStateChange[] = robotToFieldFrame(stateChange[3], stateChange[4]);
+        // x velocity in inches per second
+        xVelocity = fieldStateChange[0];
+        // y velocity in inches per second
+        yVelocity = fieldStateChange[1];
+        // Heading rate in degrees per second.
+        headingRate = stateChange[5];
+    }
+
+    /**
+     * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
+     * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
+     * @param x the robot x value
+     * @param y the robot y value
+     * @return {fieldX, fieldY}
+     *
+     */
+    public double[] robotToFieldFrame(double x,double y){
+        double[] retVal ={
+                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
+                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
+        return retVal;
     }
     /**
      * Updates the robot state estimate based on time elapsed.
      */
     private void updateState(){
         double thisTime = runtime.seconds();
-        double deltat = thisTime - stateTime;
-        x += deltat * xVelocity;
-        y += deltat * yVelocity;
-        heading += deltat * headingRate;
+        double deltaT = thisTime - stateTime;
+        x += deltaT * xVelocity;
+        y += deltaT * yVelocity;
+        heading += deltaT * headingRate;
         stateTime = thisTime;
-        positionUncertainty += 0.5 * deltat * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
-        headingUncertainty += 0.5 * deltat * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
+        positionUncertainty += 0.5 * deltaT * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
+        headingUncertainty += 0.5 * deltaT * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
     }
-    public void measureHeading(){
+
+    /**
+     * Measure the Vuforia Heading
+     */
+    public void measureVuforiaHeading(){
         if(targetVisible) {
             double k = headingUncertainty / (headingUncertainty + vuforiaHeadingUncertainty); //Kalman gain for a Kalman filter
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             double vuforiaHeading = rotation.thirdAngle%360;
-            heading += k*((vuforiaHeading)-heading);
+            double err = smartAngleError(vuforiaHeading, heading);
+            heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
 
         }
     }
 
+    /**
+     * Computes an Angle Error calculation, accounting for wrap arounds.
+     *
+     * @param a angle a
+     * @param b angle b
+     * @return angle error (a-b, as close to zero as possible)
+     */
+    public double smartAngleError(double a, double b){
+        double diff = a - b;
+        return diff - Math.round(diff/360.0) * 360.0;
+    }
+
     /** Measures the robot position if possible
      *
      */
-    public void measurePosition(){
+    public void measureVuforiaPosition(){
        if (targetVisible) {
            //https://kalmanfilter.net/kalman1d.html
            double k = positionUncertainty/(positionUncertainty+vuforiaPositionUncertainty); //another Kalman gain for a Kalman filter
@@ -197,40 +248,45 @@ public class CombinedLocalizer implements Localizer {
      * Measures changes in state and incorporates them into our state estimates.
      */
     private void measureState(){
-        measurePosition();
-        measureHeading();
+        measureVuforiaPosition();
+        measureVuforiaHeading();
+        measureIMUChange();
     }
 
     @Override
     public void handleTracking() {
+        // Always update and measure state.
+
+        // Only
         // X and Y
-        if ((runtime.seconds() - lastT) < loopSpeedHT) {
-            return;
-        }
-        // check all the trackable targets to see which one (if any) is visible.
         targetVisible = false;
-        for (VuforiaTrackable trackable : allTrackables) {
-            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
-                targetVisible = true;
-
-                // getUpdatedRobotLocation() will return null if no new information is available since
-                // the last time that call was made, or if the trackable is not currently visible.
-                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
-                if (robotLocationTransform != null) {
-                    lastLocation = robotLocationTransform;
+        if ((runtime.seconds() - lastT) > loopSpeedHT) {
+            // check all the trackable targets to see which one (if any) is visible.
+            targetWasVisible = false;
+            for (VuforiaTrackable trackable : allTrackables) {
+                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                    targetVisible = true;
+                    targetWasVisible = true;
+                    // getUpdatedRobotLocation() will return null if no new information is available since
+                    // the last time that call was made, or if the trackable is not currently visible.
+                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                    if (robotLocationTransform != null) {
+                        lastLocation = robotLocationTransform;
+                    }
+                    break;
                 }
-                break;
-            }
 
+            }
         }
         updateState();
         measureState();
+
     }
 
     @Override
     public double getHeading() {
 
-        return 0;
+        return heading;
     }
 
 }
