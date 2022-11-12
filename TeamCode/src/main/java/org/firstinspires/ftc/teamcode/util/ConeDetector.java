@@ -1,22 +1,16 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
-import java.util.HashMap;
 import java.util.List;
 
-@Autonomous(name = "Cone Detector", group = "Autonomous")
-public class ConeDetector extends LinearOpMode
+//@Autonomous(name = "Cone Detector111", group = "Autonomous")
+public class ConeDetector
 {
 
     /*
@@ -26,19 +20,25 @@ public class ConeDetector extends LinearOpMode
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-//    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/model.tflite";
+//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+      private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/wheel_fish_eye.tflite";
 
 //    private static final String[] LABELS = {
-//            "0 Zone1",
-//            "1 Zone2",
-//            "2 Zone3"
+//            "1 Zone1",
+//            "2 Zone2",
+//            "3 Zone3"
 //    };
 
-    private static final String[] LABELS2 = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+//    private static final String[] LABELS = {
+//            "1 Bolt",
+//            "2 Bulb",
+//            "3 Panel"
+//    };
+
+    private static final String[] LABELS = {
+            "fish",
+            "eye",
+            "wheel"
     };
 
     /*
@@ -70,40 +70,18 @@ public class ConeDetector extends LinearOpMode
 
     private int coneNumber = -1;
 
-    @Override
-    public void runOpMode()
+    public int detector(Telemetry telemetry, HardwareMap hardwareMap)
     {
         initVuforia(hardwareMap);
         initTfod(hardwareMap);
 
-        waitForStart();
-
-        while (opModeIsActive())
-        {
-            detectSleeve(telemetry, hardwareMap);
-        }
-    }
-
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-
-    public void detectSleeve(Telemetry telemetry, HardwareMap hardwareMap)
-    {
-
-        telemetry.addData("String", "%s", "Vuforia and tensor flow initated");
-        telemetry.update();
-
         if (tfod != null)
         {
             tfod.activate();
-            telemetry.addData("","%s", "tfod is not null");
-            telemetry.update();
             tfod.setZoom(1.0, 16.0/9.0);
-
         }
+
         boolean flag = true;
-        boolean flag2 = true;
         while (flag)
         {
 //            telemetry.addData("", "%s", "while (flag)");
@@ -126,55 +104,55 @@ public class ConeDetector extends LinearOpMode
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;
                         double width = Math.abs(recognition.getRight() - recognition.getLeft());
                         double height = Math.abs(recognition.getTop() - recognition.getBottom());
-
                         telemetry.addData("", " ");
                         telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
                         telemetry.addData("- Position (Row/Col)", "%.0f / %.0f", row, col);
                         telemetry.addData("- Size (Width/Height)", "%.0f / %.0f", width, height);
-
                         String object = recognition.getLabel();
-
                         switch (object)
                         {
-                            case "Zone1":
+                            case "1 wheel":
                             {
                                 this.coneNumber = 1;
-                                telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
-
-                            case "Zone2":
+                            case "2 fish":
                             {
                                 this.coneNumber = 2;
-                                telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
-
-                            case "Zone3":
+                            case "3 eye":
                             {
                                 this.coneNumber = 3;
-                                telemetry.addData("Cone:", "%d", coneNumber);
                                 flag = false;
                                 break;
                             }
-
                             default:
                             {
-                                this.coneNumber = -1;
-                                telemetry.addData("Cone:", "%d", coneNumber);
                                 break;
                             }
                         }
-                        telemetry.addData("Detected: ", "%d", coneNumber);
-                        telemetry.update();
+                        if (1 == coneNumber || 2 == coneNumber || 3 == coneNumber)
+                        {
+                            return coneNumber;
+                        }
                     }
                 }
-
             }
         }
+        return -1;
     }
+
+    // forward drive(1000, 1000, 1000, 1000, 0.25);
+    // Turn drive(1000, -1000, 1000, -1000, 0.25);
+    // strafe drive(1000, -1000, -1000, 1000, 0.25);
+
+
+    /**
+     * Initialize the Vuforia localization engine.
+     */
 
     private void initVuforia(HardwareMap hardwareMap)
     {
@@ -204,7 +182,8 @@ public class ConeDetector extends LinearOpMode
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS2);
-//        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+//        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
+
 }

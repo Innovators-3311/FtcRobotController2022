@@ -1,14 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.util.IntegratedLocalizerIMU;
-import org.firstinspires.ftc.teamcode.util.Localizer;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
@@ -35,6 +28,10 @@ public class InnoTeleOp extends OpMode
         localizer.displayTelemetry(telemetry);
         localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
+        towerController.handleUBar();
+//        towerController.handleScrew();
+//        towerController.handleIntake();
+//        towerController.handleGamepad(gamepad2);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
         telemetry.addData("TeleOp heading", localizer.getHeading() );
         pacMan.handlePacMan(gamepad1, telemetry);

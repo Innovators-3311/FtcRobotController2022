@@ -61,14 +61,40 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
 //    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_ASSET = "model_unquant.tflite";
-//      private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/coneSleeve.tflite";
+//    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/DefaultConeTest.tflite";
+//      private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomConeSleeveOld.tflite";
 //    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/model.tflite";
 //    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/model_unquant.tflite";
+//    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/wheel11.8.22.tflite";
+    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/wheel_fish_eye.tflite";
+
+
+//    private static final String[] LABELS = {
+//            "0 Zone1",
+//            "1 Zone2",
+//            "2 Zone3"
+//    };
+
+//    private static final String[] LABELS = {
+//            "1 Bolt",
+//            "2 Bulb",
+//            "3 Panel"
+//    };
+
+//    private static final String[] LABELS = {
+//            "1 wrench",
+//            "2 duck",
+//            "3 create"
+//    };
+
+//    private static final String[] LABELS = {
+//            "wheel"
+//    };
+
     private static final String[] LABELS = {
-            "0 Zone1",
-            "1 Zone2",
-            "2 Zone3"
+            "fish",
+            "eye",
+            "wheel"
     };
 
     /*
@@ -117,7 +143,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1.0, 16.0/9.0);
+            tfod.setZoom(2.0, 16.0/9.0);
         }
 
         /** Wait for the game to begin */
@@ -184,15 +210,15 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.79f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-//        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 
 

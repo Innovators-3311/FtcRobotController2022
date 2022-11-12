@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import android.hardware.Sensor;
+
+import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,8 +17,8 @@ public class TowerController {
     private DcMotor screw;
     private DcMotor uBar;
     private Servo intake;
-    private DigitalChannel highSensor;
-    private DigitalChannel lowSensor;
+//    private DigitalChannel highSensor;
+//    private DigitalChannel lowSensor;
     public boolean raiseTower;
     public boolean intakePos;
     public double uBarNum = 1;
@@ -25,7 +28,7 @@ public class TowerController {
     static final double     DRIVE_GEAR_REDUCTION    = 1 ;     // This is < 1.0 if geared UP
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR * DRIVE_GEAR_REDUCTION);
 
-    public TowerController (HardwareMap hardwareMap){
+    public TowerController(HardwareMap hardwareMap){
 
         //Setup motors
         screw = hardwareMap.get(DcMotor.class, "screw");
@@ -35,10 +38,10 @@ public class TowerController {
         uBar.setDirection(DcMotor.Direction.FORWARD);
 
         //Setup sensors
-        DigitalChannel highSensor = hardwareMap.get(DigitalChannel.class, "highSensor");
-        DigitalChannel lowSensor = hardwareMap.get(DigitalChannel.class, "lowSensor");
-        highSensor.setMode(DigitalChannel.Mode.INPUT);
-        lowSensor.setMode(DigitalChannel.Mode.INPUT);
+//        DigitalChannel highSensor = hardwareMap.get(DigitalChannel.class, "highSensor");
+//        DigitalChannel lowSensor = hardwareMap.get(DigitalChannel.class, "lowSensor");
+//        highSensor.setMode(DigitalChannel.Mode.INPUT);
+//        lowSensor.setMode(DigitalChannel.Mode.INPUT);
 
         //setup encoder
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -46,20 +49,20 @@ public class TowerController {
 
     public void handleScrew() {
         if(raiseTower){
-            if(highSensor.getState()){
-                screw.setPower(0);
-            }
-            else{
+//            if(highSensor.getState()){
+//                screw.setPower(0);
+//            }
+//            else{
                 screw.setPower(1);
-            }
+//            }
         }
         else{
-            if(lowSensor.getState()){
-                screw.setPower(0);
-            }
-            else{
+//            if(lowSensor.getState()){
+//                screw.setPower(0);
+//            }
+//            else{
                 screw.setPower(-1);
-            }
+//            }
         }
     }
 
