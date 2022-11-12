@@ -111,19 +111,19 @@ public class ConeDetector
                         String object = recognition.getLabel();
                         switch (object)
                         {
-                            case "1 wheel":
+                            case "wheel":
                             {
                                 this.coneNumber = 1;
                                 flag = false;
                                 break;
                             }
-                            case "2 fish":
+                            case "fish":
                             {
                                 this.coneNumber = 2;
                                 flag = false;
                                 break;
                             }
-                            case "3 eye":
+                            case "eye":
                             {
                                 this.coneNumber = 3;
                                 flag = false;
@@ -175,7 +175,7 @@ public class ConeDetector
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.80f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         this.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

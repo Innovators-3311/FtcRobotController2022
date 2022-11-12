@@ -49,8 +49,8 @@ public class BasicAutonomous extends LinearOpMode
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        rightBack.setDirection(DcMotor.Direction.FORWARD);
 
         leftFrontPos = 0;
         rightFrontPos = 0;
@@ -61,10 +61,10 @@ public class BasicAutonomous extends LinearOpMode
 
 
         drive(COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, 0.25);
-        Thread.sleep(1000);
-        drive(-COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, 0.50);
-        Thread.sleep(1000);
-        drive(-1000, 1000, 1000, -1000, 100);
+//        Thread.sleep(1000);
+//        drive(-COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, 0.50);
+//        Thread.sleep(1000);
+//        drive(-1000, 1000, 1000, -1000, 100);
 
 
 
