@@ -7,18 +7,23 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.localizers.Localizer;
 
 
+import org.firstinspires.ftc.teamcode.util.TowerController;
+
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub", group="Basic drive")
 public class TeleOp extends OpMode
 
 {
     private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
+    private TowerController towerController;
     private PacManTurnToPos pacMan;
 
     public void init() {
         telemetry.addData("Status", "Initialized");
         localizer = new CombinedLocalizer(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
+        towerController = new TowerController(hardwareMap);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
