@@ -18,7 +18,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.robotcore.internal.files.DataLogger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,10 +56,19 @@ public class IntegratedLocalizerIMU implements Localizer {
     private double imuHeading = 0;
     private double vuforiaHeading = 0;
 
+    private DataLogger dataLogger;
+
     public IntegratedLocalizerIMU(HardwareMap hardwareMap) {
         runtime.reset();
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         imu = new InternalIMUSensor(hardwareMap);
+
+        try {
+            dataLogger = new DataLogger("/sdcard/FIRST/matchlogs/Match-1-TeleOpStub.csv");
+            dataLogger.addHeaderLine("Time", "x", "y", "angle", "xRate", "yRate", "angleRate");
+        } catch (IOException io) {
+
+        }
 
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
