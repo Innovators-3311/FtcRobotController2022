@@ -16,7 +16,7 @@ public class TowerController {
     private Servo intake;
     private DigitalChannel highSensor;
     private DigitalChannel lowSensor;
-    public boolean raiseTower;
+    public boolean raiseTower = false;
     public boolean intakePos;
     public double uBarNum = 1;
 
@@ -95,12 +95,12 @@ public class TowerController {
     public void handleGamepad(Gamepad gamepad) {
 
         //Screw
-        /* if(gamepad.dpad_up) {
+        if(gamepad.dpad_up) {
             raiseTower = true;
         }
         if(gamepad.dpad_down) {
             raiseTower = false;
-        }*/
+        }
 
         //U Bar
         if(gamepad.b) {
