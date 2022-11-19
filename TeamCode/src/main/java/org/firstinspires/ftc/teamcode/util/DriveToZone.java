@@ -51,25 +51,16 @@ public class DriveToZone extends LinearOpMode
 
             telemetry.addData("Cone Detected is ", num);
             telemetry.update();
-            drive(inch * 8, inch * 8, inch * 8, inch * 8, 0.5);
-            Thread.sleep(1000);
-            drive(-inch * 3, -inch * 3, -inch * 3, -inch * 3, 0.5);
             Thread.sleep(1000);
             if (1 == num)
             {
-                drive(-inch * 12, inch * 12, inch * 12, -inch * 12, 0.5);
-                telemetry.addData("", "%s", "if (1 == num)");
-                telemetry.update();
-            }
-            if (2 == num)
-            {
-                drive(inch * 12, -inch * 12, -inch * 12, inch * 12, 0.5);
+                drive(-inch * 18, inch * 18, inch * 18, -inch * 18, 0.5);
                 telemetry.addData("", "%s", "if (1 == num)");
                 telemetry.update();
             }
             if (3 == num)
             {
-                drive(-inch * 30, inch * 30, inch * 30, -inch * 30, 0.5);
+                drive(-inch * 18, inch * 18, inch * 18, -inch * 18, 0.5);
                 telemetry.addData("", "%s", "if (1 == num)");
                 telemetry.update();
             }

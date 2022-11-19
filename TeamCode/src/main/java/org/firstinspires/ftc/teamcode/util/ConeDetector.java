@@ -9,7 +9,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
-//@Autonomous(name = "Cone Detector111", group = "Autonomous")
 public class ConeDetector
 {
 
@@ -22,12 +21,6 @@ public class ConeDetector
      */
 //    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
       private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/wheel_fish_eye.tflite";
-
-//    private static final String[] LABELS = {
-//            "1 Zone1",
-//            "2 Zone2",
-//            "3 Zone3"
-//    };
 
 //    private static final String[] LABELS = {
 //            "1 Bolt",
