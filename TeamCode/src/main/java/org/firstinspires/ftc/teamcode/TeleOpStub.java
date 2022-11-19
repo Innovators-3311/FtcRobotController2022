@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
-import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
-import org.firstinspires.ftc.teamcode.util.localizers.Localizer;
-
-
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
-
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub", group="Basic drive")
-public class TeleOp extends OpMode
+@TeleOp(name="TeleOpStub", group="Basic drive")
+public class TeleOpStub extends OpMode
 
 {
     private CombinedLocalizer localizer        = null;
