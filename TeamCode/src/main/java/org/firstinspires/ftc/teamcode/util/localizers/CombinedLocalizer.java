@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -280,7 +281,7 @@ public class CombinedLocalizer implements Localizer {
         }
         updateState();
         measureState();
-
+        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate);
     }
 
     @Override

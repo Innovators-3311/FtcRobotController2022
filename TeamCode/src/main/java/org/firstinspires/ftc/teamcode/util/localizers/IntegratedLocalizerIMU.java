@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.localizers;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -19,6 +19,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.internal.files.DataLogger;
+import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
+import org.firstinspires.ftc.teamcode.util.localizers.Localizer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -197,7 +199,6 @@ public class IntegratedLocalizerIMU implements Localizer {
         }
     }
 
-    @Override
     public double getHeading() {
         return heading;
     }
