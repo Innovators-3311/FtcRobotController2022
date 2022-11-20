@@ -281,7 +281,7 @@ public class CombinedLocalizer implements Localizer {
         }
         updateState();
         measureState();
-        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate);
+        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate, positionUncertainty);
     }
 
     @Override
