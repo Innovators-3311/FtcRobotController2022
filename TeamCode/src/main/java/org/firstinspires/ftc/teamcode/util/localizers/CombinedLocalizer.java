@@ -22,8 +22,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
@@ -58,7 +61,7 @@ public class CombinedLocalizer implements Localizer {
     VuforiaTrackable trackable;
     private boolean targetVisible                  = false;
     private boolean targetWasVisible                  = false;
-
+    private StateServer stateServer;
     private double lastT                           =  0;
     private double headingOffSet                   =  0;
     private double gyroHeading                     =  0;
@@ -76,6 +79,12 @@ public class CombinedLocalizer implements Localizer {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
+        try{
+            stateServer = new StateServer();
+        }catch (IOException e12141){
+            RobotLog.ee("Localizer", "Error initializing NanoHTTPD StateServer");
+
+        }
 //        odoPods = new OdometryPodsSensor(hardwareMap);
 
 
@@ -199,8 +208,10 @@ public class CombinedLocalizer implements Localizer {
         y += deltaT * yVelocity;
         heading += deltaT * headingRate;
         stateTime = thisTime;
-        positionUncertainty += 0.5 * deltaT * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
-        headingUncertainty += 0.5 * deltaT * (Math.abs(xVelocity)+Math.abs(yVelocity))*.01;
+        // Over one second, we estimate that position uncertainty grows by 5 inch.
+        positionUncertainty += deltaT*deltaT * 5;
+        // Over one second, we estimate that heading uncertainty grows by 0.5 degrees.
+        headingUncertainty += deltaT*deltaT * 5;
     }
 
     /**
@@ -274,6 +285,7 @@ public class CombinedLocalizer implements Localizer {
                     if (robotLocationTransform != null) {
                         lastLocation = robotLocationTransform;
                     }
+                    lastT=runtime.seconds();
                     break;
                 }
 
@@ -281,7 +293,14 @@ public class CombinedLocalizer implements Localizer {
         }
         updateState();
         measureState();
-        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate);
+        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
+        stateServer.state = "<html><head><title>Innovators 3311 Robot State</title></head><body>\n";
+        stateServer.state += String.format(Locale.US,"<p>\nState: %f %f %f %f %f %f\n",x, y, heading, xVelocity, yVelocity, headingRate);
+        stateServer.state += String.format(Locale.US,"<p>\nUncertainty: %f %f\n",positionUncertainty, headingUncertainty);
+        stateServer.state += String.format(Locale.US,"<p>\nRun Time: %f seconds\n",runtime.seconds());
+        stateServer.state += String.format(Locale.US,"<p>\nTarget visible: %s\n",String.valueOf(targetWasVisible));
+        stateServer.state += String.format(Locale.US,"<p>\nTime since last vuforia call: %f\n",runtime.seconds()-lastT);
+        stateServer.state += "</body></html>\n";
     }
 
     @Override
