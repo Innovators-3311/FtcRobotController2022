@@ -19,8 +19,7 @@ public class TeleOpStub extends OpMode
         telemetry.addData("Status", "Initialized");
         localizer = new CombinedLocalizer(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
-        towerController = new TowerController(hardwareMap);
-//        localizer = new LocalizerIMU(hardwareMap);
+//        towerController = new TowerController(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
     }
