@@ -87,7 +87,6 @@ public class CombinedLocalizer implements Localizer {
         }
         odoPods = new OdometryPodsSensor(hardwareMap);
 
-
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
@@ -184,6 +183,18 @@ public class CombinedLocalizer implements Localizer {
         headingRate = stateChange[5];
     }
 
+    public void measurePodChange() {
+        double[] stateChange = odoPods.getStateChange();
+        // Converts the robot's heading in its own frame to the field's frame.
+        double fieldStateChange[] = robotToFieldFrame(stateChange[3], stateChange[4]);
+        // x velocity in inches per second
+        xVelocity = fieldStateChange[0];
+        // y velocity in inches per second
+        yVelocity = fieldStateChange[1];
+        // Heading rate in degrees per second.
+        headingRate = stateChange[5];
+    }
+
     /**
      * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
      * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
@@ -262,7 +273,7 @@ public class CombinedLocalizer implements Localizer {
     private void measureState(){
         measureVuforiaPosition();
         measureVuforiaHeading();
-        measureIMUChange();
+        measurePodChange();
     }
 
     @Override
