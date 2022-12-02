@@ -6,13 +6,14 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class StateServer extends NanoHTTPD {
     public String state;
+    public int port = 8083;
     /**
      * Constructs an HTTP server on given port.
      *
      * @param
      */
     public StateServer() throws IOException {
-        super(8083);
+        super(8079);
         start(NanoHTTPD.SOCKET_READ_TIMEOUT,false);
     }
 

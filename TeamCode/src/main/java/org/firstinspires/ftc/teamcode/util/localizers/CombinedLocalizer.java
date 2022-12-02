@@ -85,7 +85,7 @@ public class CombinedLocalizer implements Localizer {
             RobotLog.ee("Localizer", "Error initializing NanoHTTPD StateServer");
 
         }
-//        odoPods = new OdometryPodsSensor(hardwareMap);
+        odoPods = new OdometryPodsSensor(hardwareMap);
 
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
