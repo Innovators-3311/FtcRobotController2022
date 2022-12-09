@@ -53,6 +53,7 @@ public class MecanumDriveBase {
           speedFactor = .5 + .5 * gamepad.right_trigger;
           driveMotors(drive, turn, strafe, speedFactor);
       }
+
       public void driveMotors(double drive,double turn,double strafe,double speedFactor){
 
           leftPowerFront  = (drive + turn + strafe) * speedFactor;

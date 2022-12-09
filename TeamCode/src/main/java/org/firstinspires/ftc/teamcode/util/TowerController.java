@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+// TODO: Refactor this Controller into the util.controllers package.
+
 public class TowerController {
 
     //setup variables, motors, and servos
