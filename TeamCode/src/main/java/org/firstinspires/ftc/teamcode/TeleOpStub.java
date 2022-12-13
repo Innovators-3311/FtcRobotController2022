@@ -20,7 +20,6 @@ public class TeleOpStub extends OpMode
         localizer = new CombinedLocalizer(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         towerController = new TowerController(hardwareMap);
-//        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
     }
