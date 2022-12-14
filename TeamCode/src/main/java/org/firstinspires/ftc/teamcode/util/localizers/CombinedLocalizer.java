@@ -321,7 +321,7 @@ public class CombinedLocalizer implements Localizer {
                     .put("secondsSinceVuforia", runtime.seconds()-lastT);
             stateServer.addState(state);
         } catch (JSONException e) {
-            RobotLog.ii("Localizer", "Error encoding json.");
+            RobotLog.ee("Localizer", "Error encoding json.");
         };
     }
 
