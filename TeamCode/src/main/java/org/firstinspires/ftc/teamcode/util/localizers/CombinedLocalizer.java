@@ -307,19 +307,19 @@ public class CombinedLocalizer implements Localizer {
         measureState();
         RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
         try {
-        JSONObject state = new JSONObject()
-                .put("x", x)
-                .put("y", y)
-                .put("heading", heading)
-                .put("xVelocity", xVelocity)
-                .put("yVelocity", yVelocity)
-                .put("headingRate", headingRate)
-                .put("positionUncertainty", positionUncertainty)
-                .put("headingUncertainty", headingUncertainty)
-                .put("runTime", runtime.seconds())
-                .put("targetVisible", targetWasVisible)
-                .put("secondsSinceVuforia", runtime.seconds()-lastT);
-        stateServer.addState(state);
+            JSONObject state = new JSONObject()
+                    .put("x", x)
+                    .put("y", y)
+                    .put("heading", heading)
+                    .put("xVelocity", xVelocity)
+                    .put("yVelocity", yVelocity)
+                    .put("headingRate", headingRate)
+                    .put("positionUncertainty", positionUncertainty)
+                    .put("headingUncertainty", headingUncertainty)
+                    .put("runTime", runtime.seconds())
+                    .put("targetVisible", targetWasVisible)
+                    .put("secondsSinceVuforia", runtime.seconds()-lastT);
+            stateServer.addState(state);
         } catch (JSONException e) {
             RobotLog.ii("Localizer", "Error encoding json.");
         };
