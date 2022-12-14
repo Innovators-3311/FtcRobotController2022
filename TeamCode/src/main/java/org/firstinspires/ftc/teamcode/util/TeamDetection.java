@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TeamDetection {
     public boolean redTeam;
     public boolean blueTeam;
-    public boolean side;
+    public boolean rightSide;
 
     /**
      * Returns what team you are on from the switch.
@@ -29,7 +29,7 @@ public class TeamDetection {
         //set values according to the switches
         blueTeam = blueSwitch.getState();
         redTeam = !blueTeam;
-        side = sideSwitch.getState();
+        rightSide = sideSwitch.getState();
     }
 
     /**
