@@ -8,8 +8,8 @@ import java.io.IOException;
 import fi.iki.elonen.NanoHTTPD;
 
 public class StateServer extends NanoHTTPD {
-    public String state;
     public JSONArray response;
+    private static final int MAX_STATES = 10000;
     public int port = 8083;
     /**
      * Constructs an HTTP server on given port.
@@ -30,7 +30,13 @@ public class StateServer extends NanoHTTPD {
 
 
     public void addState(JSONObject obj){
+        // Append this state to the end.
         response.put(obj);
+
+        // If there's over 1000 states, remove the first one.
+        if (response.length() > MAX_STATES) {
+            response.remove(0);
+        }
     }
 
     /**
