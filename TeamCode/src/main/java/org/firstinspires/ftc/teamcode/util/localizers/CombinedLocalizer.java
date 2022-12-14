@@ -83,7 +83,6 @@ public class CombinedLocalizer implements Localizer {
             stateServer = new StateServer();
         }catch (IOException e12141){
             RobotLog.ee("Localizer", "Error initializing NanoHTTPD StateServer");
-
         }
         odoPods = new OdometryPodsSensor(hardwareMap);
 
