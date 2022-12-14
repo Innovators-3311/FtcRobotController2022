@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
 import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub", group="Basic drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="InnoTeleOp", group="Basic drive")
 public class InnoTeleOp extends OpMode
 
 {
