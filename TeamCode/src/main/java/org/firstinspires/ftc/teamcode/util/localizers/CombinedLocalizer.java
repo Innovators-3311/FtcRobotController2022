@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -304,13 +306,23 @@ public class CombinedLocalizer implements Localizer {
         updateState();
         measureState();
         RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
-        stateServer.state = "<html><head><title>Innovators 3311 Robot State</title></head><body>\n";
-        stateServer.state += String.format(Locale.US,"<p>\nState: %f %f %f %f %f %f\n",x, y, heading, xVelocity, yVelocity, headingRate);
-        stateServer.state += String.format(Locale.US,"<p>\nUncertainty: %f %f\n",positionUncertainty, headingUncertainty);
-        stateServer.state += String.format(Locale.US,"<p>\nRun Time: %f seconds\n",runtime.seconds());
-        stateServer.state += String.format(Locale.US,"<p>\nTarget visible: %s\n",String.valueOf(targetWasVisible));
-        stateServer.state += String.format(Locale.US,"<p>\nTime since last vuforia call: %f\n",runtime.seconds()-lastT);
-        stateServer.state += "</body></html>\n";
+        try {
+            JSONObject state = new JSONObject()
+                    .put("x", x)
+                    .put("y", y)
+                    .put("heading", heading)
+                    .put("xVelocity", xVelocity)
+                    .put("yVelocity", yVelocity)
+                    .put("headingRate", headingRate)
+                    .put("positionUncertainty", positionUncertainty)
+                    .put("headingUncertainty", headingUncertainty)
+                    .put("runTime", runtime.seconds())
+                    .put("targetVisible", targetWasVisible)
+                    .put("secondsSinceVuforia", runtime.seconds()-lastT);
+            stateServer.addState(state);
+        } catch (JSONException e) {
+            RobotLog.ee("Localizer", "Error encoding json.");
+        };
     }
 
     @Override
