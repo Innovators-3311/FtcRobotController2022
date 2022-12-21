@@ -20,16 +20,16 @@ public class TeamDetection {
     public TeamDetection(HardwareMap hardwareMap){
 
         //find value of switch
-        DigitalChannel blueSwitch = hardwareMap.get(DigitalChannel.class, "blueSwitch");
+        DigitalChannel blueSwitch = hardwareMap.get(DigitalChannel.class, "Switch");
         blueSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        DigitalChannel sideSwitch = hardwareMap.get(DigitalChannel.class, "side");
-        blueSwitch.setMode(DigitalChannel.Mode.INPUT);
+//        DigitalChannel sideSwitch = hardwareMap.get(DigitalChannel.class, "side");
+//        blueSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         //set values according to the switches
         blueTeam = blueSwitch.getState();
         redTeam = !blueTeam;
-        rightSide = sideSwitch.getState();
+//        rightSide = sideSwitch.getState();
     }
 
     /**
@@ -43,13 +43,13 @@ public class TeamDetection {
 
         //let the driver know what it detected
         if(blueTeam) {
-            telemetry.addData("Team:Blue", true);
-            telemetry.addData("Team:Red", false);
+            telemetry.addData("Team:Blue", "");
+            telemetry.addData("Team:Red", "");
         }
 
         if(redTeam) {
-            telemetry.addData("Team:Blue", false);
-            telemetry.addData("Team:Red", true);
+            telemetry.addData("Team:Blue", "");
+            telemetry.addData("Team:Red", "");
         }
     }
 }
