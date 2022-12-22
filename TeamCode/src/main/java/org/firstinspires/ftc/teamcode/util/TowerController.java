@@ -174,7 +174,7 @@ public class TowerController
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(-2966);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
         // Middle Junction
@@ -183,7 +183,7 @@ public class TowerController
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(-1454);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
         // Low Junction
@@ -192,7 +192,7 @@ public class TowerController
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(-2854);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(-0.5);
+            uBar.setPower(-1);
         }
 
         // Pickup Junction
@@ -201,7 +201,7 @@ public class TowerController
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(985);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
 
@@ -234,16 +234,6 @@ public class TowerController
         double screwPower;
         double driveScrew = gamepad.left_stick_y;
         screwPower = Range.clip(driveScrew, -1, 1);
-//        if ((screwPower < 0 && !highSensor.isPressed()) || screwPower > 0 && !lowSensor.isPressed())
-//        {
-//            screw.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            screw.setPower(-screwPower);
-//        }
-//        else
-//        {
-////            screw.setPower(0)
-////            screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        }
 
         //Stick is active, within bounds
         //Stick is active, out of bounds
@@ -284,16 +274,6 @@ public class TowerController
         double uBarPower;
         double driveUBar = gamepad.right_stick_y;
         uBarPower = Range.clip(driveUBar, -1, 1);
-//        if (!(uBarPower == 0))
-//        {
-//            uBar.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            uBar.setPower(uBarPower);
-//        }
-//        else
-//        {
-// //           uBar.setPower(0);
-// //           uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        }
 
 //        telemetry.addData("UBar stick", "&f", uBarPower);
 
