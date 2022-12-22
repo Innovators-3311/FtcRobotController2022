@@ -39,18 +39,21 @@ public class TeamDetection {
      *
      * @param telemetry OpMode telemetry
      */
-    public void showTeam(Telemetry telemetry) {
+    public boolean showTeam(Telemetry telemetry) {
 
         //let the driver know what it detected
-        if(blueTeam) {
-            telemetry.addData("Team:Blue", "");
-            telemetry.addData("Team:Red", "");
+        if(redTeam)
+        {
+            return false;
         }
 
-        if(redTeam) {
-            telemetry.addData("Team:Blue", "");
-            telemetry.addData("Team:Red", "");
+        if(blueTeam)
+        {
+            return true;
         }
+
+
+        return false;
     }
 }
 //boom! now we know what team we're on!

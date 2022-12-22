@@ -24,8 +24,8 @@ public class BasicAutonomous extends LinearOpMode
     static final double     COUNTS_PER_MOTOR_GOBUILDA202    = 384.5 ;
     static final double     DRIVE_GEAR_REDUCTION    = 3.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_GOBUILDA202 * DRIVE_GEAR_REDUCTION) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_GOBUILDA2bvvb 02 * 1) /
+                                                      (4 * 3.1415);
 
     private int leftFrontPos;
     private int rightFrontPos;

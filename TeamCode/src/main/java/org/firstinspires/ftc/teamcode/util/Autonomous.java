@@ -21,8 +21,16 @@ public class Autonomous extends LinearOpMode
     private TouchSensor lowSensor;
 
     private int screwLevel;
+    private int zone;
+    private boolean blueSide;
 
+    private int leftFrontPos;
+    private int rightFrontPos;
+    private int leftBackPos;
+    private int rightBackPos;
 
+    private final double ticksPerInch = (1 * 1) /
+            (4 * 3.1415);;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -75,18 +83,20 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
+//        zone = coneDetection.detector(telemetry, hardwareMap);
+//        blueSide = teamDetection.showTeam(telemetry);
+
         telemetry.addData("Hit", "start when ready", "");
-
-
-        coneDetection.detector(telemetry, hardwareMap);
-        teamDetection.showTeam(telemetry);
-
+//        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone );
         telemetry.update();
 
+        // Waits till start button is pressed
         waitForStart();
 
+        //drive to first pole
 
-
+        // Stops program when reached
+        stop();
     }
 
     private void driveScrewDown(double screwTarget, double speed)
@@ -116,6 +126,35 @@ public class Autonomous extends LinearOpMode
         screw.setPower(0);
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         screwLevel = 0;
+    }
+
+    private void driveWheels(double leftFrontTarget, double rightFrontTarget, double leftBackTarget, double rightBackTarget, double speed)
+    {
+        leftFrontPos += leftFrontTarget;
+        rightFrontPos += rightFrontTarget;
+        leftBackPos += leftBackTarget;
+        rightBackPos += rightBackTarget;
+
+        lf.setTargetPosition(leftFrontPos);
+        rf.setTargetPosition(rightFrontPos);
+        lb.setTargetPosition(leftBackPos);
+        rb.setTargetPosition(rightBackPos);
+
+        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        lf.setPower(speed);
+        rf.setPower(speed);
+        lb.setPower(speed);
+        rb.setPower(speed);
+
+//        while (opModeIsActive() && lf.isBusy() && rf.isBusy() && lb.isBusy() && rb.isBusy())
+//        {
+//            idle();
+//        }
+
     }
 
     private void driveScrewUp(double screwTarget, double speed)
