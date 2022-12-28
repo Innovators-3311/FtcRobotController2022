@@ -29,8 +29,7 @@ public class Autonomous extends LinearOpMode
     private int leftBackPos;
     private int rightBackPos;
 
-    private final double ticksPerInch = (1 * 1) /
-            (4 * 3.1415);;
+    private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -62,17 +61,17 @@ public class Autonomous extends LinearOpMode
         // Run Without Encoders
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -84,10 +83,10 @@ public class Autonomous extends LinearOpMode
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //        zone = coneDetection.detector(telemetry, hardwareMap);
-//        blueSide = teamDetection.showTeam(telemetry);
+        blueSide = teamDetection.showTeam(telemetry);
 
         telemetry.addData("Hit", "start when ready", "");
-//        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone );
+        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone );
         telemetry.update();
 
         // Waits till start button is pressed
@@ -128,33 +127,43 @@ public class Autonomous extends LinearOpMode
         screwLevel = 0;
     }
 
-    private void driveWheels(double leftFrontTarget, double rightFrontTarget, double leftBackTarget, double rightBackTarget, double speed)
+    //Set target then multiply by one with negative if you want to go backwards
+    private void driveStraight(double target, int forward, double speed)
     {
-        leftFrontPos += leftFrontTarget;
-        rightFrontPos += rightFrontTarget;
-        leftBackPos += leftBackTarget;
-        rightBackPos += rightBackTarget;
+        lf.setPower(forward * speed);
+        rf.setPower(forward * speed);
+        lb.setPower(forward * speed);
+        rb.setPower(forward * speed);
 
-        lf.setTargetPosition(leftFrontPos);
-        rf.setTargetPosition(rightFrontPos);
-        lb.setTargetPosition(leftBackPos);
-        rb.setTargetPosition(rightBackPos);
+        target *= forward;
 
-        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (lf.getCurrentPosition() != target) {}
+    }
 
-        lf.setPower(speed);
-        rf.setPower(speed);
-        lb.setPower(speed);
-        rb.setPower(speed);
+    //Set target then multiply by one with negative if you want to go left currently set right
+    private void driveStrafe(double target, int right, double speed)
+    {
+        lf.setPower(right * speed);
+        rf.setPower(-right * speed);
+        lb.setPower(right * speed);
+        rb.setPower(-right * speed);
 
-//        while (opModeIsActive() && lf.isBusy() && rf.isBusy() && lb.isBusy() && rb.isBusy())
-//        {
-//            idle();
-//        }
+        target *= right;
 
+        while (rf.getCurrentPosition() != target) {}
+    }
+
+    //Set target then multiply by one with negative if you want to go left currently set right
+    private void turnInPlace(double target, int right, double speed)
+    {
+        lf.setPower(right * speed);
+        rf.setPower(-right * speed);
+        lb.setPower(-right * speed);
+        rb.setPower(right * speed);
+
+        target *= right;
+
+        while (lb.getCurrentPosition() != target){}
     }
 
     private void driveScrewUp(double screwTarget, double speed)
