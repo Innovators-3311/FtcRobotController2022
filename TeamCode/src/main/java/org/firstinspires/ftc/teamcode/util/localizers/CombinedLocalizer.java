@@ -34,7 +34,6 @@ public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
-    private static final float halfTile = 12 * mmPerInch;
     private static final float oneAndHalfTile = 36 * mmPerInch;
     private static final float loopSpeedHT = 0.1f;
 
@@ -55,7 +54,7 @@ public class CombinedLocalizer implements Localizer {
     private OpenGLMatrix lastLocation               = null;
     private VuforiaLocalizer vuforia                = null;
     private VuforiaTrackables targets               = null;
-    private GyroSensor gyro;
+//    private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
     private WebcamName webcamName                  = null;
@@ -79,7 +78,7 @@ public class CombinedLocalizer implements Localizer {
      */
     public CombinedLocalizer(HardwareMap hardwareMap) {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        gyro = hardwareMap.get(GyroSensor.class, "gyro");
+//        gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
         try{
             stateServer = new StateServer();
@@ -156,12 +155,16 @@ public class CombinedLocalizer implements Localizer {
 
     @Override
     public void displayTelemetry(Telemetry telemetry) {
-        telemetry.addLine("position")
-            .addData("x","%.1f",x)
-            .addData("y","%.1f",y);
+        telemetry.addLine("ROBOPosition")
+            .addData("X","%.1f",x)
+            .addData("Y","%.1f",y);
+        double[] fieldFrame = robotToFieldFrame(x,y);
+        telemetry.addLine("fieldPosition")
+                .addData("x","%.1f",fieldFrame[0])
+                .addData("y","%.1f",fieldFrame[1]);
         telemetry.addData("heading","%.1f",heading);
-        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
-        telemetry.addData("Vuforia Target Visible", targetWasVisible);
+//        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
+//        telemetry.addData("Vuforia Target Visible", targetWasVisible);
     }
     public void measureVelocity() {
         double[] stateChange = imu.getStateChangeDegrees();
@@ -199,15 +202,16 @@ public class CombinedLocalizer implements Localizer {
     /**
      * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
      * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
-     * @param x the robot x value
-     * @param y the robot y value
+     * @param xin the robot x value
+     * @param yin the robot y value
      * @return {fieldX, fieldY}
      *
      */
-    public double[] robotToFieldFrame(double x,double y){
+    // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
+    public double[] robotToFieldFrame(double xin,double yin){
         double[] retVal ={
-                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
-                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
+                 Math.cos(heading*Math.PI/180)*xin-Math.sin(heading*Math.PI/180)*yin,
+                 Math.sin(heading*Math.PI/180)*xin+Math.cos(heading*Math.PI/180)*yin}; //how.TODO
         return retVal;
     }
     /**
@@ -308,6 +312,7 @@ public class CombinedLocalizer implements Localizer {
         RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
         try {
             JSONObject state = new JSONObject()
+                    .put("runTime", runtime.seconds())
                     .put("x", x)
                     .put("y", y)
                     .put("heading", heading)
@@ -316,7 +321,6 @@ public class CombinedLocalizer implements Localizer {
                     .put("headingRate", headingRate)
                     .put("positionUncertainty", positionUncertainty)
                     .put("headingUncertainty", headingUncertainty)
-                    .put("runTime", runtime.seconds())
                     .put("targetVisible", targetWasVisible)
                     .put("secondsSinceVuforia", runtime.seconds()-lastT);
             stateServer.addState(state);

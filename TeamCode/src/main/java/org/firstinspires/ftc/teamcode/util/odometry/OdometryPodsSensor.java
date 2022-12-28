@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.odometry;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -13,7 +12,7 @@ public class OdometryPodsSensor implements PositionChangeSensor {
      **/
     private OdometryPod leftPod;
     private OdometryPod rightPod;
-    private OdometryPod frontPod;
+    private OdometryPod centerPod;
     private ElapsedTime runtime = new ElapsedTime();
     private double last_measurement;
 
@@ -26,9 +25,10 @@ public class OdometryPodsSensor implements PositionChangeSensor {
 
 
     public OdometryPodsSensor(HardwareMap hardwareMap) {
-        leftPod  = new OdometryPod(hardwareMap, "odometryLeft");
-        rightPod = new OdometryPod(hardwareMap, "odometryRight");
-        frontPod = new OdometryPod(hardwareMap, "odometeryFront");
+        // change lf rb
+        leftPod   = new OdometryPod(hardwareMap, "lb");
+        rightPod  = new OdometryPod(hardwareMap, "lf",true);
+        centerPod = new OdometryPod(hardwareMap, "rf",true);
         last_measurement = runtime.seconds();
     }
 
@@ -38,7 +38,7 @@ public class OdometryPodsSensor implements PositionChangeSensor {
      * State change is returned in terms of the Robot's motion in its forward direction, strafe
      * (left is positive), and heading change (in radians)
      *
-     * @return double[] {forward, strafe, heading, forwardRate, strafeRate}
+     * @return double[] {forward, strafe, heading, forwardRate, strafeRate, headingRate}
      */
     public double[] getStateChange() {
         double distanceChangeLeft  = leftPod.getDistanceChangeInches();
@@ -47,10 +47,11 @@ public class OdometryPodsSensor implements PositionChangeSensor {
         last_measurement = runtime.seconds();
         double forward = (distanceChangeLeft + distanceChangeRight)/2;
         double headingChange = (distanceChangeLeft - distanceChangeRight) / width; //left - right because we want a positive change to the heading(turning right).
-        double strafe = frontPod.getDistanceChangeInches() - (headingChange*frontPodDistance);//?
+        double strafe = centerPod.getDistanceChangeInches() - (headingChange*frontPodDistance);//?
         double forwardRate = forward /deltaT;
         double strafeRate = strafe / deltaT;
-        double[] retVal = {forward,strafe,headingChange,forwardRate, strafeRate};
+        double headingRate = headingChange/deltaT;
+        double[] retVal = {forward,strafe,headingChange,forwardRate, strafeRate, headingRate};
         return retVal;
     }
     /** Gets the Robot's Estimated State Change.

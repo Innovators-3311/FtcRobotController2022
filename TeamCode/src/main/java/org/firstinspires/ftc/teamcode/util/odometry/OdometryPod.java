@@ -10,15 +10,25 @@ public class OdometryPod {
     public static final double inchesPerTick = circumference/ticksPerRev;
     public DcMotor pod;
     private int lastPos;
+    private double encoderSign = 1;
 
 
-    public OdometryPod(HardwareMap hardwareMap, String podName) {
+    public OdometryPod(HardwareMap hardwareMap, String podName, boolean encoderSignInverted) {
         pod = hardwareMap.get(DcMotor.class, podName);
         lastPos = pod.getCurrentPosition();
+        if (encoderSignInverted)
+        {
+            encoderSign = -1;
+        }
     }
     public double getDistanceChangeInches() {
         double distanceChange = inchesPerTick * (pod.getCurrentPosition() - lastPos);
         lastPos = pod.getCurrentPosition();
         return distanceChange;
+    }
+
+    public OdometryPod(HardwareMap hardwareMap, String podName)
+    {
+        this(hardwareMap, podName, false);
     }
 }
