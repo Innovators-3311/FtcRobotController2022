@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.TeleOp;
-
+import java.util.concurrent.TimeUnit;
 
 public class TowerController
 {
@@ -53,10 +53,27 @@ public class TowerController
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
+//        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // init screw to bottom level
-        driveScrewUp(500,0.5, telemetry);
+        driveScrewUp(500,1, telemetry);
+
+        //uBar.setPower(0);
+
+//        try
+//        {
+//            TimeUnit.SECONDS.sleep(5);
+//        } catch (InterruptedException e)
+//        {
+//            e.printStackTrace();
+//        }
+
+
+//        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        uBar.setTargetPosition(580);
+//        uBar.setPower(0.1);
+
         driveScrewDown(10000, 0.5, telemetry);
 
         // Make sure Screw will go the right way
@@ -131,7 +148,7 @@ public class TowerController
         if (gamepad.dpad_up)
         {
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(4270);
+            screw.setTargetPosition(4271);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
@@ -152,7 +169,7 @@ public class TowerController
         else if (gamepad.dpad_down)
         {
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(759);
+            screw.setTargetPosition(1456);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
@@ -199,7 +216,7 @@ public class TowerController
         else if (gamepad.a)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(985);
+            uBar.setTargetPosition(104);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
