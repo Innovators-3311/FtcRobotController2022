@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.localizers;
 
-import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -11,10 +10,12 @@ import java.io.IOException;
 import fi.iki.elonen.NanoHTTPD;
 
 public class StateServer extends NanoHTTPD {
-    public JSONArray response;
-    private static final int MAX_STATES = 10000;
+    public JSONArray stateLog;
+    private static final int MAX_STATES = 1000;
     public static int port = 8079;
     private boolean locked = false;
+    private ElapsedTime runtime = new ElapsedTime();
+    private static final double timeStep = .1;
 
     /**
      * Constructs an HTTP server on given port.
@@ -28,7 +29,7 @@ public class StateServer extends NanoHTTPD {
     }
 
     public void resetState(){
-        response = new JSONArray();
+        stateLog = new JSONArray();
 //        try
 //        {
 //            response.put(new JSONObject().put("new", true));
@@ -37,9 +38,9 @@ public class StateServer extends NanoHTTPD {
 //        };
     }
 
-    public String getResponse(){
+    public String getStateLog(){
         locked=true;
-        String retval = response.toString();
+        String retval = stateLog.toString();
         resetState();
         locked=false;
         return retval;
@@ -47,14 +48,15 @@ public class StateServer extends NanoHTTPD {
 
 
     public void addState(JSONObject obj){
-        if (!locked){
+        if (!locked && (runtime.seconds() > timeStep)){
             // Append this state to the end.
-            response.put(obj);
+            stateLog.put(obj);
 
             // If there's over 1000 states, remove the first one.
-            if (response.length() > MAX_STATES) {
-                response.remove(0);
+            if (stateLog.length() > MAX_STATES) {
+                stateLog.remove(0);
             }
+            runtime.reset();
         }
     }
 
@@ -68,6 +70,6 @@ public class StateServer extends NanoHTTPD {
      */
     @Override
     public Response serve(IHTTPSession session) {
-        return newFixedLengthResponse(Response.Status.OK, "application/json", getResponse());
+        return newFixedLengthResponse(Response.Status.OK, "application/json", getStateLog());
     }
 }
