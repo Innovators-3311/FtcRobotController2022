@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            //hi. you found me. -SECRET COMMENT
+import android.hardware.Sensor;
+
+import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -40,9 +42,6 @@ public class TowerController
         screw.setDirection(DcMotor.Direction.FORWARD);
         uBar.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        // Commit out if no intake sensor
-//        intakeSensor = hardwareMap.get(TouchSensor.class, "intakeSensor");
 
         //setup encoder
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

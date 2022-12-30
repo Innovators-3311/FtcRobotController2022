@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -72,11 +73,8 @@ public class InternalIMUSensor implements PositionChangeSensor {
      * @return heading change rate in degrees
      */
     public double angleRate(){
-        double lastH = lastHeading;
-        double timeChange = runtime.seconds()-lastT;
-        double heading  = getHeading();
-
-        return (heading - lastH)/timeChange;
+        AngularVelocity angularVelocity = imu.getAngularVelocity();
+        return angularVelocity.zRotationRate;
     }
 
     /** gets the Angle Change since you last asked in degrees.
@@ -87,6 +85,7 @@ public class InternalIMUSensor implements PositionChangeSensor {
     public double angleChange() {
         double lastH = lastHeading;
         double heading = getHeading();
+        lastHeading = heading;
 
         return (heading - lastH);
     }
@@ -95,16 +94,17 @@ public class InternalIMUSensor implements PositionChangeSensor {
     public double[] getStateChange() {
         double[] retVal = getStateChangeDegrees();
         retVal[2] *= Math.PI / 180.0;
+        retVal[5] *= Math.PI / 180.0;
         return retVal;
     }
 
     @Override
     public double[] getStateChangeDegrees() {
         Position thisPosition = imu.getPosition();
-
+        Velocity thisVelocity = imu.getVelocity();
         double [] retVal = {thisPosition.x - lastPosition.x,
                 thisPosition.y - lastPosition.y,
-                angleChange() };
+                angleChange(),thisVelocity.xVeloc,thisVelocity.yVeloc,angleRate()};
         lastPosition = thisPosition;
         return retVal;
     }
