@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="ClobberHope", group="Basic drive")
-public class TeleOp extends OpMode
+public class BasicTeleOp extends OpMode
 
 {
     private IntegratedLocalizerIMU localizer = null;
@@ -46,7 +46,7 @@ public class TeleOp extends OpMode
 //        mecanumDriveBase.gamepadController(gamepad1);
 //        mecanumDriveBase.driveBaseTelemetry(telemetry);
         towerController.handleGamepad(gamepad2, telemetry);
-//        telemetry.addData("TeleOp heading", localizer.getHeading() );
+//        telemetry.addData("BasicTeleOp heading", localizer.getHeading() );
 //        pacMan.handlePacMan(gamepad1, telemetry);
         driveForTest.drive(gamepad1);
         telemetry.update();
