@@ -37,20 +37,27 @@ public class MecanumDriveBase {
         // Run Without Encoders
         lf.setMode(runmode);
         rf.setMode(runmode);
-        lf.setMode(runmode);
-        rf.setMode(runmode);
+        lb.setMode(runmode);
+        rb .setMode(runmode);
+
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-      public void gamepadController(Gamepad gamepad) {
+
+    /**
+     * Standard controls from a gamepad
+     *
+     * @param gamepad - the gamepad you want to control the drive base
+     */
+    public void gamepadController(Gamepad gamepad) {
 
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
