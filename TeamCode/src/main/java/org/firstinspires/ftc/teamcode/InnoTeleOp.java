@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub1", group="Basic drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="smartTeleOp", group="Basic drive")
 public class InnoTeleOp extends OpMode
 
 {
@@ -18,7 +18,7 @@ public class InnoTeleOp extends OpMode
         telemetry.addData("Status", "Initialized");
         localizer = new IntegratedLocalizerIMU(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
-        towerController = new TowerController(hardwareMap);
+        towerController = new TowerController(hardwareMap, telemetry);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
@@ -27,14 +27,15 @@ public class InnoTeleOp extends OpMode
     public void loop() {
         localizer.displayTelemetry(telemetry);
         localizer.handleTracking();
-        mecanumDriveBase.gamepadController(gamepad1);
-        towerController.handleUBar();
+        towerController.handleGamepad(gamepad2, telemetry);
 //        towerController.handleScrew();
 //        towerController.handleIntake();
 //        towerController.handleGamepad(gamepad2);
+
+        mecanumDriveBase.gamepadController(gamepad1);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
-        telemetry.addData("TeleOp heading", localizer.getHeading() );
-        pacMan.handlePacMan(gamepad1, telemetry);
+
+//        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.update();
     }
 }

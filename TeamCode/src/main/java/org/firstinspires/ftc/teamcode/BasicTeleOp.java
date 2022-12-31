@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.util.DriveForTest;
-import org.firstinspires.ftc.teamcode.util.IntegratedLocalizerIMU;
+import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="ClobberHope", group="Basic drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="basicClobberHopeTeleop", group="Basic drive")
 public class BasicTeleOp extends OpMode
 
 {
@@ -24,12 +24,12 @@ public class BasicTeleOp extends OpMode
 
 
 //        localizer = new IntegratedLocalizerIMU(hardwareMap);
-//        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         towerController = new TowerController(hardwareMap, telemetry);
 //        localizer = new LocalizerIMU(hardwareMap);
 //        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
 //        double max;
-        driveForTest = new DriveForTest(hardwareMap);
+//        driveForTest = new DriveForTest(hardwareMap);
 
 //        Logging.setup();
 //        Logging.log("Starting Drive Circle Logging");
@@ -43,12 +43,13 @@ public class BasicTeleOp extends OpMode
     public void loop() {
 //        localizer.displayTelemetry(telemetry);
 //        localizer.handleTracking();
-//        mecanumDriveBase.gamepadController(gamepad1);
-//        mecanumDriveBase.driveBaseTelemetry(telemetry);
+        mecanumDriveBase.gamepadController(gamepad1);
+        mecanumDriveBase.driveBaseTelemetry(telemetry);
         towerController.handleGamepad(gamepad2, telemetry);
 //        telemetry.addData("BasicTeleOp heading", localizer.getHeading() );
 //        pacMan.handlePacMan(gamepad1, telemetry);
-        driveForTest.drive(gamepad1);
+//        driveForTest.drive(gamepad1);
+
         telemetry.update();
     }
 }
