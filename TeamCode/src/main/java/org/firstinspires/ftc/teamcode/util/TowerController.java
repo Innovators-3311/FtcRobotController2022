@@ -57,7 +57,7 @@ public class TowerController
 
         // init screw to bottom level
         driveScrewUp(500,0.5, telemetry);
-        driveScrewDown(10000, 0.5, telemetry);
+        driveScrewDown(10000, 1, telemetry);
 
         // Make sure Screw will go the right way
         screw.setDirection(DcMotor.Direction.REVERSE);
@@ -138,7 +138,7 @@ public class TowerController
         else if (gamepad.dpad_left)
         {
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(851);
+            screw.setTargetPosition(0);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
@@ -152,7 +152,7 @@ public class TowerController
         else if (gamepad.dpad_down)
         {
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(759);
+            screw.setTargetPosition(1313);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
@@ -172,36 +172,36 @@ public class TowerController
         if (gamepad.y)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(-2966);
+            uBar.setTargetPosition(-3627);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
         // Middle Junction
         else if (!gamepad.start && gamepad.b)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(-1454);
+            uBar.setTargetPosition(-2377);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
         // Low Junction
         else if (gamepad.x)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(-2854);
+            uBar.setTargetPosition(-4382);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(-0.5);
+            uBar.setPower(-1);
         }
 
         // Pickup Junction
         else if (gamepad.a)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(985);
+            uBar.setTargetPosition(400);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(0.5);
+            uBar.setPower(1);
         }
 
 
@@ -337,8 +337,6 @@ public class TowerController
     {
         telemetry.addData("Screw ticks = ", "%d", screw.getCurrentPosition());
         telemetry.addData("Ubar  ticks = ", "%d", uBar.getCurrentPosition());
-
-        telemetry.update();
     }
 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        //hi. you found me. -SECRET COMMENT

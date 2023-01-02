@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +58,7 @@ public class Autonomous extends LinearOpMode
         lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
 
         screw.setDirection(DcMotor.Direction.FORWARD);
-        uBar.setDirection(DcMotor.Direction.FORWARD);
+        uBar.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotor.Direction.FORWARD);
 
         // Run Without Encoders
@@ -68,7 +69,7 @@ public class Autonomous extends LinearOpMode
 
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Brake when power set to Zero
 //        mecanumDriveBase.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -84,59 +85,97 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
+//        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
         telemetry.addData("Hit", "start when ready", "");
-        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone );
+        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
 
         // Waits till start button is pressed
         waitForStart();
+
+        encoderLogging();
+
         //drive to first pole
-        driveStrafe(ticksPerInch * 24, -1, 0.5);
-        driveStraight(ticksPerInch * 24, 1, 0.5);
-        driveStrafe(ticksPerInch * 10, -1, 0.5);
-        driveStraight(ticksPerInch * 3, 1, 0.5);
+
+        driveScrew(4271);
+        driveStrafe(ticksPerInch * 24, -1, .5);
+        Thread.sleep(500);
+        driveUBar(-3677);
+        driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
+        Thread.sleep(500);
+        driveStrafe(ticksPerInch * 10.2, -1, .5);
+        Thread.sleep(500);
+        driveStraight(ticksPerInch * 2, -1, 0.5);
+        Thread.sleep(1000);
+        intake.setPower(-1);
+        Thread.sleep(10000);
+
 
         // Stops program when reached
         stop();
     }
 
-    //Set target then multiply by one with negative if you want to go backwards no negitive input
+    //Set target then multiply by one with negative if you want to go backwards no negative input
     private void driveStraight(double target, int forward, double speed)
     {
-        leftBackPos += target;
         speed *= forward;
-
-        while (Math.abs(mecanumDriveBase.lb.getCurrentPosition()) <= leftBackPos)
+        leftFrontPos = mecanumDriveBase.lf.getCurrentPosition();
+        if (forward == 1)
         {
-            mecanumDriveBase.driveMotors(speed, 0, 0, 1);
-            telemetry.addData("", mecanumDriveBase.lb.getCurrentPosition());
-            telemetry.update();
+            leftFrontPos += target;
+            while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
+            {
+                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+        else
+        {
+            leftFrontPos -= target;
+            while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
+            {
+                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
+                telemetry.update();
+            }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
+        encoderLogging();
     }
 
-    //Set target then multiply by one with negative if you want to go left currently set right no negitive input
+    //Set target then multiply by one with negative if you want to go left currently set right no negative input
     private void driveStrafe(double target, int right, double speed)
     {
-        rightFrontPos += target;
         speed *= right;
 
-        encoderLogging();
-
-        while (Math.abs(mecanumDriveBase.rf.getCurrentPosition()) <= rightFrontPos)
+        if (right == 1)
         {
-            mecanumDriveBase.driveMotors(0, 0, speed, 1);
-            telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-            telemetry.update();
-            encoderLogging();
+            rightFrontPos -= target;
+            while (mecanumDriveBase.rf.getCurrentPosition() >= rightFrontPos)
+            {
+                mecanumDriveBase.driveMotors(0, 0, speed, 1);
+                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+        else
+        {
+            rightFrontPos += target;
+            while (mecanumDriveBase.rf.getCurrentPosition() <= rightFrontPos)
+            {
+                mecanumDriveBase.driveMotors(0, 0, speed, 1);
+                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
+            }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
+        encoderLogging();
     }
 
-    //Set target then multiply by one with negative if you want to go left currently set right no negitive input
+    //Set target then multiply by one with negative if you want to go left currently set right no negative input
     private void turnInPlace(double target, int right, double speed)
     {
         target *= right;
@@ -147,6 +186,22 @@ public class Autonomous extends LinearOpMode
 //        mecanumDriveBase.rb.setPower(right * speed);
 
         while (mecanumDriveBase.lb.getCurrentPosition() != target){}
+    }
+
+    private void driveScrew(int target)
+    {
+        screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        screw.setTargetPosition(target);
+        screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        screw.setPower(1);
+    }
+
+    private void driveUBar(int target)
+    {
+        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        uBar.setTargetPosition(target);
+        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        uBar.setPower(1);
     }
 
     private void encoderLogging()
