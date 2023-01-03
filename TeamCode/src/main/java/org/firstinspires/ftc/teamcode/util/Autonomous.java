@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +27,7 @@ public class Autonomous extends LinearOpMode
     private DcMotor uBar;
     private DcMotor intake;
 
+    private DistanceSensor distanceSensor;
     private TouchSensor highSensor;
     private TouchSensor lowSensor;
 
@@ -54,6 +57,7 @@ public class Autonomous extends LinearOpMode
         uBar = hardwareMap.get(DcMotor.class, "uBar");
         intake = hardwareMap.get(DcMotor.class, "intake");
 
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
         lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
 
@@ -88,6 +92,8 @@ public class Autonomous extends LinearOpMode
 //        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
+
         telemetry.addData("Hit", "start when ready", "");
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
@@ -105,9 +111,13 @@ public class Autonomous extends LinearOpMode
         driveUBar(-3677);
         driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
         Thread.sleep(500);
-        driveStrafe(ticksPerInch * 10.2, -1, .5);
+        while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
+        {
+            mecanumDriveBase.driveMotors(0, 0, 0.5, 1);
+        }
+//        driveStrafe(ticksPerInch * 10.2, -1, .5);
         Thread.sleep(500);
-        driveStraight(ticksPerInch * 2, -1, 0.5);
+        driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(10000);
