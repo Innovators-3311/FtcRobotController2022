@@ -225,8 +225,8 @@ public class CombinedLocalizer implements Localizer {
     // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
     public double[] robotToFieldFrame(double xin,double yin){
         double[] retVal ={
-                 Math.cos(heading*Math.PI/180)*xin-Math.sin(heading*Math.PI/180)*yin,
-                 Math.sin(heading*Math.PI/180)*xin+Math.cos(heading*Math.PI/180)*yin}; //how.TODO
+                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
+                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
