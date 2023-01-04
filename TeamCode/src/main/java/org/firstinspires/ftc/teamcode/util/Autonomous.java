@@ -22,6 +22,7 @@ public class Autonomous extends LinearOpMode
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
+    private TowerController towerController;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -44,20 +45,25 @@ public class Autonomous extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        try {
+        try
+        {
             stateServer = new StateServer();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
+
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
+//        towerController = new TowerController(hardwareMap, telemetry);
+
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         screw = hardwareMap.get(DcMotor.class, "screw");
         uBar = hardwareMap.get(DcMotor.class, "uBar");
         intake = hardwareMap.get(DcMotor.class, "intake");
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
         lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
 
@@ -65,7 +71,7 @@ public class Autonomous extends LinearOpMode
         uBar.setDirection(DcMotor.Direction.REVERSE);
         intake.setDirection(DcMotor.Direction.FORWARD);
 
-        // Run Without Encoders
+            // Run Without Encoders
 //        mecanumDriveBase.lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        mecanumDriveBase.rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        mecanumDriveBase.lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -74,7 +80,7 @@ public class Autonomous extends LinearOpMode
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // Brake when power set to Zero
+            // Brake when power set to Zero
 //        mecanumDriveBase.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -89,7 +95,7 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        zone = coneDetection.detector(telemetry, hardwareMap);
+        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
         Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
@@ -101,26 +107,88 @@ public class Autonomous extends LinearOpMode
         // Waits till start button is pressed
         waitForStart();
 
+        // Logs to web
         encoderLogging();
 
         //drive to first pole
-
+        // Screw goes up and strafs a tile
         driveScrew(4271);
-        driveStrafe(ticksPerInch * 24, -1, .5);
-        Thread.sleep(500);
-        driveUBar(-3677);
-        driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
-        Thread.sleep(500);
-        while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
+        if (blueSide)
         {
-            mecanumDriveBase.driveMotors(0, 0, 0.5, 1);
+            driveStrafe(ticksPerInch * 24, -1, .5);
         }
-//        driveStrafe(ticksPerInch * 10.2, -1, .5);
+        else
+        {
+            driveStrafe(ticksPerInch * 24, 1, .5);
+        }
         Thread.sleep(500);
-        driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
-        Thread.sleep(1000);
+        //drives ubar to postition and drives forward
+        driveUBar(-3377);
+        driveStraight(ticksPerInch * 48, 1, 0.5); // 63,847
+        Thread.sleep(500);
+        //strafes to pole
+        //        driveStrafe(ticksPerInch * 10.2, -1, .5);
+        if (blueSide)
+        {
+            driveStrafe(ticksPerInch * 12, -1, 0.5);
+//            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
+//            {
+//                mecanumDriveBase.driveMotors(0, 0, -0.5, 1);
+//            }
+        }
+        else
+        {
+            driveStrafe(ticksPerInch * 12, 1, 0.5);
+//            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
+//            {
+//                mecanumDriveBase.driveMotors(0, 0, 0.5, 1);
+//            }
+        }
+        Thread.sleep(500);
+
+//        driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
+        driveStraight(ticksPerInch * 3, -1, 0.5);
+        Thread.sleep(500);
         intake.setPower(-1);
-        Thread.sleep(10000);
+        Thread.sleep(1000);
+        intake.setPower(0);
+        driveStraight(ticksPerInch * 3, 1, 0.5);
+
+        switch (zone)
+        {
+            case 1:
+                if (blueSide)
+                {
+                    driveStrafe(ticksPerInch * 8, 1, 0.5);
+                }
+                else
+                {
+                    driveStrafe(ticksPerInch * 56, -1, 0.5);
+                }
+            break;
+
+            case 2:
+                if (blueSide)
+                {
+                    driveStrafe(ticksPerInch * 32, 1, 0.5);
+                }
+                else
+                {
+                    driveStrafe(ticksPerInch * 32, -1, 0.5);
+                }
+                break;
+
+            case 3:
+                if (blueSide)
+                {
+                    driveStrafe(ticksPerInch * 56, 1, 0.5);
+                }
+                else
+                {
+                    driveStrafe(ticksPerInch * 8, -1, 0.5);
+                }
+                break;
+        }
 
 
         // Stops program when reached

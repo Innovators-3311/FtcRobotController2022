@@ -172,7 +172,7 @@ public class TowerController
         if (gamepad.y)
         {
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(-3627);
+            uBar.setTargetPosition(-2966);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
