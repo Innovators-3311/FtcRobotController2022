@@ -105,6 +105,8 @@ public class CombinedLocalizer implements Localizer {
 //        identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
 
         // WARNING: This is likely to be a source of error. Check z-rotations first.
+        // Our reference frame is rotated -90 degrees about z (up) from the O.G. reference frame,
+        // so we should be adding 90 degrees to the target z rotations.
         identifyTarget(0, "Red Audience Wall",
                 halfField + oneAndHalfTile, 0, mmTargetHeight,
                 90, 0, 180);
