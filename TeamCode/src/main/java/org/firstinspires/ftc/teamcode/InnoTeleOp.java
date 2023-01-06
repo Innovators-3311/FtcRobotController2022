@@ -18,7 +18,7 @@ public class InnoTeleOp extends OpMode
         telemetry.addData("Status", "Initialized");
         localizer = new IntegratedLocalizerIMU(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
-        towerController = new TowerController(hardwareMap);
+        towerController = new TowerController(hardwareMap, localizer);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
@@ -28,12 +28,12 @@ public class InnoTeleOp extends OpMode
         localizer.displayTelemetry(telemetry);
         localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
-        towerController.handleUBar();
+//        towerController.handleUBar();
 //        towerController.handleScrew();
 //        towerController.handleIntake();
 //        towerController.handleGamepad(gamepad2);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
-        telemetry.addData("TeleOp heading", localizer.getHeading() );
+        telemetry.addData("TeleOp heading", localizer.getRotation() );
         pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.update();
     }

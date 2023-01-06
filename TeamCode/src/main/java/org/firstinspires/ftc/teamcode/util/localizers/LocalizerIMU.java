@@ -187,7 +187,7 @@ public class LocalizerIMU implements Localizer {
     }
 
     @Override
-    public double getHeading() {
+    public double getRotation() {
         return heading;
     }
 //    public void gyroCalibrate(){

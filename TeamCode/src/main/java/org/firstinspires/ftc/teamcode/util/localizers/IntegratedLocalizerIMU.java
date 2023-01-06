@@ -199,7 +199,7 @@ public class IntegratedLocalizerIMU implements Localizer {
         }
     }
 
-    public double getHeading() {
+    public double getRotation() {
         return heading;
     }
 

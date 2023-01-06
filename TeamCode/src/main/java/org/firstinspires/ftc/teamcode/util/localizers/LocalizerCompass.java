@@ -185,7 +185,7 @@ public class LocalizerCompass implements Localizer {
     }
 
     @Override
-    public double getHeading() {
+    public double getRotation() {
         return heading;
     }
 }

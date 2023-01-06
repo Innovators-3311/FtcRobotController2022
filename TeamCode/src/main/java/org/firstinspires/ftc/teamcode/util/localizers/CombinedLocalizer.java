@@ -24,11 +24,9 @@ import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
@@ -49,8 +47,8 @@ public class CombinedLocalizer implements Localizer {
     public double z             = 0;
     public double yVelocity     = 0;
     public double xVelocity     = 0;
-    public double heading       = 0;
-    public double headingRate   = 0;
+    public double rotation = 0;
+    public double rotationRate = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation               = null;
     private VuforiaLocalizer vuforia                = null;
@@ -159,8 +157,8 @@ public class CombinedLocalizer implements Localizer {
         telemetry.addLine("position")
             .addData("x","%.1f",x)
             .addData("y","%.1f",y);
-        telemetry.addData("heading","%.1f",heading);
-        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
+        telemetry.addData("heading","%.1f", rotation);
+        telemetry.addData("Brendan's heading","%.1f",smartAngleError(rotation, 0));
         telemetry.addData("Vuforia Target Visible", targetWasVisible);
     }
     public void measureVelocity() {
@@ -181,7 +179,7 @@ public class CombinedLocalizer implements Localizer {
         // y velocity in inches per second
         yVelocity = fieldStateChange[1];
         // Heading rate in degrees per second.
-        headingRate = stateChange[5];
+        rotationRate = stateChange[5];
     }
 
     public void measurePodChange() {
@@ -193,7 +191,7 @@ public class CombinedLocalizer implements Localizer {
         // y velocity in inches per second
         yVelocity = fieldStateChange[1];
         // Heading rate in degrees per second.
-        headingRate = stateChange[5];
+        rotationRate = stateChange[5];
     }
 
     /**
@@ -206,8 +204,23 @@ public class CombinedLocalizer implements Localizer {
      */
     public double[] robotToFieldFrame(double x,double y){
         double[] retVal ={
-                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
-                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
+                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
+                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+        return retVal;
+    }
+
+    /**
+     * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
+     * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
+     * @param x the robot x value
+     * @param y the robot y value
+     * @return {fieldX, fieldY}
+     *
+     */
+    public double[] fieldToRobotFrame(double x,double y){
+        double[] retVal ={
+                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
+                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
@@ -218,7 +231,7 @@ public class CombinedLocalizer implements Localizer {
         double deltaT = thisTime - stateTime;
         x += deltaT * xVelocity;
         y += deltaT * yVelocity;
-        heading += deltaT * headingRate;
+        rotation += deltaT * rotationRate;
         stateTime = thisTime;
         // Over one second, we estimate that position uncertainty grows by 5 inch.
         positionUncertainty += deltaT*deltaT * 5;
@@ -235,8 +248,8 @@ public class CombinedLocalizer implements Localizer {
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             double vuforiaHeading = rotation.thirdAngle%360;
-            double err = smartAngleError(vuforiaHeading, heading);
-            heading += k*(err);
+            double err = smartAngleError(vuforiaHeading, this.rotation);
+            this.rotation += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
 
         }
@@ -247,7 +260,7 @@ public class CombinedLocalizer implements Localizer {
      *
      * @param a angle a
      * @param b angle b
-     * @return angle error (a-b, as close to zero as possible)
+     * @return angle error (a-b, as close to zero as possible) Range: -180 to 180
      */
     public double smartAngleError(double a, double b){
         double diff = a - b;
@@ -305,15 +318,15 @@ public class CombinedLocalizer implements Localizer {
         }
         updateState();
         measureState();
-        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
+        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, rotation, xVelocity, yVelocity, rotationRate,positionUncertainty, headingUncertainty);
         try {
             JSONObject state = new JSONObject()
                     .put("x", x)
                     .put("y", y)
-                    .put("heading", heading)
+                    .put("heading", rotation)
                     .put("xVelocity", xVelocity)
                     .put("yVelocity", yVelocity)
-                    .put("headingRate", headingRate)
+                    .put("headingRate", rotationRate)
                     .put("positionUncertainty", positionUncertainty)
                     .put("headingUncertainty", headingUncertainty)
                     .put("runTime", runtime.seconds())
@@ -326,9 +339,9 @@ public class CombinedLocalizer implements Localizer {
     }
 
     @Override
-    public double getHeading() {
+    public double getRotation() {
 
-        return heading;
+        return rotation;
     }
 
 }
