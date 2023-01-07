@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TeamDetection {
     public boolean redTeam;
     public boolean blueTeam;
+    public boolean rightSide;
 
     /**
      * Returns what team you are on from the switch.
@@ -19,12 +22,16 @@ public class TeamDetection {
     public TeamDetection(HardwareMap hardwareMap){
 
         //find value of switch
-        DigitalChannel blueSwitch = hardwareMap.get(DigitalChannel.class, "blueSwitch");
+        DigitalChannel blueSwitch = hardwareMap.get(DigitalChannel.class, "Switch");
         blueSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        //set two values according to the switch
+//        DigitalChannel sideSwitch = hardwareMap.get(DigitalChannel.class, "side");
+//        blueSwitch.setMode(DigitalChannel.Mode.INPUT);
+
+        //set values according to the switches
         blueTeam = blueSwitch.getState();
         redTeam = !blueTeam;
+//        rightSide = sideSwitch.getState();
     }
 
     /**
@@ -34,18 +41,20 @@ public class TeamDetection {
      *
      * @param telemetry OpMode telemetry
      */
-    public void showTeam(Telemetry telemetry) {
+    public boolean showTeam(Telemetry telemetry) {
 
         //let the driver know what it detected
-        if(blueTeam) {
-            telemetry.addData("Team:Blue", true);
-            telemetry.addData("Team:Red", false);
+        if(redTeam)
+        {
+            return false;
         }
 
-        if(redTeam) {
-            telemetry.addData("Team:Blue", false);
-            telemetry.addData("Team:Red", true);
+        if(blueTeam)
+        {
+            return true;
         }
+
+        return false;
     }
 }
 //boom! now we know what team we're on!
