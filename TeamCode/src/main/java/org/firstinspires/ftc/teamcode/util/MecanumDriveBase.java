@@ -29,14 +29,16 @@ public class MecanumDriveBase {
         lb = hardwareMap.get(DcMotor.class, "lb");
         lf = hardwareMap.get(DcMotor.class, "lf");
 
-        rb.setDirection(DcMotor.Direction.REVERSE);
+        lf.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.FORWARD);
+
         lf.setDirection(DcMotor.Direction.FORWARD);
         // reset encoders
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // Run Without Encoders
         lf.setMode(runmode);
         rf.setMode(runmode);
@@ -48,6 +50,10 @@ public class MecanumDriveBase {
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
       public void gamepadController(Gamepad gamepad) {
 
@@ -57,6 +63,7 @@ public class MecanumDriveBase {
           speedFactor = .5 + .5 * gamepad.right_trigger;
           driveMotors(drive, turn, strafe, speedFactor);
       }
+
       public void driveMotors(double drive,double turn,double strafe,double speedFactor){
 
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
@@ -74,5 +81,41 @@ public class MecanumDriveBase {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
         telemetry.addData("Speed control", speedFactor);
       }
+
+    public DcMotor getlf() {
+        return lf;
+    }
+
+    public DcMotor getlb() {
+        return lb;
+    }
+
+    public DcMotor getrb() {
+        return rb;
+    }
+
+    public DcMotor getrf() {
+        return rf;
+    }
+
+    public double getLeftPowerFront() {
+        return leftPowerFront;
+    }
+
+    public double getRightPowerFront() {
+        return rightPowerFront;
+    }
+
+    public double getRightPowerBack() {
+        return rightPowerBack;
+    }
+
+    public double getLeftPowerBack() {
+        return leftPowerBack;
+    }
+
+    public double getSpeedFactor() {
+        return speedFactor;
+    }
 }
 
