@@ -17,21 +17,21 @@ public class TeleOpStub extends OpMode
 
     public void init() {
         telemetry.addData("Status", "Initialized");
-        localizer = new CombinedLocalizer(hardwareMap);
+//        localizer = new CombinedLocalizer(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         towerController = new TowerController(hardwareMap, telemetry);
-        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
+//        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
     }
     @Override
     public void loop() {
-        localizer.displayTelemetry(telemetry);
-        localizer.handleTracking();
+//        localizer.displayTelemetry(telemetry);
+//        localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
         towerController.handleGamepad(gamepad2, telemetry);
-        telemetry.addData("TeleOp heading", localizer.getHeading() );
-        pacMan.handlePacMan(gamepad1, telemetry);
+//        telemetry.addData("TeleOp heading", localizer.getHeading());
+//        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());
         telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
         telemetry.addData("", "lb = " + mecanumDriveBase.lb.getCurrentPosition());

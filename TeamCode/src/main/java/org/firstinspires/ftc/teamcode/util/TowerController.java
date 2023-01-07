@@ -451,12 +451,15 @@ public class TowerController
     public void handleGamepad(Gamepad gamepad, Telemetry telemetry)
     {
         //Screw methods
-        handleScrewLevelSet(gamepad, telemetry);
+//        handleScrewLevelSet(gamepad, telemetry);
         screwAnlogControler(gamepad, telemetry);
 
         //Ubar Methods
-        handleUBarLevelSet(gamepad, telemetry);
+//        handleUBarLevelSet(gamepad, telemetry);
         uBarAnlogControler(gamepad, telemetry);
+
+        // Super method
+        driveAll(gamepad, telemetry);
 
         // Intake Method
         handleIntake(gamepad);

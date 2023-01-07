@@ -109,7 +109,14 @@ public class Autonomous extends LinearOpMode
         //drive to first pole
 
         driveScrew(2720);
-        driveStrafe(ticksPerInch * 24, -1, .5);
+        if (blueSide)
+        {
+            driveStrafe(ticksPerInch * 24, -1, .5);
+        }
+        else
+        {
+            driveStrafe(ticksPerInch * 24, 1, .5);
+        }
         Thread.sleep(500);
         driveUBar(-3109);
         driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
