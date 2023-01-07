@@ -24,14 +24,9 @@ public class TeamDetection {
         //find value of switch
         DigitalChannel blueSwitch = hardwareMap.get(DigitalChannel.class, "Switch");
         blueSwitch.setMode(DigitalChannel.Mode.INPUT);
-
-//        DigitalChannel sideSwitch = hardwareMap.get(DigitalChannel.class, "side");
-//        blueSwitch.setMode(DigitalChannel.Mode.INPUT);
-
         //set values according to the switches
         blueTeam = blueSwitch.getState();
         redTeam = !blueTeam;
-//        rightSide = sideSwitch.getState();
     }
 
     /**

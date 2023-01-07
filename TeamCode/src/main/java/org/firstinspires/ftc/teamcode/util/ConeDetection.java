@@ -89,18 +89,18 @@ public class ConeDetection
                 if (updatedRecognitions != null)
                 {
 //                    telemetry.addData("", "%s", "if (updatedRecognitions != null)");
-                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
-                    telemetry.update();
+//                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
+//                    telemetry.update();
                     for (Recognition recognition : updatedRecognitions)
                     {
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;
                         double row = (recognition.getTop() + recognition.getBottom()) / 2;
                         double width = Math.abs(recognition.getRight() - recognition.getLeft());
                         double height = Math.abs(recognition.getTop() - recognition.getBottom());
-                        telemetry.addData("", " ");
-                        telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-                        telemetry.addData("- Position (Row/Col)", "%.0f / %.0f", row, col);
-                        telemetry.addData("- Size (Width/Height)", "%.0f / %.0f", width, height);
+//                        telemetry.addData("", " ");
+//                        telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+//                        telemetry.addData("- Position (Row/Col)", "%.0f / %.0f", row, col);
+//                        telemetry.addData("- Size (Width/Height)", "%.0f / %.0f", width, height);
                         String object = recognition.getLabel();
                         switch (object)
                         {
