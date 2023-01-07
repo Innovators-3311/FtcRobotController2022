@@ -65,7 +65,7 @@ public class CombinedLocalizer implements Localizer {
     private double lastT                           =  0;
     private double headingOffSet                   =  0;
     private double gyroHeading                     =  0;
-    private double positionUncertainty             = .5;
+    public double positionUncertainty             = .5;
     static final double vuforiaPositionUncertainty = .2;
     private double headingUncertainty              = 5;
     private double vuforiaHeadingUncertainty       = 5;

@@ -11,6 +11,8 @@ public class DriveToPos {
     private double xStart = 0;
     private double yStart = 0;
     private double rotationStart = 0;
+    private final double safeDistance = 7;
+    public double maxSpeedFactor = 1.0;
 
     /**
      * Constructor for Relative Drive Controller
@@ -43,8 +45,6 @@ public class DriveToPos {
      * @param y Inches to move in the Field's Y frame.
      * @param rotation degrees to rotate (using compass rotation)
      */
-
-
     public void setTarget(double x, double y, double rotation){
         xTarget = x;
         yTarget = y;
@@ -66,10 +66,23 @@ public class DriveToPos {
 
         // Compute the turn that minimizes wrap-arounds.
         // Note that this is a heading change, so rotation and target are backwards
+        // TODO: Fix handling heading change! -1 < turn < 1
         double turn = localizer.smartAngleError(localizer.rotation, rotationTarget);
+        double speedFactor = 1;
+
+        // https://www.desmos.com/calculator/ln1qieke73
+        if (distanceToTarget < safeDistance) {
+            speedFactor = maxSpeedFactor/safeDistance*distanceToTarget;
+        }
+        if(distanceToTarget<localizer.positionUncertainty){
+            speedFactor = 0;
+        }
+
+
 
         // Drive the motors!
-        mecanumDriveBase.driveMotors(driveVector[0], turn, driveVector[1], 1.0);
+        mecanumDriveBase.driveMotors(driveVector[0], turn, driveVector[1], speedFactor);
+
     }
 
     /**
