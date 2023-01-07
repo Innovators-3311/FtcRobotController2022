@@ -44,11 +44,11 @@ public class Autonomous extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        try {
-            stateServer = new StateServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            stateServer = new StateServer();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
@@ -89,10 +89,10 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        zone = coneDetection.detector(telemetry, hardwareMap);
+        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
+//        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
@@ -101,14 +101,14 @@ public class Autonomous extends LinearOpMode
         // Waits till start button is pressed
         waitForStart();
 
-        encoderLogging();
+//        encoderLogging();
 
         //drive to first pole
 
-        driveScrew(4271);
+        driveScrew(2720);
         driveStrafe(ticksPerInch * 24, -1, .5);
         Thread.sleep(500);
-        driveUBar(-3677);
+        driveUBar(-3109);
         driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
         Thread.sleep(500);
         while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
@@ -120,8 +120,7 @@ public class Autonomous extends LinearOpMode
         driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
-        Thread.sleep(10000);
-
+        Thread.sleep(1000);
 
         // Stops program when reached
         stop();
@@ -153,7 +152,7 @@ public class Autonomous extends LinearOpMode
             }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
-        encoderLogging();
+//        encoderLogging();
     }
 
     //Set target then multiply by one with negative if you want to go left currently set right no negative input
@@ -182,7 +181,7 @@ public class Autonomous extends LinearOpMode
             }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
-        encoderLogging();
+//        encoderLogging();
     }
 
     //Set target then multiply by one with negative if you want to go left currently set right no negative input
@@ -214,18 +213,18 @@ public class Autonomous extends LinearOpMode
         uBar.setPower(1);
     }
 
-    private void encoderLogging()
-    {
-        try {
-            JSONObject state = new JSONObject()
-                    .put("lf encoder", mecanumDriveBase.lf.getCurrentPosition())
-                    .put("rf encoder", mecanumDriveBase.rf.getCurrentPosition())
-                    .put("lb encoder", mecanumDriveBase.lb.getCurrentPosition());
-            stateServer.addState(state);
-        } catch (JSONException e) {
-            RobotLog.ee("Localizer", "Error encoding json.");
-        };
-    }
+//    private void encoderLogging()
+//    {
+//        try {
+//            JSONObject state = new JSONObject()
+//                    .put("lf encoder", mecanumDriveBase.lf.getCurrentPosition())
+//                    .put("rf encoder", mecanumDriveBase.rf.getCurrentPosition())
+//                    .put("lb encoder", mecanumDriveBase.lb.getCurrentPosition());
+//            stateServer.addState(state);
+//        } catch (JSONException e) {
+//            RobotLog.ee("Localizer", "Error encoding json.");
+//        };
+//    }
 
     private void driveScrewUp(double screwTarget, double speed)
     {

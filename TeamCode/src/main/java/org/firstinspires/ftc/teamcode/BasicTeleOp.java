@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.util.DriveForTest;
-import org.firstinspires.ftc.teamcode.util.IntegratedLocalizerIMU;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
@@ -11,7 +10,6 @@ import org.firstinspires.ftc.teamcode.util.TowerController;
 public class BasicTeleOp extends OpMode
 
 {
-    private IntegratedLocalizerIMU localizer = null;
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;

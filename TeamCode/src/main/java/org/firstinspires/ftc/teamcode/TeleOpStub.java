@@ -29,6 +29,7 @@ public class TeleOpStub extends OpMode
         localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
+        towerController.handleGamepad(gamepad2, telemetry);
         telemetry.addData("TeleOp heading", localizer.getHeading() );
         pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());

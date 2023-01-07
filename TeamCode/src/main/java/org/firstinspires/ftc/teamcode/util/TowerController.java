@@ -56,7 +56,7 @@ public class TowerController
 
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
--
+
         // init screw to bottom level
         driveScrewUp(500,0.5, telemetry);
         driveScrewDown(10000, 1, telemetry);
@@ -277,10 +277,22 @@ public class TowerController
 
     private void driveAll(Gamepad gamepad, Telemetry telemetry)
     {
-        //3885
         //4 button screw position set
-
         /** High Poll */
+        highPoll(gamepad);
+
+        /** Middle Poll */
+        middlePoll(gamepad);
+
+        /** Low Poll */
+        lowPoll(gamepad);
+
+        /** Pick up */
+        pickUp(gamepad);
+    }
+
+    private void highPoll(Gamepad gamepad)
+    {
         if (gamepad.y)
         {
             uBarY = true;
@@ -297,27 +309,10 @@ public class TowerController
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
+    }
 
-        /** Low Poll */
-        if (gamepad.b && !gamepad.start)
-        {
-            uBarB = true;
-            screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(2760);
-            screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            screw.setPower(1);
-
-        }
-        if (screw.getCurrentPosition() > 2700 && uBarB)
-        {
-            uBarB = false;
-            uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(-1680);
-            uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(1);
-        }
-
-        /** Middle Poll */
+    private void middlePoll(Gamepad gamepad)
+    {
         if (gamepad.x && screw.getCurrentPosition() >= 2700 && uBar.getCurrentPosition() > 0)
         {
             uBarX = true;
@@ -348,8 +343,30 @@ public class TowerController
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
+    }
 
-        /** Pick up */
+    private void lowPoll(Gamepad gamepad)
+    {
+        if (gamepad.b && !gamepad.start)
+        {
+            uBarB = true;
+            screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            screw.setTargetPosition(2760);
+            screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            screw.setPower(1);
+
+        }
+        if (screw.getCurrentPosition() > 2700 && uBarB)
+        {
+            uBarB = false;
+            uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            uBar.setTargetPosition(-1680);
+            uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            uBar.setPower(1);
+        }
+    }
+    private void pickUp(Gamepad gamepad)
+    {
         if (gamepad.a && screw.getCurrentPosition() > 2700)
         {
             screwA = true;
@@ -429,33 +446,6 @@ public class TowerController
         {
             //Do nothing, stick is idle
         }
-    }
-
-    public void handleGamepad(Gamepad gamepad, Telemetry telemetry)
-    {
-        //Screw methods
-//        handleScrewLevelSet(gamepad, telemetry);
-        screwAnlogControler(gamepad, telemetry);
-
-//        Ubar Methods
-//        handleUBarLevelSet(gamepad, telemetry);
-        uBarAnlogControler(gamepad, telemetry);
-
-        driveAll(gamepad, telemetry);
-
-        // Intake Method
-        handleIntake(gamepad);
-
-        //Screw and Ubar ticks printout or breaking method
-        telemetryOutput(telemetry);
-    }
-
-    public void telemetryOutput(Telemetry telemetry)
-    {
-        telemetry.addData("Screw ticks = ", "%d", screw.getCurrentPosition());
-        telemetry.addData("Ubar  ticks = ", "%d", uBar.getCurrentPosition());
-
-        telemetry.update();
     }
 
     public void handleGamepad(Gamepad gamepad, Telemetry telemetry)
