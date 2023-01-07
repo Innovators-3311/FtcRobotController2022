@@ -55,7 +55,7 @@ public class CombinedLocalizer implements Localizer {
     private OpenGLMatrix lastLocation               = null;
     private VuforiaLocalizer vuforia                = null;
     private VuforiaTrackables targets               = null;
-    private GyroSensor gyro;
+//    private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
     private WebcamName webcamName                  = null;
@@ -79,7 +79,7 @@ public class CombinedLocalizer implements Localizer {
      */
     public CombinedLocalizer(HardwareMap hardwareMap) {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        gyro = hardwareMap.get(GyroSensor.class, "gyro");
+//        gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
         try{
             stateServer = new StateServer();
@@ -162,6 +162,7 @@ public class CombinedLocalizer implements Localizer {
         telemetry.addData("heading","%.1f",heading);
         telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
         telemetry.addData("Vuforia Target Visible", targetWasVisible);
+
     }
     public void measureVelocity() {
         double[] stateChange = imu.getStateChangeDegrees();

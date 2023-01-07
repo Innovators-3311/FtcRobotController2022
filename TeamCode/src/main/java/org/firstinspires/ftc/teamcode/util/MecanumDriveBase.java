@@ -17,11 +17,11 @@ public class MecanumDriveBase {
     public DcMotor lb;
     public DcMotor rb;
     public DcMotor rf;
-    public double leftPowerFront  = 1.0;
-    public double rightPowerFront = 1.0;
-    public double rightPowerBack  = 1.0;
-    public double leftPowerBack   = 1.0;
-    public double speedFactor     = 1.0;
+    public double leftPowerFront  = 0;
+    public double rightPowerFront = 0;
+    public double rightPowerBack  = 0;
+    public double leftPowerBack   = 0;
+    public double speedFactor     = 0;
 
     public MecanumDriveBase(HardwareMap hardwareMap){
         rb = hardwareMap.get(DcMotor.class, "rb");
@@ -32,13 +32,18 @@ public class MecanumDriveBase {
         lf.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.FORWARD);
-        rb.setDirection(DcMotor.Direction.REVERSE);
+
+        lf.setDirection(DcMotor.Direction.FORWARD);
+        // reset encoders
+        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
         lf.setMode(runmode);
         rf.setMode(runmode);
-        lf.setMode(runmode);
-        rf.setMode(runmode);
+        lb.setMode(runmode);
+        rb.setMode(runmode);
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -71,6 +76,7 @@ public class MecanumDriveBase {
           lb.setPower(leftPowerBack);
           rb.setPower(rightPowerBack);
       }
+
       public void driveBaseTelemetry(Telemetry telemetry) {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
         telemetry.addData("Speed control", speedFactor);
