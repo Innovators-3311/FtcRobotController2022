@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.util.DriveForTest;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="ClobberHope", group="Basic drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="BackUpCode", group="!")
 //@Disabled
 public class BasicTeleOp extends OpMode
 
