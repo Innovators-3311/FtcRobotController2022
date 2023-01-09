@@ -23,7 +23,7 @@ public class MecanumDriveBase {
     public double leftPowerBack   = 0;
     public double speedFactor     = 0;
 
-    public MecanumDriveBase(HardwareMap hardwareMap){
+    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous){
         rb = hardwareMap.get(DcMotor.class, "rb");
         rf = hardwareMap.get(DcMotor.class, "rf");
         lb = hardwareMap.get(DcMotor.class, "lb");
@@ -39,19 +39,26 @@ public class MecanumDriveBase {
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
+        if (!autonomous)
+        {
         lf.setMode(runmode);
         rf.setMode(runmode);
         lb.setMode(runmode);
         rb.setMode(runmode);
+        }
+        else
+        {
+            lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
     }
       public void gamepadController(Gamepad gamepad) {
           lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
