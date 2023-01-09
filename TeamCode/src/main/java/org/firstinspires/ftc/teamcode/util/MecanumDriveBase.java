@@ -17,13 +17,13 @@ public class MecanumDriveBase {
     public DcMotor lb;
     public DcMotor rb;
     public DcMotor rf;
-    public double leftPowerFront  = 1.0;
-    public double rightPowerFront = 1.0;
-    public double rightPowerBack  = 1.0;
-    public double leftPowerBack   = 1.0;
-    public double speedFactor     = 1.0;
+    public double leftPowerFront  = 0;
+    public double rightPowerFront = 0;
+    public double rightPowerBack  = 0;
+    public double leftPowerBack   = 0;
+    public double speedFactor     = 0;
 
-    public MecanumDriveBase(HardwareMap hardwareMap){
+    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous){
         rb = hardwareMap.get(DcMotor.class, "rb");
         rf = hardwareMap.get(DcMotor.class, "rf");
         lb = hardwareMap.get(DcMotor.class, "lb");
@@ -32,26 +32,38 @@ public class MecanumDriveBase {
         lf.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.FORWARD);
-        rb.setDirection(DcMotor.Direction.REVERSE);
+
+        // reset encoders
+        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
+        if (!autonomous)
+        {
         lf.setMode(runmode);
         rf.setMode(runmode);
-        lf.setMode(runmode);
-        rf.setMode(runmode);
+        lb.setMode(runmode);
+        rb.setMode(runmode);
+        }
+        else
+        {
+            lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
     }
       public void gamepadController(Gamepad gamepad) {
-
+          lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+          rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+          lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;
@@ -71,6 +83,7 @@ public class MecanumDriveBase {
           lb.setPower(leftPowerBack);
           rb.setPower(rightPowerBack);
       }
+
       public void driveBaseTelemetry(Telemetry telemetry) {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
         telemetry.addData("Speed control", speedFactor);

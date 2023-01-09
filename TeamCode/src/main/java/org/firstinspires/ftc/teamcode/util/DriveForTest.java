@@ -12,7 +12,7 @@ public class DriveForTest
     private DcMotor rightFront = null;
     private DcMotor leftBack = null;
     private DcMotor rightBack = null;
-    private double speedFactor = 0.25;
+    private double speedFactor = 1;
 
     public DriveForTest(HardwareMap hardwareMap)
     {
