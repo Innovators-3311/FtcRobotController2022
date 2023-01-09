@@ -52,7 +52,7 @@ public class Autonomous extends LinearOpMode
 //        }
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, true);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
