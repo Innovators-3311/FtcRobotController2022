@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
@@ -22,7 +23,7 @@ public class TeleOpBabyModeStub extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
         localizer          = new CombinedLocalizer(hardwareMap);
-        mecanumDriveBase   = new MecanumDriveBase(hardwareMap);
+        mecanumDriveBase   = new MecanumDriveBase(hardwareMap, false);
         babyModeController = new BabyModeController(mecanumDriveBase, localizer);
         towerController    = new TowerController(hardwareMap,telemetry);
         pacMan             = new PacManTurnToPos(localizer, mecanumDriveBase);
