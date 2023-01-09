@@ -33,7 +33,6 @@ public class MecanumDriveBase {
         rf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.FORWARD);
 
-        lf.setDirection(DcMotor.Direction.FORWARD);
         // reset encoders
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -53,10 +52,11 @@ public class MecanumDriveBase {
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
       public void gamepadController(Gamepad gamepad) {
-
+          lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+          rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+          lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;
