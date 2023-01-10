@@ -6,12 +6,12 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub1", group="Basic drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub1", group="!")
 @Disabled
 public class InnoTeleOp extends OpMode
 
 {
-    private IntegratedLocalizerIMU localizer        = null;
+    private IntegratedLocalizerIMU localizer = null;
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;
@@ -19,7 +19,7 @@ public class InnoTeleOp extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
         localizer = new IntegratedLocalizerIMU(hardwareMap);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         towerController = new TowerController(hardwareMap, telemetry);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);

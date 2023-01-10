@@ -6,9 +6,8 @@ import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 
-@TeleOp(name="TeleOpStub", group="!")
+@TeleOp(name="MainCode", group="!")
 public class TeleOpStub extends OpMode
-
 {
     private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
