@@ -30,16 +30,20 @@ public class InnoTeleOp extends OpMode
         localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
 //        towerController.handleUBar();
+        towerController.handleGamepad(gamepad2, telemetry);
 //        towerController.handleScrew();
 //        towerController.handleIntake();
 //        towerController.handleGamepad(gamepad2);
         towerController.handleGamepad(gamepad2, telemetry);
+
         mecanumDriveBase.driveBaseTelemetry(telemetry);
         telemetry.addData("TeleOp heading", localizer.getRotation() );
         pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());
         telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
         telemetry.addData("", "lb = " + mecanumDriveBase.lb.getCurrentPosition());
+
+//        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.update();
     }
 }
