@@ -32,6 +32,7 @@ public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
+    private static final float fullField = 144 * mmPerInch;
     private static final float halfTile = 12 * mmPerInch;
     private static final float oneAndHalfTile = 36 * mmPerInch;
     private static final float loopSpeedHT = 0.1f;
@@ -97,10 +98,26 @@ public class CombinedLocalizer implements Localizer {
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
 
-        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
-        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
-        identifyTarget(2, "Blue Audience Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90);
-        identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+//        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
+//        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+//        identifyTarget(2, "Blue Audience Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90);
+//        identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+
+        // WARNING: This is likely to be a source of error. Check z-rotations first.
+        // Our reference frame is rotated -90 degrees about z (up) from the O.G. reference frame,
+        // so we should be adding 90 degrees to the target z rotations.
+        identifyTarget(0, "Red Audience Wall",
+                halfField + oneAndHalfTile, 0, mmTargetHeight,
+                90, 0, 180);
+        identifyTarget(1, "Red Rear Wall",
+                halfField + oneAndHalfTile, fullField, mmTargetHeight,
+                90, 0, 0);
+        identifyTarget(2, "Blue Audience Wall",
+                halfField - oneAndHalfTile, 0, mmTargetHeight,
+                90, 0, 180);
+        identifyTarget(3, "Blue Rear Wall",
+                halfField - oneAndHalfTile, fullField, mmTargetHeight,
+                90, 0, 0);
 
         /*
          * Create a transformation matrix describing where the camera is on the robot.

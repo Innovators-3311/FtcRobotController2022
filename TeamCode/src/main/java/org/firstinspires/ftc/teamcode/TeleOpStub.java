@@ -38,7 +38,6 @@ public class TeleOpStub extends OpMode
         telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
         telemetry.addData("", "lb = " + mecanumDriveBase.lb.getCurrentPosition());
         telemetry.addData("TeleOp heading", localizer.getRotation() );
-        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.update();
     }
 }

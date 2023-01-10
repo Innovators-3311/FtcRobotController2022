@@ -41,16 +41,17 @@ public class MecanumDriveBase {
         // Run Without Encoders
         if (!autonomous)
         {
-        lf.setMode(runmode);
-        rf.setMode(runmode);
-        lb.setMode(runmode);
-        rb.setMode(runmode);
+            lf.setMode(runmode);
+            rf.setMode(runmode);
+            lb.setMode(runmode);
+            rb.setMode(runmode);
         }
         else
         {
             lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         
         // Brake when power set to Zero
@@ -64,6 +65,7 @@ public class MecanumDriveBase {
           lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
           rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
           lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+          rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;

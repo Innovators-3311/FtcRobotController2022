@@ -37,7 +37,7 @@ public class OdometryPodsSensor implements PositionChangeSensor {
      * State change is returned in terms of the Robot's motion in its forward direction, strafe
      * (left is positive), and heading change (in radians)
      *
-     * @return double[] {forward, strafe, rotation, forwardRate, strafeRate}
+     * @return double[] {forward, strafe, rotation, forwardRate, strafeRate, rotationRate}
      */
     public double[] getStateChange() {
         double distanceChangeLeft  = leftPod.getDistanceChangeInches();
@@ -49,7 +49,8 @@ public class OdometryPodsSensor implements PositionChangeSensor {
         double strafe = centerPod.getDistanceChangeInches() - (rotationChange*frontPodDistance);//?
         double forwardRate = forward /deltaT;
         double strafeRate = strafe / deltaT;
-        double[] retVal = {forward,strafe,rotationChange,forwardRate, strafeRate};
+        double rotationRate = rotationChange / deltaT;
+        double[] retVal = {forward,strafe,rotationChange,forwardRate, strafeRate, rotationRate};
         return retVal;
     }
     /** Gets the Robot's Estimated State Change.
