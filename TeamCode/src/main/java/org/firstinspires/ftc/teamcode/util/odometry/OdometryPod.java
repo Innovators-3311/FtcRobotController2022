@@ -13,6 +13,13 @@ public class OdometryPod {
     private double encoderSign = 1;
 
 
+    /**
+     * Odometry Pod Constructor
+     *
+     * @param hardwareMap The hardwareMap
+     * @param podName The name of the pod motor
+     * @param encoderSignInverted Whether the pod is inverted
+     */
     public OdometryPod(HardwareMap hardwareMap, String podName, boolean encoderSignInverted) {
         pod = hardwareMap.get(DcMotor.class, podName);
         lastPos = pod.getCurrentPosition();
@@ -21,12 +28,19 @@ public class OdometryPod {
             encoderSign = -1;
         }
     }
+
     public double getDistanceChangeInches() {
         double distanceChange = inchesPerTick * (pod.getCurrentPosition() - lastPos);
         lastPos = pod.getCurrentPosition();
         return distanceChange;
     }
 
+    /**
+     * Odometry Pod Constructor
+     *
+     * @param hardwareMap The hardwareMap
+     * @param podName The name of the pod to initialize
+     */
     public OdometryPod(HardwareMap hardwareMap, String podName)
     {
         this(hardwareMap, podName, false);
