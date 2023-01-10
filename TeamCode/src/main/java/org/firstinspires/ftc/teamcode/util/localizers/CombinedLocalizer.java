@@ -64,7 +64,7 @@ public class CombinedLocalizer implements Localizer {
     private double lastT                           =  0;
     private double headingOffSet                   =  0;
     private double gyroHeading                     =  0;
-    private double positionUncertainty             = .5;
+    public double positionUncertainty             = .5;
     static final double vuforiaPositionUncertainty = .2;
     private double headingUncertainty              = 5;
     private double vuforiaHeadingUncertainty       = 5;
@@ -216,16 +216,32 @@ public class CombinedLocalizer implements Localizer {
     /**
      * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
      * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
-     * @param xin the robot x value
-     * @param yin the robot y value
+     * @param x the robot x value
+     * @param y the robot y value
      * @return {fieldX, fieldY}
      *
      */
-    // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
-    public double[] robotToFieldFrame(double xin,double yin){
+    public double[] robotToFieldFrame(double x,double y){
+        double rotation = getRotation();
         double[] retVal ={
-                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
-                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
+                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
+                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+        return retVal;
+    }
+
+    /**
+     * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
+     * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
+     * @param x the robot x value
+     * @param y the robot y value
+     * @return {fieldX, fieldY}
+     *
+     */
+    public double[] fieldToRobotFrame(double x,double y){
+        double rotation = getRotation();
+        double[] retVal ={
+                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
+                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**

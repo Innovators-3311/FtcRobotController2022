@@ -67,7 +67,7 @@ public class DriveToPos {
         // Compute the turn that minimizes wrap-arounds.
         // Note that this is a heading change, so rotation and target are backwards
         // TODO: Fix handling heading change! -1 < turn < 1
-        double turn = localizer.smartAngleError(localizer.rotation, rotationTarget);
+        double turn = localizer.smartAngleError(localizer.getRotation(), rotationTarget);
         double speedFactor = 1;
 
         // https://www.desmos.com/calculator/ln1qieke73
