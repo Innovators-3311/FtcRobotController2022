@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
-import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -33,7 +32,6 @@ public class CombinedLocalizer implements Localizer {
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
     private static final float fullField = 144 * mmPerInch;
-    private static final float halfTile = 12 * mmPerInch;
     private static final float oneAndHalfTile = 36 * mmPerInch;
     private static final float loopSpeedHT = 0.1f;
 
@@ -48,8 +46,8 @@ public class CombinedLocalizer implements Localizer {
     public double z             = 0;
     public double yVelocity     = 0;
     public double xVelocity     = 0;
-    public double rotation = 0;
-    public double rotationRate = 0;
+    public double heading       = 0;
+    public double headingRate   = 0;
     private ElapsedTime runtime = new ElapsedTime();
     private OpenGLMatrix lastLocation               = null;
     private VuforiaLocalizer vuforia                = null;
@@ -66,7 +64,7 @@ public class CombinedLocalizer implements Localizer {
     private double lastT                           =  0;
     private double headingOffSet                   =  0;
     private double gyroHeading                     =  0;
-    public double positionUncertainty             = .5;
+    private double positionUncertainty             = .5;
     static final double vuforiaPositionUncertainty = .2;
     private double headingUncertainty              = 5;
     private double vuforiaHeadingUncertainty       = 5;
@@ -171,13 +169,16 @@ public class CombinedLocalizer implements Localizer {
 
     @Override
     public void displayTelemetry(Telemetry telemetry) {
-        telemetry.addLine("position")
-            .addData("x","%.1f",x)
-            .addData("y","%.1f",y);
-        telemetry.addData("heading","%.1f", rotation);
-        telemetry.addData("Brendan's heading","%.1f",smartAngleError(rotation, 0));
-        telemetry.addData("Vuforia Target Visible", targetWasVisible);
-
+        telemetry.addLine("ROBOPosition")
+            .addData("X","%.1f",x)
+            .addData("Y","%.1f",y);
+        double[] fieldFrame = robotToFieldFrame(x,y);
+        telemetry.addLine("fieldPosition")
+                .addData("x","%.1f",fieldFrame[0])
+                .addData("y","%.1f",fieldFrame[1]);
+        telemetry.addData("heading","%.1f",heading);
+//        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
+//        telemetry.addData("Vuforia Target Visible", targetWasVisible);
     }
     public void measureVelocity() {
         double[] stateChange = imu.getStateChangeDegrees();
@@ -197,7 +198,7 @@ public class CombinedLocalizer implements Localizer {
         // y velocity in inches per second
         yVelocity = fieldStateChange[1];
         // Heading rate in degrees per second.
-        rotationRate = stateChange[5];
+        headingRate = stateChange[5];
     }
 
     public void measurePodChange() {
@@ -209,36 +210,22 @@ public class CombinedLocalizer implements Localizer {
         // y velocity in inches per second
         yVelocity = fieldStateChange[1];
         // Heading rate in degrees per second.
-        rotationRate = stateChange[5];
+        headingRate = stateChange[5];
     }
 
     /**
      * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
      * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
-     * @param x the robot x value
-     * @param y the robot y value
+     * @param xin the robot x value
+     * @param yin the robot y value
      * @return {fieldX, fieldY}
      *
      */
-    public double[] robotToFieldFrame(double x,double y){
+    // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
+    public double[] robotToFieldFrame(double xin,double yin){
         double[] retVal ={
-                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
-                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
-        return retVal;
-    }
-
-    /**
-     * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
-     * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
-     * @param x the robot x value
-     * @param y the robot y value
-     * @return {fieldX, fieldY}
-     *
-     */
-    public double[] fieldToRobotFrame(double x,double y){
-        double[] retVal ={
-                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
-                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
+                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
@@ -249,7 +236,7 @@ public class CombinedLocalizer implements Localizer {
         double deltaT = thisTime - stateTime;
         x += deltaT * xVelocity;
         y += deltaT * yVelocity;
-        rotation += deltaT * rotationRate;
+        heading += deltaT * headingRate;
         stateTime = thisTime;
         // Over one second, we estimate that position uncertainty grows by 5 inch.
         positionUncertainty += deltaT*deltaT * 5;
@@ -266,8 +253,8 @@ public class CombinedLocalizer implements Localizer {
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             double vuforiaHeading = rotation.thirdAngle%360;
-            double err = smartAngleError(vuforiaHeading, this.rotation);
-            this.rotation += k*(err);
+            double err = smartAngleError(vuforiaHeading, heading);
+            heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
 
         }
@@ -278,7 +265,7 @@ public class CombinedLocalizer implements Localizer {
      *
      * @param a angle a
      * @param b angle b
-     * @return angle error (a-b, as close to zero as possible) Range: -180 to 180
+     * @return angle error (a-b, as close to zero as possible)
      */
     public double smartAngleError(double a, double b){
         double diff = a - b;
@@ -336,30 +323,34 @@ public class CombinedLocalizer implements Localizer {
         }
         updateState();
         measureState();
-        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, rotation, xVelocity, yVelocity, rotationRate,positionUncertainty, headingUncertainty);
-        try {
-            JSONObject state = new JSONObject()
-                    .put("x", x)
-                    .put("y", y)
-                    .put("heading", rotation)
-                    .put("xVelocity", xVelocity)
-                    .put("yVelocity", yVelocity)
-                    .put("headingRate", rotationRate)
-                    .put("positionUncertainty", positionUncertainty)
-                    .put("headingUncertainty", headingUncertainty)
-                    .put("runTime", runtime.seconds())
-                    .put("targetVisible", targetWasVisible)
-                    .put("secondsSinceVuforia", runtime.seconds()-lastT);
-            stateServer.addState(state);
-        } catch (JSONException e) {
-            RobotLog.ee("Localizer", "Error encoding json.");
-        };
+        RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
+        if(stateServer != null)
+        {
+            try
+            {
+                JSONObject state = new JSONObject().put("runTime", runtime.seconds())
+                        .put("x", x).put("y", y).put("heading", heading)
+                        .put("xVelocity", xVelocity).put("yVelocity", yVelocity).put("headingRate", headingRate)
+                        .put("positionUncertainty", positionUncertainty)
+                        .put("headingUncertainty", headingUncertainty)
+                        .put("targetVisible", targetWasVisible)
+                        .put("secondsSinceVuforia", runtime.seconds() - lastT);
+                stateServer.addState(state);
+            } catch (JSONException e)
+            {
+                RobotLog.ee("Localizer", "Error encoding json.");
+            }
+        }
+    }
+
+    @Override
+    public double getHeading() {
+        return heading;
     }
 
     @Override
     public double getRotation() {
-
-        return rotation;
+        return -heading;
     }
 
 }

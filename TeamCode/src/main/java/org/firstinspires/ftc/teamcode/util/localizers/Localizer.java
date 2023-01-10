@@ -39,8 +39,10 @@ public interface Localizer {
      * @param dx, dy, dz  Target offsets in x,y,z axes
      * @param rx, ry, rz  Target rotations in x,y,z axes
      */
-    public void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz);
-    public void displayTelemetry(Telemetry telemetry);
-    public void handleTracking();
-    public double getRotation();
+    void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz);
+    void displayTelemetry(Telemetry telemetry);
+    void handleTracking();
+    double getRotation();
+
+    double getHeading();
 }
