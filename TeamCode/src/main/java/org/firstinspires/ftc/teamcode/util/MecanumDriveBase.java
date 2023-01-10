@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class MecanumDriveBase {
@@ -64,8 +61,6 @@ public class MecanumDriveBase {
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -90,8 +85,8 @@ public class MecanumDriveBase {
           driveMotors(drive, turn, strafe, speedFactor);
       }
 
-      public void driveMotors(double drive,double turn,double strafe,double speedFactor){
-
+      public void driveMotors(double drive,double turn,double strafe,double speedFactor)
+      {
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
@@ -103,45 +98,10 @@ public class MecanumDriveBase {
           rb.setPower(rightPowerBack);
       }
 
-      public void driveBaseTelemetry(Telemetry telemetry) {
+      public void driveBaseTelemetry(Telemetry telemetry)
+      {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
         telemetry.addData("Speed control", speedFactor);
       }
-
-    public DcMotor getlf() {
-        return lf;
-    }
-
-    public DcMotor getlb() {
-        return lb;
-    }
-
-    public DcMotor getrb() {
-        return rb;
-    }
-
-    public DcMotor getrf() {
-        return rf;
-    }
-
-    public double getLeftPowerFront() {
-        return leftPowerFront;
-    }
-
-    public double getRightPowerFront() {
-        return rightPowerFront;
-    }
-
-    public double getRightPowerBack() {
-        return rightPowerBack;
-    }
-
-    public double getLeftPowerBack() {
-        return leftPowerBack;
-    }
-
-    public double getSpeedFactor() {
-        return speedFactor;
-    }
 }
 

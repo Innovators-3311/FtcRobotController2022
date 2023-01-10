@@ -329,6 +329,7 @@ public class TowerController
             screw.setPower(1);
             if (screw.getCurrentPosition() >= 2662)
             {
+                uBarX = true;
                 uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 uBar.setTargetPosition(-3000);
                 uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
