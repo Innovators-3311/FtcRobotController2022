@@ -32,11 +32,13 @@ public class MecanumDriveBase {
         lf.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.FORWARD);
+        rb.setDirection(DcMotor.Direction.REVERSE);
 
         // reset encoders
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
         if (!autonomous)
