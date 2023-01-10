@@ -2,21 +2,15 @@ package org.firstinspires.ftc.teamcode.proto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 @Autonomous(name = "basicAutonomous", group = "2022 - 2023 Autonomous")
-@Disabled
+
 public class BasicAutonomous extends LinearOpMode
 {
+    private MecanumDriveBase mecanumDriveBase;
     // Initialize motors
     private DcMotor leftFront;
     private DcMotor rightFront;
@@ -40,21 +34,7 @@ public class BasicAutonomous extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        leftFront = hardwareMap.get(DcMotor.class, "lf");
-        rightFront = hardwareMap.get(DcMotor.class, "rf");
-        leftBack = hardwareMap.get(DcMotor.class, "lb");
-        rightBack = hardwareMap.get(DcMotor.class, "rb");
-
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.REVERSE);
-
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         leftFrontPos = 0;
         rightFrontPos = 0;
         leftBackPos = 0;
@@ -62,18 +42,31 @@ public class BasicAutonomous extends LinearOpMode
 
         waitForStart();
 
+        turnInPlace(5000, 1, 1);
 
-        drive(COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, 0.25);
-        Thread.sleep(1000);
-        drive(-COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, 0.50);
-        Thread.sleep(1000);
-        drive(-1000, 1000, 1000, -1000, 100);
+//        drive(COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, COUNTS_PER_INCH * 8, 0.25);
+//        Thread.sleep(1000);
+//        drive(-COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, -COUNTS_PER_INCH * 8, 0.50);
+//        Thread.sleep(1000);
+//        drive(-1000, 1000, 1000, -1000, 100);
 
 
 
         // forward drive(1000, 1000, 1000, 1000, 0.25);
         // Turn drive(1000, -1000, 1000, -1000, 0.25);
         // strafe drive(1000, -1000, -1000, 1000, 0.25);
+        stop();
+    }
+    private void turnInPlace(double target, int right, double speed)
+    {
+    target *= right;
+
+
+        mecanumDriveBase.driveMotors(0, speed, 0, 1);
+    while (mecanumDriveBase.lb.getCurrentPosition() !=  target){
+        mecanumDriveBase.driveMotors(0, speed, 0, 1);
+    }
+    mecanumDriveBase.driveMotors(0, 0, 0, 0);
     }
 
     private void drive(double leftFrontTarget, double rightFrontTarget, double leftBackTarget, double rightBackTarget, double speed)

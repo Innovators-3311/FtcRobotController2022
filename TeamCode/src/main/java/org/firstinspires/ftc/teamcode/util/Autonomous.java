@@ -141,7 +141,7 @@ public class Autonomous extends LinearOpMode
 //        driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
         telemetry.addData("", runtime.seconds());
         telemetry.update();
-        while (runtime.seconds() < 20)
+        while (runtime.seconds() < 18)
         {
             mecanumDriveBase.driveMotors(0.1,0, 0, -1);
         }
@@ -152,7 +152,7 @@ public class Autonomous extends LinearOpMode
         Thread.sleep(1000);
         intake.setPower(0);
 
-        driveStraight(ticksPerInch * 3, 1, 0.5);
+        driveStraight(ticksPerInch * 2.5, 1, 0.5);
         Thread.sleep(500);
         driveUBarSpecial(-600);
         switch (zone)
@@ -192,7 +192,7 @@ public class Autonomous extends LinearOpMode
         }
         driveUBar(0);
         driveScrew(0);
-        driveStraight(ticksPerInch * 3, -1, 0.3);
+        driveStraight(ticksPerInch * 4, -1, 0.3);
         while (screw.isBusy())
         {
             idle();
@@ -263,12 +263,9 @@ public class Autonomous extends LinearOpMode
     {
         target *= right;
 
-//        mecanumDriveBase.lf.setPower(right * speed);
-//        mecanumDriveBase.rf.setPower(-right * speed);
-//        mecanumDriveBase.lb.setPower(-right * speed);
-//        mecanumDriveBase.rb.setPower(right * speed);
+        mecanumDriveBase.driveMotors(0, 1, 0, 1);
 
-        while (mecanumDriveBase.lb.getCurrentPosition() != target){}
+        while (mecanumDriveBase.lb.getCurrentPosition() <=  target){}
     }
 
     private void driveScrew(int target)
