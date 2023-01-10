@@ -52,10 +52,10 @@ public class Autonomous extends LinearOpMode
 //        }
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, true);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+//        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         screw = hardwareMap.get(DcMotor.class, "screw");
         uBar = hardwareMap.get(DcMotor.class, "uBar");
@@ -221,7 +221,6 @@ public class Autonomous extends LinearOpMode
     private void driveStrafe(double target, int right, double speed)
     {
         speed *= right;
-
         if (right == 1)
         {
             rightFrontPos -= target;
