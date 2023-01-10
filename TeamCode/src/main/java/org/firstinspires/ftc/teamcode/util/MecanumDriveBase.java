@@ -56,22 +56,37 @@ public class MecanumDriveBase {
             rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         
+        lf.setMode(runmode);
+        rf.setMode(runmode);
+        lb.setMode(runmode);
+        rb .setMode(runmode);
+
         // Brake when power set to Zero
-        lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
+        lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-      public void gamepadController(Gamepad gamepad) {
-          lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-          rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-          lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-          rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+    /**
+     * Standard controls from a gamepad
+     *
+     * @param gamepad - the gamepad you want to control the drive base
+     */
+    public void gamepadController(Gamepad gamepad) {
+
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;
-          speedFactor = .5 + .5 * gamepad.right_trigger;
+          speedFactor = 1 - (.5*gamepad.right_trigger);
           driveMotors(drive, turn, strafe, speedFactor);
       }
 
@@ -92,5 +107,41 @@ public class MecanumDriveBase {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
         telemetry.addData("Speed control", speedFactor);
       }
+
+    public DcMotor getlf() {
+        return lf;
+    }
+
+    public DcMotor getlb() {
+        return lb;
+    }
+
+    public DcMotor getrb() {
+        return rb;
+    }
+
+    public DcMotor getrf() {
+        return rf;
+    }
+
+    public double getLeftPowerFront() {
+        return leftPowerFront;
+    }
+
+    public double getRightPowerFront() {
+        return rightPowerFront;
+    }
+
+    public double getRightPowerBack() {
+        return rightPowerBack;
+    }
+
+    public double getLeftPowerBack() {
+        return leftPowerBack;
+    }
+
+    public double getSpeedFactor() {
+        return speedFactor;
+    }
 }
 

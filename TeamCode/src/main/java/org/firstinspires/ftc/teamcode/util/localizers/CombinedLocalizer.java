@@ -221,6 +221,7 @@ public class CombinedLocalizer implements Localizer {
      * @return {fieldX, fieldY}
      *
      */
+    // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
     public double[] robotToFieldFrame(double x,double y){
         double rotation = getRotation();
         double[] retVal ={
