@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.proto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
 
 @Autonomous(name = "basicAutonomous", group = "2022 - 2023 Autonomous")
+@Disabled
 public class BasicAutonomous extends LinearOpMode
 {
     // Initialize motors
