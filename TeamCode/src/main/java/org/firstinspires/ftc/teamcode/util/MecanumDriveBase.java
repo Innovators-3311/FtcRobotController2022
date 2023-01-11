@@ -32,31 +32,19 @@ public class MecanumDriveBase {
         rb.setDirection(DcMotor.Direction.REVERSE);
 
         // reset encoders
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
         if (!autonomous)
         {
-            lf.setMode(runmode);
-            rf.setMode(runmode);
-            lb.setMode(runmode);
-            rb.setMode(runmode);
+            setMode(runmode);
         }
         else
         {
-            lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        
-        lf.setMode(runmode);
-        rf.setMode(runmode);
-        lb.setMode(runmode);
-        rb .setMode(runmode);
+
+        setMode(runmode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -64,10 +52,14 @@ public class MecanumDriveBase {
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    private void setMode(DcMotor.RunMode runmode) {
+        lf.setMode(runmode);
+        rf.setMode(runmode);
+        lb.setMode(runmode);
+        rb.setMode(runmode);
     }
 
 
