@@ -1,23 +1,18 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "autonomous")
 public class Autonomous extends LinearOpMode
 {
+
     private MecanumDriveBase mecanumDriveBase;
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
@@ -52,10 +47,10 @@ public class Autonomous extends LinearOpMode
 //        }
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, true);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+//        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         screw = hardwareMap.get(DcMotor.class, "screw");
         uBar = hardwareMap.get(DcMotor.class, "uBar");
@@ -87,14 +82,13 @@ public class Autonomous extends LinearOpMode
         uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveScrewUp(500, 0.5);
-        driveScrewDown(10000, 0.5);
-
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
         zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
+        driveScrewUp(500, 0.5);
+        driveScrewDown(10000, 0.5);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
@@ -103,6 +97,9 @@ public class Autonomous extends LinearOpMode
 
         // Waits till start button is pressed
         waitForStart();
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.seconds();
+        runtime.startTime();
 
 //        encoderLogging();
 
@@ -111,14 +108,14 @@ public class Autonomous extends LinearOpMode
         driveScrew(2720);
         if (blueSide)
         {
-            driveStrafe(ticksPerInch * 24, -1, .5);
+            driveStrafe(ticksPerInch * 24, -1, 0.5);
         }
         else
         {
-            driveStrafe(ticksPerInch * 24, 1, .5);
+            driveStrafe(ticksPerInch * 24, 1, 0.5);
         }
         Thread.sleep(500);
-        driveUBar(-3109);
+        driveUBar(-3250);
         driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
         Thread.sleep(500);
         //strafes to pole
@@ -142,13 +139,22 @@ public class Autonomous extends LinearOpMode
         Thread.sleep(500);
 
 //        driveStraight((ticksPerInch * distanceSensor.getDistance(DistanceUnit.INCH)) - 0.75, -1, 0.5);
-        driveStraight(ticksPerInch * 3, -1, 0.5);
-        Thread.sleep(500);
+        telemetry.addData("", runtime.seconds());
+        telemetry.update();
+        while (runtime.seconds() < 18)
+        {
+            mecanumDriveBase.driveMotors(0.1,0, 0, -1);
+        }
+        driveUBar(-3050);
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+        Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
         intake.setPower(0);
-        driveStraight(ticksPerInch * 3, 1, 0.5);
 
+        driveStraight(ticksPerInch * 2.5, 1, 0.5);
+        Thread.sleep(500);
+        driveUBarSpecial(-600);
         switch (zone)
         {
             case 1:
@@ -183,6 +189,13 @@ public class Autonomous extends LinearOpMode
                     driveStrafe(ticksPerInch * 8, -1, 0.5);
                 }
                 break;
+        }
+        driveUBar(0);
+        driveScrew(0);
+        driveStraight(ticksPerInch * 4, -1, 0.3);
+        while (screw.isBusy())
+        {
+            idle();
         }
         // Stops program when reached
         stop();
@@ -221,7 +234,6 @@ public class Autonomous extends LinearOpMode
     private void driveStrafe(double target, int right, double speed)
     {
         speed *= right;
-
         if (right == 1)
         {
             rightFrontPos -= target;
@@ -251,12 +263,9 @@ public class Autonomous extends LinearOpMode
     {
         target *= right;
 
-//        mecanumDriveBase.lf.setPower(right * speed);
-//        mecanumDriveBase.rf.setPower(-right * speed);
-//        mecanumDriveBase.lb.setPower(-right * speed);
-//        mecanumDriveBase.rb.setPower(right * speed);
+        mecanumDriveBase.driveMotors(0, 1, 0, 1);
 
-        while (mecanumDriveBase.lb.getCurrentPosition() != target){}
+        while (mecanumDriveBase.lb.getCurrentPosition() <=  target){}
     }
 
     private void driveScrew(int target)
@@ -269,6 +278,15 @@ public class Autonomous extends LinearOpMode
 
     private void driveUBar(int target)
     {
+        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        uBar.setTargetPosition(target);
+        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        uBar.setPower(1);
+    }
+
+    private void driveUBarSpecial(int target) throws InterruptedException
+    {
+        Thread.sleep(500);
         uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         uBar.setTargetPosition(target);
         uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);

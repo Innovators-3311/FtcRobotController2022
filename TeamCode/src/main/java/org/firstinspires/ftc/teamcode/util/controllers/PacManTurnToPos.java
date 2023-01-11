@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util.controllers;
 
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -28,7 +28,7 @@ CompassSensor                compass;
 
     public void handlePacMan(Gamepad gamepad, Telemetry telemetry) {
         //makes heading easier for me.
-        double heading =  localizer.getHeading();
+        double heading =  localizer.getRotation();
         double angleError = 0;
 
         if(Math.abs(gamepad.right_stick_y) < .1 && Math.abs(gamepad.right_stick_x) < .1 &&

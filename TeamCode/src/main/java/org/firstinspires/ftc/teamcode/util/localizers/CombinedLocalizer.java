@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
-import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -24,17 +23,15 @@ import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CombinedLocalizer implements Localizer {
     private static final float mmPerInch = 25.4f;
     private static final float mmTargetHeight = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField = 72 * mmPerInch;
-    private static final float halfTile = 12 * mmPerInch;
+    private static final float fullField = 144 * mmPerInch;
     private static final float oneAndHalfTile = 36 * mmPerInch;
     private static final float loopSpeedHT = 0.1f;
 
@@ -67,7 +64,7 @@ public class CombinedLocalizer implements Localizer {
     private double lastT                           =  0;
     private double headingOffSet                   =  0;
     private double gyroHeading                     =  0;
-    private double positionUncertainty             = .5;
+    public double positionUncertainty             = .5;
     static final double vuforiaPositionUncertainty = .2;
     private double headingUncertainty              = 5;
     private double vuforiaHeadingUncertainty       = 5;
@@ -99,10 +96,26 @@ public class CombinedLocalizer implements Localizer {
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
 
-        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
-        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
-        identifyTarget(2, "Blue Audience Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90);
-        identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+//        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
+//        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+//        identifyTarget(2, "Blue Audience Wall", -halfField, oneAndHalfTile, mmTargetHeight, 90, 0, 90);
+//        identifyTarget(3, "Blue Rear Wall", halfField, oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+
+        // WARNING: This is likely to be a source of error. Check z-rotations first.
+        // Our reference frame is rotated -90 degrees about z (up) from the O.G. reference frame,
+        // so we should be adding 90 degrees to the target z rotations.
+        identifyTarget(0, "Red Audience Wall",
+                halfField + oneAndHalfTile, 0, mmTargetHeight,
+                90, 0, 180);
+        identifyTarget(1, "Red Rear Wall",
+                halfField + oneAndHalfTile, fullField, mmTargetHeight,
+                90, 0, 0);
+        identifyTarget(2, "Blue Audience Wall",
+                halfField - oneAndHalfTile, 0, mmTargetHeight,
+                90, 0, 180);
+        identifyTarget(3, "Blue Rear Wall",
+                halfField - oneAndHalfTile, fullField, mmTargetHeight,
+                90, 0, 0);
 
         /*
          * Create a transformation matrix describing where the camera is on the robot.
@@ -156,13 +169,16 @@ public class CombinedLocalizer implements Localizer {
 
     @Override
     public void displayTelemetry(Telemetry telemetry) {
-        telemetry.addLine("position")
-            .addData("x","%.1f",x)
-            .addData("y","%.1f",y);
+        telemetry.addLine("ROBOPosition")
+            .addData("X","%.1f",x)
+            .addData("Y","%.1f",y);
+        double[] fieldFrame = robotToFieldFrame(x,y);
+        telemetry.addLine("fieldPosition")
+                .addData("x","%.1f",fieldFrame[0])
+                .addData("y","%.1f",fieldFrame[1]);
         telemetry.addData("heading","%.1f",heading);
-        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
-        telemetry.addData("Vuforia Target Visible", targetWasVisible);
-
+//        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
+//        telemetry.addData("Vuforia Target Visible", targetWasVisible);
     }
     public void measureVelocity() {
         double[] stateChange = imu.getStateChangeDegrees();
@@ -205,10 +221,28 @@ public class CombinedLocalizer implements Localizer {
      * @return {fieldX, fieldY}
      *
      */
+    // Graph to demonstrate the translating the robot orientation to the field orientation https://www.desmos.com/calculator/i1i6oc7qlc
     public double[] robotToFieldFrame(double x,double y){
+        double rotation = getRotation();
         double[] retVal ={
-                 Math.cos(heading*Math.PI/180)*x-Math.sin(heading*Math.PI/180)*y,
-                 Math.sin(heading*Math.PI/180)*x+Math.cos(heading*Math.PI/180)*y}; //how.TODO
+                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
+                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+        return retVal;
+    }
+
+    /**
+     * To understand this function, read about "Rotation Matrix" on Wikipedia and look at
+     * the Desmos graph https://www.desmos.com/calculator/6evsqgs7qz
+     * @param x the robot x value
+     * @param y the robot y value
+     * @return {fieldX, fieldY}
+     *
+     */
+    public double[] fieldToRobotFrame(double x,double y){
+        double rotation = getRotation();
+        double[] retVal ={
+                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
+                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
@@ -307,29 +341,33 @@ public class CombinedLocalizer implements Localizer {
         updateState();
         measureState();
         RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
-        try {
-            JSONObject state = new JSONObject()
-                    .put("x", x)
-                    .put("y", y)
-                    .put("heading", heading)
-                    .put("xVelocity", xVelocity)
-                    .put("yVelocity", yVelocity)
-                    .put("headingRate", headingRate)
-                    .put("positionUncertainty", positionUncertainty)
-                    .put("headingUncertainty", headingUncertainty)
-                    .put("runTime", runtime.seconds())
-                    .put("targetVisible", targetWasVisible)
-                    .put("secondsSinceVuforia", runtime.seconds()-lastT);
-            stateServer.addState(state);
-        } catch (JSONException e) {
-            RobotLog.ee("Localizer", "Error encoding json.");
-        };
+        if(stateServer != null)
+        {
+            try
+            {
+                JSONObject state = new JSONObject().put("runTime", runtime.seconds())
+                        .put("x", x).put("y", y).put("heading", heading)
+                        .put("xVelocity", xVelocity).put("yVelocity", yVelocity).put("headingRate", headingRate)
+                        .put("positionUncertainty", positionUncertainty)
+                        .put("headingUncertainty", headingUncertainty)
+                        .put("targetVisible", targetWasVisible)
+                        .put("secondsSinceVuforia", runtime.seconds() - lastT);
+                stateServer.addState(state);
+            } catch (JSONException e)
+            {
+                RobotLog.ee("Localizer", "Error encoding json.");
+            }
+        }
     }
 
     @Override
     public double getHeading() {
-
         return heading;
+    }
+
+    @Override
+    public double getRotation() {
+        return -heading;
     }
 
 }

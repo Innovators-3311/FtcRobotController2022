@@ -372,7 +372,7 @@ public class TowerController
         {
             screwA = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(48);
+            uBar.setTargetPosition(322);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
@@ -389,7 +389,7 @@ public class TowerController
             uBarA = false;
             screwA = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(50);
+            uBar.setTargetPosition(322);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }

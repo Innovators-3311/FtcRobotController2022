@@ -187,6 +187,11 @@ public class LocalizerIMU implements Localizer {
     }
 
     @Override
+    public double getRotation() {
+        return -heading;
+    }
+
+    @Override
     public double getHeading() {
         return heading;
     }

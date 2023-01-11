@@ -1,19 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import org.firstinspires.ftc.teamcode.util.DriveForTest;
-import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
-import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="BackUpCode", group="!")
-public class BasicTeleOp extends OpMode
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="BackUp", group="Basic drive")
+public class TeleOp extends OpMode
 
 {
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
-    private PacManTurnToPos pacMan;
     private DriveForTest driveForTest;
 
     public void init()

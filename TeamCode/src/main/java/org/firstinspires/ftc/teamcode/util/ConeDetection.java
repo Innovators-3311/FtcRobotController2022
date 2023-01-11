@@ -89,8 +89,8 @@ public class ConeDetection
                 if (updatedRecognitions != null)
                 {
 //                    telemetry.addData("", "%s", "if (updatedRecognitions != null)");
-//                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
-//                    telemetry.update();
+                    telemetry.addData("# Objects Detected", updatedRecognitions.size());
+                    telemetry.update();
                     for (Recognition recognition : updatedRecognitions)
                     {
                         double col = (recognition.getLeft() + recognition.getRight()) / 2;

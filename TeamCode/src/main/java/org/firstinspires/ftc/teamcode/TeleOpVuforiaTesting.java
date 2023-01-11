@@ -3,25 +3,24 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
-import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
-import org.firstinspires.ftc.teamcode.util.TowerController;
 
-@TeleOp(name="MainCode", group="!")
+@TeleOp(name="Vuforia Testing", group="Testing")
+public class TeleOpVuforiaTesting extends OpMode
 
-public class TeleOpStub extends OpMode
 {
     private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
-    private TowerController towerController;
+//    private TowerController towerController;
     private PacManTurnToPos pacMan;
 
     public void init() {
         telemetry.addData("Status", "Initialized");
         localizer = new CombinedLocalizer(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
-        towerController = new TowerController(hardwareMap, telemetry);
+//        towerController = new TowerController(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
     }
@@ -31,13 +30,8 @@ public class TeleOpStub extends OpMode
         localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
-        towerController.handleGamepad(gamepad2, telemetry);
-//        telemetry.addData("TeleOp heading", localizer.getHeading());
-//        pacMan.handlePacMan(gamepad1, telemetry);
-        telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());
-        telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
-        telemetry.addData("", "lb = " + mecanumDriveBase.lb.getCurrentPosition());
-        telemetry.addData("TeleOp heading", localizer.getRotation() );
+        telemetry.addData("TeleOp heading", localizer.getHeading());
+        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.update();
     }
 }
