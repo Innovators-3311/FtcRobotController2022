@@ -8,7 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class MecanumDriveBase {
     private ElapsedTime runtime = new ElapsedTime();
-    private static DcMotor.RunMode runmode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+    private static final DcMotor.RunMode runmode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 
     public DcMotor lf;
     public DcMotor lb;
@@ -32,19 +32,19 @@ public class MecanumDriveBase {
         rb.setDirection(DcMotor.Direction.REVERSE);
 
         // reset encoders
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
         if (!autonomous)
         {
-            setMode(runmode);
+            setMotorMode(runmode);
         }
         else
         {
-            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
-        setMode(runmode);
+        setMotorMode(runmode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -52,10 +52,16 @@ public class MecanumDriveBase {
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    private void setMode(DcMotor.RunMode runmode) {
+    /**
+     * We tend to set all the motor modes at once, so break it out using "extract Method" under the
+     * refactor menu
+     *
+     * @param runmode The runmode to set all motors to.
+     */
+    private void setMotorMode(DcMotor.RunMode runmode) {
         lf.setMode(runmode);
         rf.setMode(runmode);
         lb.setMode(runmode);
@@ -77,6 +83,14 @@ public class MecanumDriveBase {
           driveMotors(drive, turn, strafe, speedFactor);
       }
 
+    /**
+     * Drive the motors according to drive, turn, strafe inputs.
+     *
+     * @param drive forward / backward (-1 to 1)
+     * @param turn how much to turn left or right (heading) (-1 to 1)
+     * @param strafe strafe (left or right = -1 to 1)
+     * @param speedFactor scale factor that is applied to all motor powers (0 to 1)
+     */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
@@ -90,6 +104,11 @@ public class MecanumDriveBase {
           rb.setPower(rightPowerBack);
       }
 
+    /**
+     * report drivebase telemetry
+     *
+     * @param telemetry the telemetry object we're reporting to.
+     */
       public void driveBaseTelemetry(Telemetry telemetry)
       {
         telemetry.addData("Motors", "lf(%.2f), rf(%.2f), lb(%.2f), rb(%.2f)", leftPowerFront, rightPowerFront, leftPowerBack, rightPowerBack);
