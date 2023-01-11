@@ -18,7 +18,8 @@ public class MecanumDriveBase {
     public double leftPowerBack   = 0;
     public double speedFactor     = 0;
 
-    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous){
+    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous)
+    {
         rb = hardwareMap.get(DcMotor.class, "rb");
         rf = hardwareMap.get(DcMotor.class, "rf");
         lb = hardwareMap.get(DcMotor.class, "lb");
@@ -35,7 +36,7 @@ public class MecanumDriveBase {
         // Run Without Encoders
         if (!autonomous)
         {
-            setMotorMode(runMode);
+            setMotorMode(this.runmode);
         }
         else
         {
@@ -49,8 +50,6 @@ public class MecanumDriveBase {
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     /**
