@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class MecanumDriveBase {
-    private ElapsedTime runtime = new ElapsedTime();
-    private static final DcMotor.RunMode runmode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+    private static final DcMotor.RunMode runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 
     public DcMotor lf;
     public DcMotor lb;
@@ -37,14 +35,14 @@ public class MecanumDriveBase {
         // Run Without Encoders
         if (!autonomous)
         {
-            setMotorMode(runmode);
+            setMotorMode(runMode);
         }
         else
         {
             setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
-        setMotorMode(runmode);
+        setMotorMode(runMode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -59,13 +57,13 @@ public class MecanumDriveBase {
      * We tend to set all the motor modes at once, so break it out using "extract Method" under the
      * refactor menu
      *
-     * @param runmode The runmode to set all motors to.
+     * @param runMode The runMode to set all motors to.
      */
-    private void setMotorMode(DcMotor.RunMode runmode) {
-        lf.setMode(runmode);
-        rf.setMode(runmode);
-        lb.setMode(runmode);
-        rb.setMode(runmode);
+    private void setMotorMode(DcMotor.RunMode runMode) {
+        lf.setMode(runMode);
+        rf.setMode(runMode);
+        lb.setMode(runMode);
+        rb.setMode(runMode);
     }
 
 
@@ -98,10 +96,28 @@ public class MecanumDriveBase {
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
           rightPowerBack  = (drive - turn + strafe) * speedFactor;
 
-          lf.setPower(leftPowerFront);
-          rf.setPower(rightPowerFront);
-          lb.setPower(leftPowerBack);
-          rb.setPower(rightPowerBack);
+          // This code is awful.
+          double maxAbsVal = maxAbsVal(leftPowerFront, leftPowerBack,
+                                       rightPowerFront, rightPowerBack);
+
+          lf.setPower(leftPowerFront/maxAbsVal);
+          rf.setPower(rightPowerFront/maxAbsVal);
+          lb.setPower(leftPowerBack/maxAbsVal);
+          rb.setPower(rightPowerBack/maxAbsVal);
+      }
+
+    /**
+     * maxAbsVal returns the maximum absolute value among an arbitrary number of arguments.
+     *
+     * @param values an arbitrary number of values.
+     * @return the maximum absolute value among the numbers.
+     */
+      public static double maxAbsVal(double ... values){
+          double mav = Double.NEGATIVE_INFINITY;
+          for (double val: values) {
+              mav = Math.max(mav, Math.abs(val));
+          }
+          return mav;
       }
 
     /**
