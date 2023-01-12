@@ -38,7 +38,7 @@ public class Autonomous extends LinearOpMode
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
 
-    private final double degree = ticksPerInch * 4.8 / 90;
+    private final double ticksPerDegree = ticksPerInch * 4.75 / 90;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -48,17 +48,6 @@ public class Autonomous extends LinearOpMode
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
-
-
-
-
-
-
-
-
-
-
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
@@ -118,29 +107,161 @@ public class Autonomous extends LinearOpMode
 
 //        encoderLogging();
 
+        /*********HI**********/
         //drive to first pole
+        driveScrew(3300);
+        driveStraight(ticksPerInch * 56, 1, 0.6);
+        driveUBar(1750);
+        Thread.sleep(750);
 
-        driveScrew(2720);
-        Thread.sleep(3000);
-        driveUBar(2000);
-        driveStraight(ticksPerInch * 50, 1, 0.3);
+        driveStraight(ticksPerInch * 5, -1, 0.6);
+        Thread.sleep(750);
 
+        if (blueSide)
+        {
+            turnInPlace(ticksPerDegree * 45, -1, 0.6);
+        }
+        else
+        {
+            turnInPlace(ticksPerDegree * 38, 1, 0.6);
+        }
+        Thread.sleep(750);
 
-        turnInPlace(degree * 45, 1, 0.5);
-        driveStraight(ticksPerInch * 6, 1, 0.2);
-
+        driveStraight(ticksPerInch * 5, 1, 0.6);
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
         Thread.sleep(1000);
+
+        //Drop cone
         intake.setPower(-1);
         Thread.sleep(1000);
+
+        driveUBar(2000);
         intake.setPower(0);
 
-        driveStraight(ticksPerInch * 6, -1, 0.5);
-        driveScrew(1300);
-        driveUBar(300);
-        turnInPlace(degree * 205, 1, 0.5);
+        // pickup another cone
+        driveStraight(ticksPerInch * 2.5, -1, 0.6);
+        Thread.sleep(750);
 
-        driveStraight(ticksPerInch * 18, 1, 0.5);
+        if (blueSide)
+        {
+            turnInPlace(ticksPerDegree * 135.2, 1, 0.6);
+        }
+        else
+        {
+            turnInPlace(ticksPerDegree * 132.2, -1, 0.6);
+        }
+
+        driveUBar(500);
+        Thread.sleep(750);
+
+        driveScrew(1900);
+        driveStraight(ticksPerInch * 20.3, 1, 0.6);
+        driveScrew(980);
+        Thread.sleep(500);
+
+        intake.setPower(1);
+        Thread.sleep(1250);
+
+        intake.setPower(0);
+        driveScrew(2500);
+        Thread.sleep(1000);
+
+        //Deliver second cone
+        uBar.setTargetPosition(-3000);
+        driveStraight(ticksPerInch * 17, -1, 0.6);
+        Thread.sleep(500);
+
+        screw.setTargetPosition(2800);
+        if (blueSide)
+        {
+            turnInPlace(ticksPerDegree * 45, 1, 0.6);
+        }
+        else
+        {
+            turnInPlace(ticksPerDegree * 45, -1, 0.6);
+        }
+        Thread.sleep(500);
+
+        driveStraight(ticksPerInch * 6.7, -1, 0.6);
+        Thread.sleep(500);
+
+        intake.setPower(-1);
+        Thread.sleep(1500);
+
+        intake.setPower(0);
+        Thread.sleep(1000);
+
+        //Park
+        driveStraight(ticksPerInch * 6, 1, 0.6);
+        Thread.sleep(500);
+
+        driveUBar(0);
+        if (blueSide)
+        {
+            turnInPlace(ticksPerDegree * 37, -1, 0.6);
+        }
+        else
+        {
+            turnInPlace(ticksPerDegree * 33.5, 1, 0.6);
+        }
+        Thread.sleep(500);
+
+        if (blueSide)
+        {
+            switch (zone)
+            {
+                case 1:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 20, -1, 0.6);
+                    driveScrew(0);
+                    break;
+
+                case 2:
+                    driveUBar(0);
+                    driveScrew(0);
+                    break;
+
+                case 3:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 20, 1, 0.6);
+                    driveScrew(0);
+                    break;
+
+                default:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 19, 1, 0.61);
+                    driveScrew(0);
+                    break;
+            }
+        }
+        else
+        {
+            switch (zone)
+            {
+                case 1:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 20, 1, 0.6);
+                    driveScrew(0);
+                    break;
+
+                case 2:
+                    driveUBar(0);
+                    driveScrew(0);
+                    break;
+
+                case 3:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 20, -1, 0.6);
+                    driveScrew(0);
+                    break;
+
+                default:
+                    driveUBar(0);
+                    driveStraight(ticksPerInch * 20, -1, 0.6);
+                    driveScrew(0);
+                    break;
+            }
+        }
 
         stop();
 
@@ -272,95 +393,111 @@ public class Autonomous extends LinearOpMode
     }
 
     //Set target then multiply by one with negative if you want to go left currently set right no negative input
-    private void driveStrafe2(double target, int right, double strafeSpeed)
-    {
-        double correctionStart = mecanumDriveBase.lb.getCurrentPosition();
-
-        //negative is left??
-        strafeSpeed *= right;
-
-        if (right == 1)
-        {
-            rightFrontPos -= target;
-            while (mecanumDriveBase.rf.getCurrentPosition() >= rightFrontPos)
-            {
-                double drift = correctionStart - mecanumDriveBase.lb.getCurrentPosition();
-
-                mecanumDriveBase.driveMotors(drift, 0, strafeSpeed, 0.5);
-                //mecanumDriveBase.driveMotors(0, 0, speed, 1);
-                telemetry.addData("Drift = ", drift);
-                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        else
-        {
-            rightFrontPos += target;
-            while (mecanumDriveBase.rf.getCurrentPosition() <= rightFrontPos)
-            {
-                double drift = correctionStart - mecanumDriveBase.lb.getCurrentPosition();
-
-                mecanumDriveBase.driveMotors(drift, 0, strafeSpeed, 0.5);
-                //mecanumDriveBase.driveMotors(0, 0, speed, 1);
-                telemetry.addData("Drift = ", drift);
-                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//        encoderLogging();
-    }
-
-    //Set target then multiply by one with negative if you want to go left currently set right no negative input
-    private void driveStrafe(double target, int right, double speed)
-    {
-        speed *= right;
-        if (right == 1)
-        {
-            rightFrontPos -= target;
-            while (mecanumDriveBase.rf.getCurrentPosition() >= rightFrontPos)
-            {
-                mecanumDriveBase.driveMotors(0, 0, speed, 1);
-                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        else
-        {
-            rightFrontPos += target;
-            while (mecanumDriveBase.rf.getCurrentPosition() <= rightFrontPos)
-            {
-                mecanumDriveBase.driveMotors(0, 0, speed, 1);
-                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//        encoderLogging();
-    }
+//    private void driveStrafe2(double target, int right, double strafeSpeed)
+//    {
+//        double correctionStart = mecanumDriveBase.lb.getCurrentPosition();
+//
+//        //negative is left??
+//        strafeSpeed *= right;
+//
+//        if (right == 1)
+//        {
+//            rightFrontPos -= target;
+//            while (mecanumDriveBase.rf.getCurrentPosition() >= rightFrontPos)
+//            {
+//                double drift = correctionStart - mecanumDriveBase.lb.getCurrentPosition();
+//
+//                mecanumDriveBase.driveMotors(drift, 0, strafeSpeed, 0.5);
+//                //mecanumDriveBase.driveMotors(0, 0, speed, 1);
+//                telemetry.addData("Drift = ", drift);
+//                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+//                telemetry.update();
+//            }
+//        }
+//        else
+//        {
+//            rightFrontPos += target;
+//            while (mecanumDriveBase.rf.getCurrentPosition() <= rightFrontPos)
+//            {
+//                double drift = correctionStart - mecanumDriveBase.lb.getCurrentPosition();
+//
+//                mecanumDriveBase.driveMotors(drift, 0, strafeSpeed, 0.5);
+//                //mecanumDriveBase.driveMotors(0, 0, speed, 1);
+//                telemetry.addData("Drift = ", drift);
+//                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+//                telemetry.update();
+//            }
+//        }
+//        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+////        encoderLogging();
+//    }
+//
+//    //Set target then multiply by one with negative if you want to go left currently set right no negative input
+//    private void driveStrafe(double target, int right, double speed)
+//    {
+//        speed *= right;
+//        if (right == 1)
+//        {
+//            rightFrontPos -= target;
+//            while (mecanumDriveBase.rf.getCurrentPosition() >= rightFrontPos)
+//            {
+//                mecanumDriveBase.driveMotors(0, 0, speed, 1);
+//                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+//                telemetry.update();
+//            }
+//        }
+//        else
+//        {
+//            rightFrontPos += target;
+//            while (mecanumDriveBase.rf.getCurrentPosition() <= rightFrontPos)
+//            {
+//                mecanumDriveBase.driveMotors(0, 0, speed, 1);
+//                telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+//                telemetry.update();
+//            }
+//        }
+//        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+////        encoderLogging();
+//    }
 
     //Set target then multiply by one with negative if you want to go left currently set right no negative input
     private void turnInPlace(double target, int right, double speed)
     {
-        target *= right;
+        speed *= right;
 
-        target = target + mecanumDriveBase.lb.getCurrentPosition();
-
-
+        leftBackPos = mecanumDriveBase.lb.getCurrentPosition();
         telemetry.addData("target = ", target);
-        telemetry.addData("rf pos = ", mecanumDriveBase.lb.getCurrentPosition());
-        telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
+        telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+        telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
         telemetry.update();
 
-        while (mecanumDriveBase.lb.getCurrentPosition() <=  target)
+        if (right == 1)
         {
-            mecanumDriveBase.driveMotors(0, -speed, 0, 1);
+            leftBackPos -= target;
+            while (mecanumDriveBase.lb.getCurrentPosition() >= leftBackPos)
+            {
+                mecanumDriveBase.driveMotors(0, speed, 0, 1);
 
-            telemetry.addData("target = ", target);
-            telemetry.addData("rf pos = ", mecanumDriveBase.lb.getCurrentPosition());
-            telemetry.addData("", mecanumDriveBase.rf.getCurrentPosition());
-            telemetry.update();
+                telemetry.addData("target = ", target);
+                telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+                telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
 
+            }
+        }
+        else
+        {
+            leftBackPos += target;
+            while (mecanumDriveBase.lb.getCurrentPosition() <= leftBackPos)
+            {
+                mecanumDriveBase.driveMotors(0, speed, 0, 1);
+
+                telemetry.addData("target = ", target);
+                telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+                telemetry.addData("rf pos ", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
+
+            }
         }
 
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
@@ -382,14 +519,14 @@ public class Autonomous extends LinearOpMode
         uBar.setPower(1);
     }
 
-    private void driveUBarSpecial(int target) throws InterruptedException
-    {
-        Thread.sleep(500);
-        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        uBar.setTargetPosition(target);
-        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        uBar.setPower(1);
-    }
+//    private void driveUBarSpecial(int target) throws InterruptedException
+//    {
+//        Thread.sleep(500);
+//        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        uBar.setTargetPosition(target);
+//        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        uBar.setPower(1);
+//    }
 
 //    private void encoderLogging()
 //    {
