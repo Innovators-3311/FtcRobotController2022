@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "autonomous")
-public class Autonomous extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "BackUpAuto", group = "autonomous")
+public class BackUpAuto extends LinearOpMode
+
 {
 
     private MecanumDriveBase mecanumDriveBase;
@@ -36,6 +37,7 @@ public class Autonomous extends LinearOpMode
     private int leftBackPos;
 
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
+
 
     private final double ticksPerDegree = ticksPerInch * 4.75 / 90;
 
@@ -87,7 +89,7 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        zone = coneDetection.detector(telemetry, hardwareMap);
+        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
         driveScrewUp(500, 0.5);
@@ -106,8 +108,7 @@ public class Autonomous extends LinearOpMode
 
 //        encoderLogging();
 
-        /************************/
-        //Drive to first pole
+        /*********HI**********/
         driveScrew(200);
         driveStraight(ticksPerInch * 32, 1, 0.3);
         Thread.sleep(500);
@@ -144,171 +145,6 @@ public class Autonomous extends LinearOpMode
         Thread.sleep(500);
         driveStraight(ticksPerInch * 24, 1, 0.3);
         Thread.sleep(500);
-        if (blueSide)
-        {
-            turnInPlace(ticksPerDegree * 90, 1, 0.3);
-        }
-        else
-        {
-            turnInPlace(ticksPerDegree * 90, -1, 0.3);
-        }
-
-
-
-//        //drive to first pole
-//        driveScrew(3300);
-//        driveStraight(ticksPerInch * 56, 1, 0.6);
-//        driveUBar(1750);
-//        Thread.sleep(750);
-//
-//        driveStraight(ticksPerInch * 5, -1, 0.6);
-//        Thread.sleep(750);
-//
-//        if (blueSide)
-//        {
-//            turnInPlace(ticksPerDegree * 45, -1, 0.6);
-//        }
-//        else
-//        {
-//            turnInPlace(ticksPerDegree * 38, 1, 0.6);
-//        }
-//        Thread.sleep(750);
-//
-//        driveStraight(ticksPerInch * 5, 1, 0.6);
-//        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//        Thread.sleep(1000);
-//
-//        //Drop cone
-//        intake.setPower(-1);
-//        Thread.sleep(1000);
-//
-//        driveUBar(2000);
-//        intake.setPower(0);
-//
-//        // pickup another cone
-//        driveStraight(ticksPerInch * 2.5, -1, 0.6);
-//        Thread.sleep(750);
-//
-//        if (blueSide)
-//        {
-//            turnInPlace(ticksPerDegree * 135.2, 1, 0.6);
-//        }
-//        else
-//        {
-//            turnInPlace(ticksPerDegree * 132.2, -1, 0.6);
-//        }
-//
-//        driveUBar(500);
-//        Thread.sleep(750);
-//
-//        driveScrew(1900);
-//        driveStraight(ticksPerInch * 20.3, 1, 0.6);
-//        driveScrew(980);
-//        Thread.sleep(500);
-//
-//        intake.setPower(1);
-//        Thread.sleep(1250);
-//
-//        intake.setPower(0);
-//        driveScrew(2500);
-//        Thread.sleep(1000);
-//
-//        //Deliver second cone
-//        uBar.setTargetPosition(-3000);
-//        driveStraight(ticksPerInch * 17, -1, 0.6);
-//        Thread.sleep(500);
-//
-//        screw.setTargetPosition(2800);
-//        if (blueSide)
-//        {
-//            turnInPlace(ticksPerDegree * 45, 1, 0.6);
-//        }
-//        else
-//        {
-//            turnInPlace(ticksPerDegree * 45, -1, 0.6);
-//        }
-//        Thread.sleep(500);
-//
-//        driveStraight(ticksPerInch * 6.7, -1, 0.6);
-//        Thread.sleep(500);
-//
-//        intake.setPower(-1);
-//        Thread.sleep(1500);
-//
-//        intake.setPower(0);
-//        Thread.sleep(1000);
-//
-//        //Park
-//        driveStraight(ticksPerInch * 6, 1, 0.6);
-//        Thread.sleep(500);
-//
-//        driveUBar(0);
-//        if (blueSide)
-//        {
-//            turnInPlace(ticksPerDegree * 37, -1, 0.6);
-//        }
-//        else
-//        {
-//            turnInPlace(ticksPerDegree * 33.5, 1, 0.6);
-//        }
-//        Thread.sleep(500);
-//
-//        if (blueSide)
-//        {
-//            switch (zone)
-//            {
-//                case 1:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 20, -1, 0.6);
-//                    driveScrew(0);
-//                    break;
-//
-//                case 2:
-//                    driveUBar(0);
-//                    driveScrew(0);
-//                    break;
-//
-//                case 3:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 20, 1, 0.6);
-//                    driveScrew(0);
-//                    break;
-//
-//                default:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 19, 1, 0.61);
-//                    driveScrew(0);
-//                    break;
-//            }
-//        }
-//        else
-//        {
-//            switch (zone)
-//            {
-//                case 1:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 20, 1, 0.6);
-//                    driveScrew(0);
-//                    break;
-//
-//                case 2:
-//                    driveUBar(0);
-//                    driveScrew(0);
-//                    break;
-//
-//                case 3:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 20, -1, 0.6);
-//                    driveScrew(0);
-//                    break;
-//
-//                default:
-//                    driveUBar(0);
-//                    driveStraight(ticksPerInch * 20, -1, 0.6);
-//                    driveScrew(0);
-//                    break;
-//            }
-//        }
 
         stop();
 
