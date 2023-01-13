@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "autonomous")
-public class Autonomous extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousRed", group = "autonomous")
+public class AutonomousRed extends LinearOpMode
 {
 
     private MecanumDriveBase mecanumDriveBase;
@@ -121,6 +121,9 @@ public class Autonomous extends LinearOpMode
 
         zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
+
+        blueSide = false;
+
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
 
@@ -168,10 +171,10 @@ public class Autonomous extends LinearOpMode
         }
         else
         {
-            turnInPlace(ticksPerDegree * 45, 1, 0.3);
+            turnInPlace(ticksPerDegree * 43, 1, 0.3);
         }
         Thread.sleep(1000);
-        driveStraight(ticksPerInch * 6.5, 1, 0.5);
+        driveStraight(ticksPerInch * 4, 1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
@@ -179,7 +182,7 @@ public class Autonomous extends LinearOpMode
 
         // pickup cone
         driveScrew(0);
-        driveStraight(ticksPerInch * 5, -1, 0.5);
+        driveStraight(ticksPerInch * 4, -1, 0.5);
         Thread.sleep(500);
         driveUBar(0);
         if (blueSide)
@@ -188,7 +191,7 @@ public class Autonomous extends LinearOpMode
         }
         else
         {
-            turnInPlace(ticksPerDegree * 45, 1, 0.3);
+            turnInPlace(ticksPerDegree * 55, 1, 0.3);
         }
         Thread.sleep(500);
 //        driveStraight(ticksPerInch * 30, 1, 0.5);
