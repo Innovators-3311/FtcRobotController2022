@@ -297,7 +297,7 @@ public class TowerController
         {
             uBarY = true;
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(2720);
+            screw.setTargetPosition(2760);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }
@@ -324,7 +324,7 @@ public class TowerController
         else if (gamepad.x && !(screw.getCurrentPosition() >= 2700))
         {
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(2900);
+            screw.setTargetPosition(3000);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
             if (screw.getCurrentPosition() >= 2662)
@@ -352,10 +352,9 @@ public class TowerController
         {
             uBarB = true;
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(2760);
+            screw.setTargetPosition(2830);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
-
         }
         if (screw.getCurrentPosition() > 2700 && uBarB)
         {
@@ -372,7 +371,7 @@ public class TowerController
         {
             screwA = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(322);
+            uBar.setTargetPosition(200);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
@@ -389,7 +388,7 @@ public class TowerController
             uBarA = false;
             screwA = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(322);
+            uBar.setTargetPosition(200);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
         }
@@ -397,7 +396,7 @@ public class TowerController
         {
             screwA = false;
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(1600);
+            screw.setTargetPosition(1200);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
         }

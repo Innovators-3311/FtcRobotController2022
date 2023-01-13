@@ -72,6 +72,9 @@ public class ConeDetection
         {
             tfod.activate();
             tfod.setZoom(2.5, 10.0/10.0);
+
+            //tfod.setClippingMargins(400, 300, 50, 0);
+            //tfod.setZoom(1, 1);
         }
 
         boolean flag = true;
@@ -168,7 +171,7 @@ public class ConeDetection
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.80f;
+        tfodParameters.minResultConfidence = 0.70f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         this.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
