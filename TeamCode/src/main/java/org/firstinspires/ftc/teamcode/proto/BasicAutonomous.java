@@ -31,7 +31,7 @@ public class BasicAutonomous extends LinearOpMode
 
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
-    private final double degree = ticksPerInch * 4.8 / 90;
+    private final double degree = ticksPerInch * 4.9 / 90;
 
     //Four modes
     //leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -50,15 +50,24 @@ public class BasicAutonomous extends LinearOpMode
 //        driveStraight(ticksPerInch * 55, 1, 0.5);
 //
         turnInPlace(degree * 90, 1, 0.3);
-        turnInPlace(degree * 90, -1, 0.3);
-        turnInPlace(degree * 90, 1, 0.3);
-        turnInPlace(degree * 90, -1, 0.3);
-        turnInPlace(degree * 90, 1, 0.3);
-        turnInPlace(degree * 90, -1, 0.3);
-        turnInPlace(degree * 90, 1, 0.3);
-        turnInPlace(degree * 90, -1, 0.3);
-        turnInPlace(degree * 90, 1, 0.3);
-        turnInPlace(degree * 90, -1, 0.3);
+
+        Thread.sleep(5000);
+
+        turnInPlace(degree * -90, 1, 0.3);
+
+        Thread.sleep(5000);
+
+        turnInPlace(degree * 360, 1, 0.3);
+
+//        turnInPlace(degree * 90, -1, 0.3);
+//        turnInPlace(degree * 90, 1, 0.3);
+//        turnInPlace(degree * 90, -1, 0.3);
+//        turnInPlace(degree * 90, 1, 0.3);
+//        turnInPlace(degree * 90, -1, 0.3);
+//        turnInPlace(degree * 90, 1, 0.3);
+//        turnInPlace(degree * 90, -1, 0.3);
+//        turnInPlace(degree * 90, 1, 0.3);
+//        turnInPlace(degree * 90, -1, 0.3);
 //        driveStraight(ticksPerInch * 5, 1, 0.2);
 
 

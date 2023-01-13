@@ -28,7 +28,7 @@ public class Autonomous extends LinearOpMode
     private TouchSensor lowSensor;
 
     private int screwLevel;
-    private int zone;
+    private int zone = -1;
     private boolean blueSide;
 
     private int leftFrontPos;
@@ -37,7 +37,8 @@ public class Autonomous extends LinearOpMode
 
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
-    private final double ticksPerDegree = ticksPerInch * 4.75 / 90;
+//    private final double ticksPerDegree = ticksPerInch * 4.75 / 90;
+    private final double ticksPerDegree = ticksPerInch * 4.9 / 90;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -87,11 +88,12 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        zone = coneDetection.detector(telemetry, hardwareMap);
+        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
         driveScrewUp(500, 0.5);
         driveScrewDown(10000, 0.5);
+        driveScrew(750);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
@@ -105,44 +107,52 @@ public class Autonomous extends LinearOpMode
         runtime.startTime();
 
 //        encoderLogging();
-
+        zone = coneDetection.detector(telemetry, hardwareMap);
+        while (zone == 0)
+        {
+            idle();
+        }
         /************************/
         //Drive to first pole
-        driveScrew(200);
-        driveStraight(ticksPerInch * 32, 1, 0.3);
+        driveScrew(100);
+        driveStraight(ticksPerInch * 32, 1, 0.5);
         Thread.sleep(500);
-        driveStraight(ticksPerInch * 7, -1, 0.3);
+        driveStraight(ticksPerInch * 6, -1, 0.5);
         driveUBar(1750);
+
+        //Turn to middle poll
         if (blueSide)
         {
-            turnInPlace(ticksPerDegree * 50, -1, 0.3);
+            turnInPlace(ticksPerDegree * 45, -1, 0.3);
         }
         else
         {
-            turnInPlace(ticksPerDegree * 50, 1, 0.3);
+            turnInPlace(ticksPerDegree * 45, 1, 0.3);
         }
         Thread.sleep(500);
-        driveStraight(ticksPerInch * 7, 1, 0.3);
+        driveStraight(ticksPerInch * 5, 1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
         intake.setPower(0);
 
         // pickup cone
-        driveScrew(2000);
-        driveStraight(ticksPerInch * 7, -1, 0.3);
+        driveScrew(0);
+        driveStraight(ticksPerInch * 5, -1, 0.5);
         Thread.sleep(500);
-        driveUBar(200);
+        driveUBar(0);
         if (blueSide)
         {
-            turnInPlace(ticksPerDegree * 50, 1, 0.3);
+            turnInPlace(ticksPerDegree * 45, 1, 0.3);
         }
         else
         {
-            turnInPlace(ticksPerDegree * 50, -1, 0.3);
+            turnInPlace(ticksPerDegree * 45, -1, 0.3);
         }
         Thread.sleep(500);
-        driveStraight(ticksPerInch * 24, 1, 0.3);
+//        driveStraight(ticksPerInch * 30, 1, 0.5);
+//        Thread.sleep(500);
+//        driveStraight(ticksPerInch * 5, -1, 0.5);
         Thread.sleep(500);
         if (blueSide)
         {
@@ -152,6 +162,47 @@ public class Autonomous extends LinearOpMode
         {
             turnInPlace(ticksPerDegree * 90, -1, 0.3);
         }
+        Thread.sleep(500);
+        driveStraight(ticksPerInch * 2, 1, 0.5);
+        Thread.sleep(500);
+        switch (zone)
+        {
+            case 1:
+                if (blueSide)
+                {
+                    driveStraight(ticksPerInch * 18, -1, 0.5);
+                }
+                else
+                {
+                    driveStraight(ticksPerInch * 18, 1, 0.5);
+                }
+                break;
+
+            case 2:
+                if (blueSide)
+                {
+
+                }
+                else
+                {
+
+                }
+                break;
+
+            case 3:
+                if (blueSide)
+                {
+                    driveStraight(ticksPerInch * 18, 1, 0.5);
+                }
+                else
+                {
+                    driveStraight(ticksPerInch * 18, -1, 0.5);
+                }
+                break;
+        }
+
+//        Thread.sleep(500);
+//        driveStraight(ticksPerInch * 18, 1, 0.5);
 
 
 

@@ -19,20 +19,20 @@ public class ConeDetection
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-//    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/wheel_fish_eye.tflite";
-
-    private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
-    };
+//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/wheel_fish_eye.tflite";
 
 //    private static final String[] LABELS = {
-//            "fish",
-//            "eye",
-//            "wheel"
+//            "1 Bolt",
+//            "2 Bulb",
+//            "3 Panel"
 //    };
+
+    private static final String[] LABELS = {
+            "fish",
+            "eye",
+            "wheel"
+    };
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -107,19 +107,19 @@ public class ConeDetection
                         String object = recognition.getLabel();
                         switch (object)
                         {
-                            case "1 bolt":
+                            case "wheel":
                             {
                                 this.coneNumber = 1;
                                 flag = false;
                                 break;
                             }
-                            case "2 Bulb":
+                            case "fish":
                             {
                                 this.coneNumber = 2;
                                 flag = false;
                                 break;
                             }
-                            case "3 Panel":
+                            case "eye":
                             {
                                 this.coneNumber = 3;
                                 flag = false;
@@ -171,15 +171,15 @@ public class ConeDetection
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 50;
+        tfodParameters.minResultConfidence = 0.70f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         this.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-//        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+//        this.tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 
 }
