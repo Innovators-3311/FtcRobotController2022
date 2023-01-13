@@ -17,7 +17,6 @@ public class Autonomous extends LinearOpMode
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
-    private TowerController towerController;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -374,13 +373,13 @@ public class Autonomous extends LinearOpMode
         }
         Thread.sleep(500);
         driveUBar(-3250);
-        driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
+        driveStraight(ticksPerInch * 47, 1, 0.5); // 63,847
         Thread.sleep(500);
         //strafes to pole
         //        driveStrafe(ticksPerInch * 10.2, -1, .5);
         if (blueSide)
         {
-            driveStrafe(ticksPerInch * 12, -1, 0.5);
+            driveStrafe(ticksPerInch * 11.5, -1, 0.5);
 //            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
 //            {
 //                mecanumDriveBase.driveMotors(0, 0, -0.5, 1);
@@ -388,7 +387,7 @@ public class Autonomous extends LinearOpMode
         }
         else
         {
-            driveStrafe(ticksPerInch * 12, 1, 0.5);
+            driveStrafe(ticksPerInch * 11.5, 1, 0.5);
 //            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
 //            {
 //                mecanumDriveBase.driveMotors(0, 0, 0.5, 1);
