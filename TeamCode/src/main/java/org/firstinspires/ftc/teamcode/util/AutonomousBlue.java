@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
-public class Autonomous extends LinearOpMode
+public class AutonomousBlue extends LinearOpMode
 {
 
     private MecanumDriveBase mecanumDriveBase;
@@ -143,7 +143,7 @@ public class Autonomous extends LinearOpMode
 
         /************************/
         //Drive to first pole
-        driveScrew(250);
+        driveScrew(200);
         driveStraight(ticksPerInch * 30, 1, 0.3);
         Thread.sleep(1000);
         driveStraight(ticksPerInch * 6, -1, 0.3);
@@ -159,15 +159,15 @@ public class Autonomous extends LinearOpMode
             turnInPlace(ticksPerDegree * 45, 1, 0.3);
         }
         Thread.sleep(1000);
-        driveStraight(ticksPerInch * 6.5, 1, 0.5);
+        driveStraight(ticksPerInch * 6, 1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
         intake.setPower(0);
 
-        // pickup cone
+        // park
         driveScrew(100);
-        driveStraight(ticksPerInch * 5, -1, 0.5);
+        driveStraight(ticksPerInch * 4.5, -1, 0.5);
         Thread.sleep(500);
         driveUBar(0);
         if (blueSide)

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 
-@Autonomous(name = "basicMezAutonomous", group = "2022 - 2023 Autonomous")
+@Autonomous(name = "basicMezAutonomous", group = "2022 - 2023 AutonomousBlue")
 
 public class BasicAutonomous extends LinearOpMode
 {
