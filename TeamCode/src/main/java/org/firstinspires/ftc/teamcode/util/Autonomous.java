@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
 public class Autonomous extends LinearOpMode
 {
 
@@ -91,13 +91,12 @@ public class Autonomous extends LinearOpMode
 //        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
 
-        driveScrewUp(500, 0.5);
+        driveScrewUp(750, 0.5);
         driveScrewDown(10000, 0.5);
         driveScrew(750);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
-        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
 
         // Waits till start button is pressed

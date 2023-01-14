@@ -91,13 +91,12 @@ public class AutonomousRed extends LinearOpMode
 //        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
 
-        driveScrewUp(500, 0.5);
+        driveScrewUp(750, 0.5);
         driveScrewDown(10000, 0.5);
         driveScrew(750);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
-        telemetry.addData("Hit", "start when ready", "");
-        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
+        telemetry.addData("Intialized", "");
         telemetry.update();
 
         // Waits till start button is pressed

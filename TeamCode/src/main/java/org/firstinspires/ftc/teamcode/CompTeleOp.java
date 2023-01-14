@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.TowerController;
 
 @TeleOp(name="MainCode", group="!")
 
-public class TeleOpStub extends OpMode
+public class CompTeleOp extends OpMode
 {
     private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
