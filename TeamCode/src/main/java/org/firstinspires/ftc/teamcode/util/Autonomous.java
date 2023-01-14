@@ -90,10 +90,6 @@ public class Autonomous extends LinearOpMode
 
 //        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
-
-        driveScrewUp(750, 0.5);
-        driveScrewDown(10000, 0.5);
-        driveScrew(750);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
@@ -115,7 +111,7 @@ public class Autonomous extends LinearOpMode
 //        }
 
         /******  Take 45 */
-        driveScrew(100);
+        driveScrew(200);
         driveUBar(1750);
 
         zone = coneDetection.detector(telemetry, hardwareMap);
@@ -154,7 +150,7 @@ public class Autonomous extends LinearOpMode
 
 
         //Drive to first pole
-        driveScrew(100);
+        driveScrew(200);
         driveStraight(ticksPerInch * 30, 1, 0.3);
         Thread.sleep(1000);
         driveStraight(ticksPerInch * 6, -1, 0.3);
@@ -243,9 +239,6 @@ public class Autonomous extends LinearOpMode
                 }
                 break;
         }
-
-        driveUBar(1750);
-
 
 //        Thread.sleep(500);
 //        driveStraight(ticksPerInch * 18, 1, 0.5);
