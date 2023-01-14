@@ -111,7 +111,7 @@ public class Autonomous extends LinearOpMode
 //        }
 
         /******  Take 45 */
-        driveScrew(200);
+        driveScrew(250);
         driveUBar(1750);
 
         zone = coneDetection.detector(telemetry, hardwareMap);
@@ -141,16 +141,9 @@ public class Autonomous extends LinearOpMode
 */
 
 
-
-
-
-
         /************************/
-
-
-
         //Drive to first pole
-        driveScrew(200);
+        driveScrew(250);
         driveStraight(ticksPerInch * 30, 1, 0.3);
         Thread.sleep(1000);
         driveStraight(ticksPerInch * 6, -1, 0.3);
@@ -173,7 +166,7 @@ public class Autonomous extends LinearOpMode
         intake.setPower(0);
 
         // pickup cone
-        driveScrew(0);
+        driveScrew(100);
         driveStraight(ticksPerInch * 5, -1, 0.5);
         Thread.sleep(500);
         driveUBar(0);
