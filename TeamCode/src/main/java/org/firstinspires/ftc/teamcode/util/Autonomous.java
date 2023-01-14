@@ -202,11 +202,11 @@ public class Autonomous extends LinearOpMode
             case 1:
                 if (blueSide)
                 {
-                    driveStraight(ticksPerInch * 21, 1, 0.5);
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
                 }
                 else
                 {
-                    driveStraight(ticksPerInch * 21, -1, 0.5);
+                    driveStraight(ticksPerInch * 22, -1, 0.5);
                 }
                 break;
 
@@ -220,11 +220,11 @@ public class Autonomous extends LinearOpMode
             case 3:
                 if (blueSide)
                 {
-                    driveStraight(ticksPerInch * 21, -1, 0.5);
+                    driveStraight(ticksPerInch * 22, -1, 0.5);
                 }
                 else
                 {
-                    driveStraight(ticksPerInch * 21, 1, 0.5);
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
                 }
                 break;
         }
