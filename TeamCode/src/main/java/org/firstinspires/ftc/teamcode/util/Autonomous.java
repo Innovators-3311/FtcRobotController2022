@@ -212,13 +212,9 @@ public class Autonomous extends LinearOpMode
 
             case 2:
                 if (blueSide)
-                {
-
-                }
+                {}
                 else
-                {
-
-                }
+                {}
                 break;
 
             case 3:
