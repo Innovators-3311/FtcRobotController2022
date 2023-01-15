@@ -78,11 +78,7 @@ public class CombinedLocalizer implements Localizer {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
-        try{
-            stateServer = new StateServer();
-        }catch (IOException e12141){
-            RobotLog.ee("Localizer", "Error initializing NanoHTTPD StateServer");
-        }
+        stateServer = new StateServer();
         odoPods = new OdometryPodsSensor(hardwareMap);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -341,7 +337,7 @@ public class CombinedLocalizer implements Localizer {
         updateState();
         measureState();
         RobotLog.ii("Localizer", "State= %f %f %f %f %f %f %f %f", x, y, heading, xVelocity, yVelocity, headingRate,positionUncertainty, headingUncertainty);
-        if(stateServer != null)
+        if(stateServer.valid)
         {
             try
             {

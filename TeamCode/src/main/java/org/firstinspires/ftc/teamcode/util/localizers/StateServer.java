@@ -11,31 +11,41 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class StateServer extends NanoHTTPD {
     public JSONArray stateLog;
+    public boolean valid = true;
     private static final int MAX_STATES = 1000;
     public static int port = 8079;
     private boolean locked = false;
     private ElapsedTime runtime = new ElapsedTime();
     private static final double timeStep = .1;
 
+    private static final StateServer instance = new StateServer();
+
     /**
      * Constructs an HTTP server on given port.
      *
      * @param
      */
-    public StateServer() throws IOException {
+    public StateServer() {
         super(port);
-        start(NanoHTTPD.SOCKET_READ_TIMEOUT,false);
-        resetState();
+        try {
+            start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+            resetState();
+        } catch(IOException e){
+            valid = false;
+        }
+    }
+
+    /**
+     * Only ever return a single State Server object.
+     *
+     * @return stateserver.
+     */
+    public static StateServer getInstance() {
+        return instance;
     }
 
     public void resetState(){
         stateLog = new JSONArray();
-//        try
-//        {
-//            response.put(new JSONObject().put("new", true));
-//        } catch (JSONException e) {
-//            RobotLog.ee("Localizer", "Error adding marker.");
-//        };
     }
 
     public String getStateLog(){
