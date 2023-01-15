@@ -2,8 +2,12 @@ package org.firstinspires.ftc.teamcode.util.odometry;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.util.PositionChangeSensor;
+import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class OdometryPodsSensor implements PositionChangeSensor {
     /**
@@ -13,8 +17,13 @@ public class OdometryPodsSensor implements PositionChangeSensor {
     private OdometryPod leftPod;
     private OdometryPod rightPod;
     private OdometryPod centerPod;
+    private StateServer stateServer;
     private ElapsedTime runtime = new ElapsedTime();
     private double last_measurement;
+
+    // Minimum time between state logging (otherwise it's stupid-fast).
+    private final double MIN_STATE_PERIOD = 0.1;
+    private double lastStateLog = 0.0;
 
     // Distance between wheels
     private static final double width = 14;
@@ -26,12 +35,33 @@ public class OdometryPodsSensor implements PositionChangeSensor {
 
     public OdometryPodsSensor(HardwareMap hardwareMap) {
         // change lf rb
-        leftPod   = new OdometryPod(hardwareMap, "lb");
-        rightPod  = new OdometryPod(hardwareMap, "lf",true);
-        centerPod = new OdometryPod(hardwareMap, "rf",true);
+        leftPod   = new OdometryPod(hardwareMap, "lb", true);
+        rightPod  = new OdometryPod(hardwareMap, "lf");
+        centerPod = new OdometryPod(hardwareMap, "rf");
+        stateServer = StateServer.getInstance();
         last_measurement = runtime.seconds();
     }
 
+
+    public void logState(){
+        if(stateServer.valid && (runtime.seconds()-lastStateLog) > MIN_STATE_PERIOD)
+        {
+            try
+            {
+                JSONObject state = new JSONObject().put("runTime", runtime.seconds())
+                        .put("leftPodValue", leftPod.getLastPos())
+                        .put("rightPodValue", rightPod.getLastPos())
+                        .put("centerPodValue", centerPod.getLastPos())
+                        .put("type", "OdometryPodsSensor");
+                stateServer.addState(state);
+                lastStateLog = runtime.seconds();
+            } catch (JSONException e)
+            {
+                RobotLog.ee("Localizer", "Error encoding json.");
+            }
+        }
+
+    }
 
     /** Gets the Robot's Estimated State Change.
      *
@@ -52,6 +82,7 @@ public class OdometryPodsSensor implements PositionChangeSensor {
         double strafeRate = strafe / deltaT;
         double headingRate = headingChange/deltaT;
         double[] retVal = {forward,strafe,headingChange,forwardRate, strafeRate, headingRate};
+        this.logState();
         return retVal;
     }
     /** Gets the Robot's Estimated State Change.

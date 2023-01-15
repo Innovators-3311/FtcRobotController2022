@@ -37,9 +37,9 @@ public class CombinedLocalizer implements Localizer {
 
     private static final String VUFORIA_KEY =
             "ATCNswP/////AAABmboo62E3M0RLvUoBrala8GQowW4hvn2lz0v4xIUqDcerBojdZbFDT7KxueF7R6JgJY9tQ+gV9sHXv6aOcnznTsupwlzsqujeV1pIN0j5/uZNqLkxZCORToVMVD/kd8XY5y58Pnml+lS3pqkZee6pSUTNWfmWgJAu/oKPGVrOm5GwCPObOM9Mx3NSbWeRVSiKcaN9o6QyqV+Knuf2xYpF87rKiH0pbWGRIFSy8JgVQ6dabuIoDCKbXpDeTwK3PJ2VtgON+8PA2TIIn95Yq8UmBYJRJc6kDyvCDyCnKJ63oPRfzth3P8DM4IchQd69ccU6vqeto4JNQbPZh5JB5KRXFS8CcmQJLkSRcHDIP92eIhv/";
-    final float CAMERA_FORWARD_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
-    final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // FIXME
-    final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
+    final float CAMERA_FORWARD_DISPLACEMENT = 4.75f * mmPerInch;
+    final float CAMERA_VERTICAL_DISPLACEMENT = 2.5f * mmPerInch;
+    final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;
     public double stateTime     = 0;
     public double y             = 0;
     public double x             = 0;
@@ -78,7 +78,7 @@ public class CombinedLocalizer implements Localizer {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
-        stateServer = new StateServer();
+        stateServer = StateServer.getInstance();
         odoPods = new OdometryPodsSensor(hardwareMap);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -135,10 +135,11 @@ public class CombinedLocalizer implements Localizer {
 
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 0, 0));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 0, 90, 90));
 
         for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
+            ((VuforiaTrackableDefaultListener) trackable.getListener())
+                    .setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
         }
 
         targets.activate();
@@ -265,7 +266,7 @@ public class CombinedLocalizer implements Localizer {
             double k = headingUncertainty / (headingUncertainty + vuforiaHeadingUncertainty); //Kalman gain for a Kalman filter
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            double vuforiaHeading = rotation.thirdAngle%360;
+            double vuforiaHeading = -rotation.thirdAngle%360;
             double err = smartAngleError(vuforiaHeading, heading);
             heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
@@ -342,6 +343,7 @@ public class CombinedLocalizer implements Localizer {
             try
             {
                 JSONObject state = new JSONObject().put("runTime", runtime.seconds())
+                        .put("type", "CombinedLocalizer")
                         .put("x", x).put("y", y).put("heading", heading)
                         .put("xVelocity", xVelocity).put("yVelocity", yVelocity).put("headingRate", headingRate)
                         .put("positionUncertainty", positionUncertainty)

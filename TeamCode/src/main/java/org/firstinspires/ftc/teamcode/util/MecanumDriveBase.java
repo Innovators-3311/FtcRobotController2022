@@ -36,14 +36,14 @@ public class MecanumDriveBase {
         // Run Without Encoders
         if (!autonomous)
         {
-            setMotorMode(this.runmode);
+            setMotorMode(runMode);
         }
         else
         {
             setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
-        setMotorMode(runMode);
+        setMotorMode(this.runMode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

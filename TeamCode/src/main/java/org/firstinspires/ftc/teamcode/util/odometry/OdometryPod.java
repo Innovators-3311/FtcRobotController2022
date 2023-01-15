@@ -12,7 +12,6 @@ public class OdometryPod {
     private int lastPos;
     private double encoderSign = 1;
 
-
     /**
      * Odometry Pod Constructor
      *
@@ -29,10 +28,23 @@ public class OdometryPod {
         }
     }
 
+    /**
+     * Returns the last measured encoder value (as an int). ignores encoderSign
+     *
+     * @return
+     */
+    public int getLastPos(){
+        return lastPos;
+    }
+
+    /**
+     * Returns the inches moved since the last measurement.
+     * @return
+     */
     public double getDistanceChangeInches() {
         double distanceChange = inchesPerTick * (pod.getCurrentPosition() - lastPos);
         lastPos = pod.getCurrentPosition();
-        return distanceChange;
+        return distanceChange * encoderSign;
     }
 
     /**

@@ -12,7 +12,7 @@ import fi.iki.elonen.NanoHTTPD;
 public class StateServer extends NanoHTTPD {
     public JSONArray stateLog;
     public boolean valid = true;
-    private static final int MAX_STATES = 1000;
+    private static final int MAX_STATES = 100000;
     public static int port = 8079;
     private boolean locked = false;
     private ElapsedTime runtime = new ElapsedTime();
@@ -25,7 +25,7 @@ public class StateServer extends NanoHTTPD {
      *
      * @param
      */
-    public StateServer() {
+    private StateServer() {
         super(port);
         try {
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
