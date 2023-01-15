@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 
-@Autonomous(name = "basicMezAutonomous", group = "2022 - 2023 Autonomous")
+@Autonomous(name = "basicMezAutonomous", group = "2022 - 2023 AutonomousBlue")
 
 public class BasicAutonomous extends LinearOpMode
 {
@@ -31,7 +31,7 @@ public class BasicAutonomous extends LinearOpMode
 
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
-    private final double degree = ticksPerInch * 4.9 / 90;
+    private final double degree = ticksPerInch * 4.8 / 90;
 
     //Four modes
     //leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -53,7 +53,7 @@ public class BasicAutonomous extends LinearOpMode
 
         Thread.sleep(5000);
 
-        turnInPlace(degree * -90, 1, 0.3);
+        turnInPlace(degree * 90, -1, 0.3);
 
         Thread.sleep(5000);
 
@@ -90,7 +90,53 @@ public class BasicAutonomous extends LinearOpMode
         // strafe drive(1000, -1000, -1000, 1000, 0.25);
         stop();
     }
+
+    //Set target then multiply by one with negative if you want to go left currently set right no negative input
     private void turnInPlace(double target, int right, double speed)
+    {
+        speed *= right;
+
+        leftBackPos = mecanumDriveBase.lb.getCurrentPosition();
+        telemetry.addData("target = ", target);
+        telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+        telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
+        telemetry.update();
+
+        if (right == 1)
+        {
+            leftBackPos -= target;
+            while (mecanumDriveBase.lb.getCurrentPosition() >= leftBackPos)
+            {
+                mecanumDriveBase.driveMotors(0, speed, 0, 1);
+
+                telemetry.addData("target = ", target);
+                telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+                telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
+
+            }
+        }
+        else
+        {
+            leftBackPos += target;
+            while (mecanumDriveBase.lb.getCurrentPosition() <= leftBackPos)
+            {
+                mecanumDriveBase.driveMotors(0, speed, 0, 1);
+
+                telemetry.addData("target = ", target);
+                telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
+                telemetry.addData("rf pos ", mecanumDriveBase.rf.getCurrentPosition());
+                telemetry.update();
+
+            }
+        }
+
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+    }
+
+
+
+    private void turnInPlace3(double target, int right, double speed)
     {
         speed *= right;
 

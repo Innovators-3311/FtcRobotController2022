@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "autonomous")
-public class Autonomous extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
+public class AutonomousBlue extends LinearOpMode
 {
 
     private MecanumDriveBase mecanumDriveBase;
@@ -37,7 +37,7 @@ public class Autonomous extends LinearOpMode
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
 
 //    private final double ticksPerDegree = ticksPerInch * 4.75 / 90;
-    private final double ticksPerDegree = ticksPerInch * 4.9 / 90;
+    private final double ticksPerDegree = ticksPerInch * 4.77 / 90;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -87,16 +87,11 @@ public class Autonomous extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
-        blueSide = teamDetection.showTeam(telemetry);
-
-        driveScrewUp(500, 0.5);
-        driveScrewDown(10000, 0.5);
-        driveScrew(750);
+//        zone = coneDetection.detector(telemetry, hardwareMap);
+//        blueSide = teamDetection.showTeam(telemetry);
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
         telemetry.addData("Hit", "start when ready", "");
-        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
 
         // Waits till start button is pressed
@@ -106,19 +101,53 @@ public class Autonomous extends LinearOpMode
         runtime.startTime();
 
 //        encoderLogging();
-        zone = coneDetection.detector(telemetry, hardwareMap);
-        while (zone == 0)
-        {
-            idle();
-        }
-        /************************/
-        //Drive to first pole
-        driveScrew(100);
-        driveStraight(ticksPerInch * 32, 1, 0.5);
-        Thread.sleep(500);
-        driveStraight(ticksPerInch * 6, -1, 0.5);
+//        zone = coneDetection.detector(telemetry, hardwareMap);
+//        blueSide = teamDetection.showTeam(telemetry);
+
+//        while (zone == 0)
+//        {
+//            idle();
+//        }
+
+        /******  Take 45 */
+        driveScrew(250);
         driveUBar(1750);
 
+        zone = coneDetection.detector(telemetry, hardwareMap);
+        blueSide = teamDetection.showTeam(telemetry);
+        telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
+        telemetry.update();
+
+        //Thread.sleep(3000);
+/*
+        driveStraight(ticksPerInch *18, 1, 0.5);
+        Thread.sleep(1000);
+
+        if (blueSide)
+        {
+            turnInPlace(ticksPerDegree * 30, -1, 0.3);
+        }
+        else
+        {
+            turnInPlace(ticksPerDegree * 30, 1, 0.3);
+        }
+
+        driveStraight(ticksPerInch * 10, 1, 0.5);
+        Thread.sleep(1000);
+        intake.setPower(-1);
+        Thread.sleep(1000);
+        intake.setPower(0);
+*/
+
+
+        /************************/
+        //Drive to first pole
+        driveScrew(200);
+        driveStraight(ticksPerInch * 30, 1, 0.3);
+        Thread.sleep(1000);
+        driveStraight(ticksPerInch * 6, -1, 0.3);
+        driveUBar(1750);
+        Thread.sleep(1000);
         //Turn to middle poll
         if (blueSide)
         {
@@ -128,74 +157,73 @@ public class Autonomous extends LinearOpMode
         {
             turnInPlace(ticksPerDegree * 45, 1, 0.3);
         }
-        Thread.sleep(500);
-        driveStraight(ticksPerInch * 5, 1, 0.5);
+        Thread.sleep(1000);
+        driveStraight(ticksPerInch * 6, 1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
         intake.setPower(0);
 
-        // pickup cone
-        driveScrew(0);
-        driveStraight(ticksPerInch * 5, -1, 0.5);
+        // park
+        driveScrew(100);
+        driveStraight(ticksPerInch * 4.5, -1, 0.5);
         Thread.sleep(500);
         driveUBar(0);
         if (blueSide)
         {
-            turnInPlace(ticksPerDegree * 45, 1, 0.3);
+            turnInPlace(ticksPerDegree * 45, -1, 0.3);
         }
         else
         {
-            turnInPlace(ticksPerDegree * 45, -1, 0.3);
+            turnInPlace(ticksPerDegree * 45, 1, 0.3);
         }
         Thread.sleep(500);
 //        driveStraight(ticksPerInch * 30, 1, 0.5);
 //        Thread.sleep(500);
 //        driveStraight(ticksPerInch * 5, -1, 0.5);
-        Thread.sleep(500);
-        if (blueSide)
-        {
-            turnInPlace(ticksPerDegree * 90, 1, 0.3);
-        }
-        else
-        {
-            turnInPlace(ticksPerDegree * 90, -1, 0.3);
-        }
-        Thread.sleep(500);
-        driveStraight(ticksPerInch * 2, 1, 0.5);
-        Thread.sleep(500);
+
+
+//        Thread.sleep(500);
+//        if (blueSide)
+//        {
+//            turnInPlace(ticksPerDegree * 90, 1, 0.3);
+//        }
+//        else
+//        {
+//            turnInPlace(ticksPerDegree * 90, -1, 0.3);
+//        }
+//        Thread.sleep(500);
+//        driveStraight(ticksPerInch * 2, 1, 0.5);
+//        Thread.sleep(500);
+
         switch (zone)
         {
             case 1:
                 if (blueSide)
                 {
-                    driveStraight(ticksPerInch * 18, -1, 0.5);
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
                 }
                 else
                 {
-                    driveStraight(ticksPerInch * 18, 1, 0.5);
+                    driveStraight(ticksPerInch * 22, -1, 0.5);
                 }
                 break;
 
             case 2:
                 if (blueSide)
-                {
-
-                }
+                {}
                 else
-                {
-
-                }
+                {}
                 break;
 
             case 3:
                 if (blueSide)
                 {
-                    driveStraight(ticksPerInch * 18, 1, 0.5);
+                    driveStraight(ticksPerInch * 22, -1, 0.5);
                 }
                 else
                 {
-                    driveStraight(ticksPerInch * 18, -1, 0.5);
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
                 }
                 break;
         }
