@@ -92,7 +92,6 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
-          localizer.measureState();
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
@@ -106,7 +105,6 @@ public class MecanumDriveBase {
           rf.setPower(rightPowerFront/maxAbsVal);
           lb.setPower(leftPowerBack/maxAbsVal);
           rb.setPower(rightPowerBack/maxAbsVal);
-          localizer.measureState();
       }
 
     /**
