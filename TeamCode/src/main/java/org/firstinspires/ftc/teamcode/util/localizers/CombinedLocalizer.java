@@ -58,7 +58,7 @@ public class CombinedLocalizer implements Localizer {
     private WebcamName webcam = null;
     private List<VuforiaTrackable> allTrackables   = null;
     VuforiaTrackable trackable;
-    private boolean targetVisible                  = false;
+    public boolean targetVisible                  = false;
     private boolean targetWasVisible                  = false;
     private StateServer stateServer;
     private double lastT                           =  0;
@@ -306,7 +306,8 @@ public class CombinedLocalizer implements Localizer {
     /**
      * Measures changes in state and incorporates them into our state estimates.
      */
-    public void measureState(){
+    // KEEP PRIVATE
+    private void measureState(){
         measureVuforiaPosition();
         measureVuforiaHeading();
         measurePodChange();

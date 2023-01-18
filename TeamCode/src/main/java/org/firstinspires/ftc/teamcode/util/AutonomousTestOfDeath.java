@@ -105,7 +105,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap);
+//            zone = coneDetection.detector(telemetry, hardwareMap);
             waitForStart();
         }
         if (zone == -1)
@@ -114,8 +114,8 @@ public class AutonomousTestOfDeath extends LinearOpMode
         }
         //crunch crunch crunch
         // Waits till start button is pressed
-        coneDetection.tfod.setZoom(1, 16/9);
-        combinedLocalizer.measureState();
+//        coneDetection.tfod.setZoom(1, 16/9);
+        combinedLocalizer.handleTracking();
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -133,7 +133,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        driveScrew(200);
 //        driveUBar(1750);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
+//        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
 //        blueSide = false;
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
@@ -526,7 +526,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                combinedLocalizer.measureState();
+                combinedLocalizer.handleTracking();
                 mecanumDriveBase.driveMotors(speed, 0, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
                 telemetry.update();
@@ -537,14 +537,14 @@ public class AutonomousTestOfDeath extends LinearOpMode
             leftFrontPos -= target;
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
-                combinedLocalizer.measureState();
+                combinedLocalizer.handleTracking();
                 mecanumDriveBase.driveMotors(speed, 0, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
                 telemetry.update();
             }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
-        combinedLocalizer.measureState();
+        combinedLocalizer.handleTracking();
 //        encoderLogging();
     }
 
@@ -633,7 +633,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
             while (mecanumDriveBase.lb.getCurrentPosition() >= leftBackPos)
             {
                 mecanumDriveBase.driveMotors(0, speed, 0, 1);
-                combinedLocalizer.measureState();
+                combinedLocalizer.handleTracking();
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
                 telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
@@ -647,7 +647,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
             while (mecanumDriveBase.lb.getCurrentPosition() <= leftBackPos)
             {
                 mecanumDriveBase.driveMotors(0, speed, 0, 1);
-                combinedLocalizer.measureState();
+                combinedLocalizer.handleTracking();
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
                 telemetry.addData("rf pos ", mecanumDriveBase.rf.getCurrentPosition());
@@ -655,7 +655,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
             }
         }
-        combinedLocalizer.measureState();
+        combinedLocalizer.handleTracking();
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
     }
 

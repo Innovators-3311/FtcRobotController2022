@@ -91,14 +91,14 @@ public class MecanumDriveBase {
      * @param speedFactor scale factor that is applied to all motor powers (0 to 1)
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
-      {
-          localizer.measureState();
+      {   // This code is awful
+          localizer.handleTracking();
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
           rightPowerBack  = (drive - turn + strafe) * speedFactor;
 
-          // This code is awful.
+
           double maxAbsVal = maxAbsVal(leftPowerFront, leftPowerBack,
                                        rightPowerFront, rightPowerBack);
 
@@ -106,7 +106,8 @@ public class MecanumDriveBase {
           rf.setPower(rightPowerFront/maxAbsVal);
           lb.setPower(leftPowerBack/maxAbsVal);
           rb.setPower(rightPowerBack/maxAbsVal);
-          localizer.measureState();
+          localizer.handleTracking();
+
       }
 
     /**
