@@ -59,7 +59,7 @@ public class ConeDetection
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
      * Detection engine.
      */
-    private TFObjectDetector tfod;
+    public TFObjectDetector tfod;
 
     private int coneNumber = -1;
 

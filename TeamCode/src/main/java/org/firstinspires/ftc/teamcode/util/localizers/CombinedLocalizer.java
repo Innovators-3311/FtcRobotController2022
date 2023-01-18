@@ -37,8 +37,8 @@ public class CombinedLocalizer implements Localizer {
 
     private static final String VUFORIA_KEY =
             "ATCNswP/////AAABmboo62E3M0RLvUoBrala8GQowW4hvn2lz0v4xIUqDcerBojdZbFDT7KxueF7R6JgJY9tQ+gV9sHXv6aOcnznTsupwlzsqujeV1pIN0j5/uZNqLkxZCORToVMVD/kd8XY5y58Pnml+lS3pqkZee6pSUTNWfmWgJAu/oKPGVrOm5GwCPObOM9Mx3NSbWeRVSiKcaN9o6QyqV+Knuf2xYpF87rKiH0pbWGRIFSy8JgVQ6dabuIoDCKbXpDeTwK3PJ2VtgON+8PA2TIIn95Yq8UmBYJRJc6kDyvCDyCnKJ63oPRfzth3P8DM4IchQd69ccU6vqeto4JNQbPZh5JB5KRXFS8CcmQJLkSRcHDIP92eIhv/";
-    final float CAMERA_FORWARD_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
-    final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // FIXME
+    final float CAMERA_FORWARD_DISPLACEMENT = 9.0f * mmPerInch;   // FIXME
+    final float CAMERA_VERTICAL_DISPLACEMENT = 3.0f * mmPerInch;   // FIXME
     final float CAMERA_LEFT_DISPLACEMENT = 0.0f * mmPerInch;   // FIXME
     public double stateTime     = 0;
     public double y             = 0;
@@ -55,7 +55,7 @@ public class CombinedLocalizer implements Localizer {
 //    private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
-    private WebcamName webcamName                  = null;
+    private WebcamName webcam = null;
     private List<VuforiaTrackable> allTrackables   = null;
     VuforiaTrackable trackable;
     private boolean targetVisible                  = false;
@@ -75,9 +75,9 @@ public class CombinedLocalizer implements Localizer {
      * @param hardwareMap a hardware map.
      */
     public CombinedLocalizer(HardwareMap hardwareMap) {
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
-        imu = new InternalIMUSensor(hardwareMap);
+//        imu = new InternalIMUSensor(hardwareMap);
         try{
             stateServer = new StateServer();
         }catch (IOException e12141){
@@ -89,7 +89,7 @@ public class CombinedLocalizer implements Localizer {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = webcamName; //Indicates which camera to use.
+        parameters.cameraName = webcam; //Indicates which camera to use.
         parameters.useExtendedTracking = false; // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
         vuforia = ClassFactory.getInstance().createVuforia(parameters); // Initiates Vuforia.
         targets = this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
@@ -306,7 +306,7 @@ public class CombinedLocalizer implements Localizer {
     /**
      * Measures changes in state and incorporates them into our state estimates.
      */
-    private void measureState(){
+    public void measureState(){
         measureVuforiaPosition();
         measureVuforiaHeading();
         measurePodChange();

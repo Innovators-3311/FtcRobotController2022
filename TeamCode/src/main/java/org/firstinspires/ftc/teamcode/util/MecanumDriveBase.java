@@ -4,10 +4,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 
 public class MecanumDriveBase {
     private static final DcMotor.RunMode runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 
+    private CombinedLocalizer localizer;
     public DcMotor lf;
     public DcMotor lb;
     public DcMotor rb;
@@ -36,7 +38,7 @@ public class MecanumDriveBase {
         // Run Without Encoders
         if (!autonomous)
         {
-            setMotorMode(this.runmode);
+            setMotorMode(this.runMode);
         }
         else
         {
@@ -90,6 +92,7 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
+          localizer.measureState();
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
@@ -103,6 +106,7 @@ public class MecanumDriveBase {
           rf.setPower(rightPowerFront/maxAbsVal);
           lb.setPower(leftPowerBack/maxAbsVal);
           rb.setPower(rightPowerBack/maxAbsVal);
+          localizer.measureState();
       }
 
     /**

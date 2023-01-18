@@ -96,8 +96,18 @@ public class AutonomousRed extends LinearOpMode
         telemetry.addData("Intialized", "");
         telemetry.update();
 
+        while (!opModeIsActive())
+        {
+            zone = coneDetection.detector(telemetry, hardwareMap);
+        }
+        if (zone == -1)
+        {
+            zone = 2;
+        }
+
         // Waits till start button is pressed
         waitForStart();
+
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
