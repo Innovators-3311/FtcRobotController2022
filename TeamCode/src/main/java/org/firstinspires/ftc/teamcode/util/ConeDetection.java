@@ -63,9 +63,9 @@ public class ConeDetection
 
     private int coneNumber = -1;
 
-    public int detector(Telemetry telemetry, HardwareMap hardwareMap)
+    public int detector(Telemetry telemetry, HardwareMap hardwareMap, WebcamName webcam)
     {
-        initVuforia(hardwareMap);
+        initVuforia(hardwareMap, webcam);
         initTfod(hardwareMap);
 
         if (tfod != null)
@@ -150,15 +150,16 @@ public class ConeDetection
      * Initialize the Vuforia localization engine.
      */
 
-    private void initVuforia(HardwareMap hardwareMap)
+    private void initVuforia(HardwareMap hardwareMap, WebcamName webcam)
     {
+
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = webcam;
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
     }

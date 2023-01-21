@@ -55,7 +55,7 @@ public class CombinedLocalizer implements Localizer {
 //    private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
-    private WebcamName webcam = null;
+    private WebcamName webcamField = null;
     private List<VuforiaTrackable> allTrackables   = null;
     VuforiaTrackable trackable;
     public boolean targetVisible                  = false;
@@ -74,8 +74,8 @@ public class CombinedLocalizer implements Localizer {
      *
      * @param hardwareMap a hardware map.
      */
-    public CombinedLocalizer(HardwareMap hardwareMap) {
-        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+    public CombinedLocalizer(HardwareMap hardwareMap, WebcamName webcam) {
+        webcamField = webcam;
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
 //        imu = new InternalIMUSensor(hardwareMap);
         try{

@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
@@ -14,11 +17,15 @@ public class InnoTeleOp extends OpMode
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
 
     public void init() {
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
         localizer = new IntegratedLocalizerIMU(hardwareMap);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
         towerController = new TowerController(hardwareMap, telemetry);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);

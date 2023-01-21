@@ -4,12 +4,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 
 public class MecanumDriveBase {
     private static final DcMotor.RunMode runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 
-    private CombinedLocalizer localizer;
+//    private CombinedLocalizer localizer;
     public DcMotor lf;
     public DcMotor lb;
     public DcMotor rb;
@@ -17,10 +18,10 @@ public class MecanumDriveBase {
     public double leftPowerFront  = 0;
     public double rightPowerFront = 0;
     public double rightPowerBack  = 0;
-    public double leftPowerBack   = 0;
+    public double leftPowerBack   = 0;//TODO: Figure out how to not use Localizer here //sam like a flag
     public double speedFactor     = 0;
 
-    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous)
+    public MecanumDriveBase(HardwareMap hardwareMap, boolean dontUse, WebcamName webcam)
     {
         rb = hardwareMap.get(DcMotor.class, "rb");
         rf = hardwareMap.get(DcMotor.class, "rf");
@@ -36,16 +37,8 @@ public class MecanumDriveBase {
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Run Without Encoders
-        if (!autonomous)
-        {
-            setMotorMode(this.runMode);
-        }
-        else
-        {
-            setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
 
-        setMotorMode(runMode);
+        setMotorMode(this.runMode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -53,6 +46,11 @@ public class MecanumDriveBase {
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
+//    public void intiCombinedLocalizer(CombinedLocalizer combinedLocalizer)
+//    {
+//        localizer = combinedLocalizer;
+//    }
 
     /**
      * We tend to set all the motor modes at once, so break it out using "extract Method" under the
@@ -78,8 +76,8 @@ public class MecanumDriveBase {
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;
-          speedFactor = 1 - (.5*gamepad.right_trigger);
-          driveMotors(drive, turn, strafe, speedFactor);
+          speedFactor = 1 - (.5 * gamepad.right_trigger);
+          driveMotors(drive, turn, strafe, /*speedFactor*/ 0.75);
       }
 
     /**
@@ -92,7 +90,7 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {   // This code is awful
-          localizer.handleTracking();
+//          localizer.handleTracking();
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
@@ -106,7 +104,8 @@ public class MecanumDriveBase {
           rf.setPower(rightPowerFront/maxAbsVal);
           lb.setPower(leftPowerBack/maxAbsVal);
           rb.setPower(rightPowerBack/maxAbsVal);
-          localizer.handleTracking();
+
+//          localizer.handleTracking();
 
       }
 

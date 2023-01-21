@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "BackUpAuto", group = "autonomous")
@@ -19,6 +20,8 @@ public class BackUpAuto extends LinearOpMode
     private ConeDetection coneDetection;
     private StateServer stateServer;
     private TowerController towerController;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -52,7 +55,7 @@ public class BackUpAuto extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
@@ -89,7 +92,7 @@ public class BackUpAuto extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
+        zone = coneDetection.detector(telemetry, hardwareMap, webcam);
         blueSide = teamDetection.showTeam(telemetry);
 
         driveScrewUp(500, 0.5);

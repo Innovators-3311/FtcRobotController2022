@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousRed", group = "autonomous")
@@ -18,6 +19,8 @@ public class AutonomousRed extends LinearOpMode
     private ConeDetection coneDetection;
     private StateServer stateServer;
     private TowerController towerController;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -43,6 +46,8 @@ public class AutonomousRed extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
 //        try {
 //            stateServer = new StateServer();
 //        } catch (IOException e) {
@@ -51,7 +56,7 @@ public class AutonomousRed extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
@@ -98,7 +103,7 @@ public class AutonomousRed extends LinearOpMode
 
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap);
+            zone = coneDetection.detector(telemetry, hardwareMap, webcam);
         }
         if (zone == -1)
         {
@@ -125,7 +130,6 @@ public class AutonomousRed extends LinearOpMode
         driveScrew(200);
         driveUBar(1750);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
 
         blueSide = false;

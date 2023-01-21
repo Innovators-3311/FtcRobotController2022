@@ -4,6 +4,9 @@ package org.firstinspires.ftc.teamcode.proto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 
@@ -12,6 +15,8 @@ import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 public class BasicAutonomous extends LinearOpMode
 {
     private MecanumDriveBase mecanumDriveBase;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
     // Initialize motors
     private DcMotor leftFront;
     private DcMotor rightFront;
@@ -39,7 +44,9 @@ public class BasicAutonomous extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
         leftFrontPos = 0;
         rightFrontPos = 0;
         leftBackPos = 0;

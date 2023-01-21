@@ -145,7 +145,6 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             // (typically 16/9).
             tfod.setClippingMargins(400, 300, 50, 0);
             tfod.setZoom(1, 1);
-
         }
 
         /** Wait for the game to begin */

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 
 public class DriveToPos {
@@ -80,7 +81,7 @@ public class DriveToPos {
             speedFactor = 0;
         }
     }
-        public void autoDriveToPosition()
+        public void autoDriveToPosition(Telemetry telemetry)
         {
             double aDX = xTarget - localizer.x;
             double aDY = yTarget - localizer.y;
@@ -93,6 +94,12 @@ public class DriveToPos {
             // TODO: Fix handling heading change! -1 < turn < 1
             double aTurn = localizer.smartAngleError(localizer.getRotation(), rotationTarget);
             double atonomousSpeedFactor = 1;
+
+//            telemetry.addData("DriveTo", "aDX(%.2f), aDY(%.2f), DTT(%.2f), rb(%.2f)", aDX, aDY, autoDistanceToTarget);
+            telemetry.addData("", "aDX: " + aDX + " aDY: " + aDY + " DTT: " + autoDistanceToTarget);
+
+            telemetry.addData("", "aDriveVector[0]: " + aDriveVector[0] + "aDriveVector[1]: " + aDriveVector[1] +" aTurn: " + aTurn);
+            telemetry.update();
 
             // https://www.desmos.com/calculator/ln1qieke73
             if (autoDistanceToTarget < safeDistance)

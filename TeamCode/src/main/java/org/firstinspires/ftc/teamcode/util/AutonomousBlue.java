@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
@@ -17,6 +18,8 @@ public class AutonomousBlue extends LinearOpMode
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -50,7 +53,7 @@ public class AutonomousBlue extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
@@ -94,7 +97,7 @@ public class AutonomousBlue extends LinearOpMode
         telemetry.update();
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap);
+            zone = coneDetection.detector(telemetry, hardwareMap, webcam);
         }
         if (zone == -1)
         {
@@ -103,7 +106,7 @@ public class AutonomousBlue extends LinearOpMode
 
         // Waits till start button is pressed
         waitForStart();
-
+        /*************/
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -121,7 +124,6 @@ public class AutonomousBlue extends LinearOpMode
         driveScrew(250);
         driveUBar(1750);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();

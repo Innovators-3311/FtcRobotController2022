@@ -6,20 +6,22 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousTestOfDooooooooooooooooooooom", group = "autonomous")
 public class AutonomousTestOfDeath extends LinearOpMode
 {
-    private CombinedLocalizer combinedLocalizer;
+    public CombinedLocalizer combinedLocalizer;
     private DriveToPos driveToPos;
     private MecanumDriveBase mecanumDriveBase;
+    private CameraInitSingleton cameraInitSingleton;
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
-
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -28,6 +30,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
     private DistanceSensor distanceSensor;
     private TouchSensor highSensor;
     private TouchSensor lowSensor;
+    private WebcamName webcam;
 
     private int screwLevel;
     private int zone = -1;
@@ -51,9 +54,12 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //            e.printStackTrace();
 //        }
 //        teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
-        combinedLocalizer = new CombinedLocalizer(hardwareMap);
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
+//        coneDetection = new ConeDetection();
+        combinedLocalizer = new CombinedLocalizer(hardwareMap, webcam);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false , webcam);
+
         driveToPos = new DriveToPos(combinedLocalizer, mecanumDriveBase);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
@@ -116,6 +122,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
         // Waits till start button is pressed
 //        coneDetection.tfod.setZoom(1, 16/9);
         combinedLocalizer.handleTracking();
+        RobotLog.ii("Localizer", "State= %f %f %f", combinedLocalizer.x, combinedLocalizer.y, combinedLocalizer.heading);
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -133,7 +140,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        driveScrew(200);
 //        driveUBar(1750);
 
-//        zone = coneDetection.detector(telemetry, hardwareMap);
+//        zone = coneDetection.detector(telemetry, hardwareMap, webcam);
 //        blueSide = teamDetection.showTeam(telemetry);
 //        blueSide = false;
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
@@ -160,10 +167,16 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
         /************************/
         //Drive to first pole
-        driveStraight(ticksPerInch * 3, 1, 1);
-        turnInPlace(ticksPerDegree * 45, -1, 1);
-        driveToPos.setTarget(5,36, 0);
-        driveToPos.driveToPosition();
+        driveStraight(ticksPerInch * 3 / 4, 1, 0.05);
+        turnInPlace(ticksPerDegree * 90 / 4, 1, 0.05); // FIXME change the negative
+        Thread.sleep(1000);
+        turnInPlace(ticksPerDegree * 90 / 4, -1, 0.05); // FIXME change the negative
+        driveToPos.setTarget(136, 41, 0);
+        telemetry.addData("going to position", 1);
+        telemetry.update();
+        driveToPos.autoDriveToPosition(telemetry);
+
+        Thread.sleep(1000000000);
 
 //        driveScrew(200);
         driveStraight(ticksPerInch * 30, 1, 0.3);
@@ -629,10 +642,10 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
         if (right == 1)
         {
-            leftBackPos -= target;
+            leftBackPos -= target; // fixme CHANG SPEED
             while (mecanumDriveBase.lb.getCurrentPosition() >= leftBackPos)
             {
-                mecanumDriveBase.driveMotors(0, speed, 0, 1);
+                mecanumDriveBase.driveMotors(0, speed, 0, -1);
                 combinedLocalizer.handleTracking();
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
@@ -643,10 +656,10 @@ public class AutonomousTestOfDeath extends LinearOpMode
         }
         else
         {
-            leftBackPos += target;
+            leftBackPos += target; // fixme CHANG SPEED
             while (mecanumDriveBase.lb.getCurrentPosition() <= leftBackPos)
             {
-                mecanumDriveBase.driveMotors(0, speed, 0, 1);
+                mecanumDriveBase.driveMotors(0, speed, 0, -1);
                 combinedLocalizer.handleTracking();
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
