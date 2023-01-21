@@ -93,6 +93,9 @@ public class MecanumDriveBase {
           double maxAbsVal = maxAbsVal(leftPowerFront, leftPowerBack,
                                        rightPowerFront, rightPowerBack);
 
+          // MaxAbsVal should only REDUCE power sent to the wheels, not increase it.
+          maxAbsVal = Math.max(1.0, maxAbsVal);
+
           lf.setPower(leftPowerFront/maxAbsVal);
           rf.setPower(rightPowerFront/maxAbsVal);
           lb.setPower(leftPowerBack/maxAbsVal);

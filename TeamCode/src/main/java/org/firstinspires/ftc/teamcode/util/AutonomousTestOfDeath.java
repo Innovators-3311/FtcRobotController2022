@@ -53,58 +53,11 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-//        teamDetection = new TeamDetection(hardwareMap);
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
-//        coneDetection = new ConeDetection();
         combinedLocalizer = new CombinedLocalizer(hardwareMap, webcam);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false , webcam);
-
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         driveToPos = new DriveToPos(combinedLocalizer, mecanumDriveBase);
-//        towerController = new TowerController(hardwareMap, telemetry);
-
-//        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
-
-//        screw = hardwareMap.get(DcMotor.class, "screw");
-//        uBar = hardwareMap.get(DcMotor.class, "uBar");
-//        intake = hardwareMap.get(DcMotor.class, "intake");
-
-//        highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
-//        lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
-
-//        screw.setDirection(DcMotor.Direction.FORWARD);
-//        uBar.setDirection(DcMotor.Direction.REVERSE);
-//        intake.setDirection(DcMotor.Direction.FORWARD);
-
-            // Run Without Encoders
-//        mecanumDriveBase.lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        mecanumDriveBase.rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        mecanumDriveBase.lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        mecanumDriveBase.rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-//        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            // Brake when power set to Zero
-//        mecanumDriveBase.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        mecanumDriveBase.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        mecanumDriveBase.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        mecanumDriveBase.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-//        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-//        screw.setDirection(DcMotorSimple.Direction.REVERSE);
-
-//        zone = coneDetection.detector(telemetry, hardwareMap);
-//        blueSide = teamDetection.showTeam(telemetry);
-
-//        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
-
-//...
-
-/*...*/
 
         telemetry.addData("Intialized", "");
         telemetry.update();
@@ -145,36 +98,30 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        blueSide = false;
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
-/*
-        driveStraight(ticksPerInch *18, 1, 0.5);
-        Thread.sleep(1000);
-
-        if (blueSide)
-        {
-            turnInPlace(ticksPerDegree * 30, -1, 0.3);
-        }
-        else
-        {
-            turnInPlace(ticksPerDegree * 30, 1, 0.3);
-        }
-
-        driveStraight(ticksPerInch * 10, 1, 0.5);
-        Thread.sleep(1000);
-        intake.setPower(-1);
-        Thread.sleep(1000);
-        intake.setPower(0);
-*/
 
         /************************/
         //Drive to first pole
-        driveStraight(ticksPerInch * 3 / 4, 1, 0.05);
-        turnInPlace(ticksPerDegree * 90 / 4, 1, 0.05); // FIXME change the negative
+        driveStraight(ticksPerInch * 5 / 4, 1, 0.5);
+        turnInPlace(ticksPerDegree * 80 / 4, 1, 0.5); // FIXME change the negative
         Thread.sleep(1000);
-        turnInPlace(ticksPerDegree * 90 / 4, -1, 0.05); // FIXME change the negative
-        driveToPos.setTarget(136, 41, 0);
-        telemetry.addData("going to position", 1);
-        telemetry.update();
-        driveToPos.autoDriveToPosition(telemetry);
+//        turnInPlace(ticksPerDegree * 90 / 4, -1, 0.5); // FIXME change the negative
+        driveToPos.setTarget(112, 36, -90);
+        driveToPos.maxSpeedFactor = 0.4;
+        double startTime = runtime.seconds();
+        while ((driveToPos.distanceToTarget() >= 5) && combinedLocalizer.targetVisible) // && (runtime.seconds() + startTime < 100))
+        {
+            combinedLocalizer.handleTracking();
+            driveToPos.autoDriveToPosition(telemetry);
+            RobotLog.ii("AutonomousTestOfDeath", "drivetopos distance: %f heading: %f, pos unc: %f, vuforiaTargetVisible: %s",
+                    driveToPos.distanceToTarget(), combinedLocalizer.heading, combinedLocalizer.positionUncertainty,
+                    String.valueOf(combinedLocalizer.targetVisible));
+            telemetry.update();
+        }
+
+        // Stop!
+        mecanumDriveBase.driveMotors(0,0,0,0);
+
+        stop();
 
         Thread.sleep(1000000000);
 

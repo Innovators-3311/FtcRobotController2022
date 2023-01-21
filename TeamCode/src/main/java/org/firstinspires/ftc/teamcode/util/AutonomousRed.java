@@ -56,7 +56,7 @@ public class AutonomousRed extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");

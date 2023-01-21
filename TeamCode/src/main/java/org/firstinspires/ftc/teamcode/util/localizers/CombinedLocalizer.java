@@ -139,7 +139,7 @@ public class CombinedLocalizer implements Localizer {
 
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 0, 0));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 90, 0));
 
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
@@ -225,8 +225,8 @@ public class CombinedLocalizer implements Localizer {
     public double[] robotToFieldFrame(double x,double y){
         double rotation = getRotation();
         double[] retVal ={
-                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
-                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+                 Math.cos(rotation *Math.PI/180)*x + -Math.sin(rotation *Math.PI/180)*y,
+                 Math.sin(rotation *Math.PI/180)*x + Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
 
@@ -241,8 +241,8 @@ public class CombinedLocalizer implements Localizer {
     public double[] fieldToRobotFrame(double x,double y){
         double rotation = getRotation();
         double[] retVal ={
-                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
-                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+                Math.cos(rotation *Math.PI/180)*x + Math.sin(rotation *Math.PI/180)*y,
+               -Math.sin(rotation *Math.PI/180)*x + Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
@@ -269,7 +269,7 @@ public class CombinedLocalizer implements Localizer {
             double k = headingUncertainty / (headingUncertainty + vuforiaHeadingUncertainty); //Kalman gain for a Kalman filter
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            double vuforiaHeading = rotation.thirdAngle%360;
+            double vuforiaHeading = -rotation.thirdAngle%360;
             double err = smartAngleError(vuforiaHeading, heading);
             heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;

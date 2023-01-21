@@ -25,7 +25,7 @@ public class InnoTeleOp extends OpMode
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
         localizer = new IntegratedLocalizerIMU(hardwareMap);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         towerController = new TowerController(hardwareMap, telemetry);
 //        localizer = new LocalizerIMU(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);

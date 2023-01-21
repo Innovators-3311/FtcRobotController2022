@@ -26,7 +26,7 @@ public class CompTeleOp extends OpMode
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
         localizer = new CombinedLocalizer(hardwareMap, webcam);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         towerController = new TowerController(hardwareMap, telemetry);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;

@@ -46,7 +46,7 @@ public class BasicAutonomous extends LinearOpMode
     {
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false, webcam);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         leftFrontPos = 0;
         rightFrontPos = 0;
         leftBackPos = 0;
