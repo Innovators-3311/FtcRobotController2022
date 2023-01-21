@@ -19,7 +19,6 @@ public class AutonomousRelativeDemo extends LinearOpMode
 {
 
     private StateServer stateServer;
-
     private boolean blueSide;
 
     @Override
@@ -33,6 +32,7 @@ public class AutonomousRelativeDemo extends LinearOpMode
 
         // Waits till start button is pressed
         waitForStart();
+
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -40,13 +40,15 @@ public class AutonomousRelativeDemo extends LinearOpMode
         RelativeDriveController waypoint1 = new RelativeDriveController(mecanumDriveBase, odoPods);
         double distance = 100;
         // Drive foward and left one tile.
-        waypoint1.setTarget(24, 24, 0);
+        waypoint1.setTarget(24, 0, 0);
         while (distance > 1) {
+
             distance = waypoint1.handleRelativeDrive();
             telemetry.addData("Distance to target:", distance);
             telemetry.update();
         }
 
+        stop();
     }
 
 }

@@ -86,19 +86,20 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
-          leftPowerFront  = (drive + turn + strafe) * speedFactor;
-          rightPowerFront = (drive - turn - strafe) * speedFactor;
-          leftPowerBack   = (drive + turn - strafe) * speedFactor;
-          rightPowerBack  = (drive - turn + strafe) * speedFactor;
+          leftPowerFront  = (drive + turn + strafe);
+          rightPowerFront = (drive - turn - strafe);
+          leftPowerBack   = (drive + turn - strafe);
+          rightPowerBack  = (drive - turn + strafe);
 
           // This code is awful.
           double maxAbsVal = maxAbsVal(leftPowerFront, leftPowerBack,
                                        rightPowerFront, rightPowerBack);
+          maxAbsVal = Math.max(1.0, maxAbsVal);
 
-          lf.setPower(leftPowerFront/maxAbsVal);
-          rf.setPower(rightPowerFront/maxAbsVal);
-          lb.setPower(leftPowerBack/maxAbsVal);
-          rb.setPower(rightPowerBack/maxAbsVal);
+          lf.setPower(leftPowerFront/maxAbsVal * speedFactor);
+          rf.setPower(rightPowerFront/maxAbsVal * speedFactor);
+          lb.setPower(leftPowerBack/maxAbsVal * speedFactor);
+          rb.setPower(rightPowerBack/maxAbsVal * speedFactor);
       }
 
     /**

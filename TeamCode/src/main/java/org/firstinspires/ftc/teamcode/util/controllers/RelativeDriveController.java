@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.controllers;
 
+import com.qualcomm.robotcore.util.RobotLog;
+
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
@@ -8,7 +10,7 @@ public class RelativeDriveController {
     private final OdometryPodsSensor odometryPodsSensor;
     private final MecanumDriveBase mecanumDriveBase;
 
-    public double speedFactor = 1.0;
+    public double speedFactor = 0.5;
 
     private double forward = 0.0;
     private double strafe = 0.0;
@@ -51,9 +53,9 @@ public class RelativeDriveController {
      * @param heading the degrees to turn right (negative is left).
      */
     public void setTarget(double forward, double strafe, double heading){
-        this.forward = forward;
-        this.strafe = strafe;
-        this.heading = heading;
+        this.forwardControl.targetValue = forward;
+        this.strafeControl.targetValue = strafe;
+        this.headingControl.targetValue = heading;
     }
 
     /**
@@ -63,15 +65,20 @@ public class RelativeDriveController {
      */
     public double handleRelativeDrive(){
         double[] state = odometryPodsSensor.getState();
-        double forwardError = initialForward + forward - state[0];
-        double strafeError = initialStrafe + strafe - state[1];
-        double headingError = initialHeading + heading - state[0];
-        this.mecanumDriveBase.driveMotors(forwardControl.update(forwardError),
-                headingControl.update(headingError),
-                strafeControl.update(strafeError), speedFactor
-                );
+
+        double drive = forwardControl.update(state[0]);
+        double turn = headingControl.update(state[2]);
+        double strafe = strafeControl.update(state[1]);
+        RobotLog.ii("RelativeDriveController",
+                "x %.2f, y %.2f, rot %.2f  /  drive: %.2f strafe: %.2f turn: %.2f",
+                state[0], state[1], state[2],
+                drive, strafe, turn);
+        this.mecanumDriveBase.driveMotors(drive, turn, strafe, speedFactor);
+
+        double driveErr = forwardControl.targetValue - state[0];
+        double strafeErr = strafeControl.targetValue - state[1];
 
         // Return the distance to the intended target.
-        return Math.sqrt(forwardError * forwardError + strafeError * strafeError);
+        return Math.sqrt(driveErr * driveErr  + strafeErr * strafeErr);
     }
 }
