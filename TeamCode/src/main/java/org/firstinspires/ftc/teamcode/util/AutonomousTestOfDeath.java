@@ -75,7 +75,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
         // Waits till start button is pressed
 //        coneDetection.tfod.setZoom(1, 16/9);
         combinedLocalizer.handleTracking();
-        RobotLog.ii("Localizer", "State= %f %f %f", combinedLocalizer.x, combinedLocalizer.y, combinedLocalizer.heading);
+        RobotLog.ii("AutomousTestofDeath", "State= %.2f %.2f %.2f", combinedLocalizer.x, combinedLocalizer.y, combinedLocalizer.heading);
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -101,8 +101,8 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
         /************************/
         //Drive to first pole
-        driveStraight(ticksPerInch * 5 / 4, 1, 0.5);
-        turnInPlace(ticksPerDegree * 80 / 4, 1, 0.5); // FIXME change the negative
+        driveStraight(ticksPerInch * 24, 1, 0.5);
+        turnInPlace(ticksPerDegree * 800, 1, 0.5); // FIXME change the negative
         Thread.sleep(1000);
 //        turnInPlace(ticksPerDegree * 90 / 4, -1, 0.5); // FIXME change the negative
         driveToPos.setTarget(112, 36, -90);
