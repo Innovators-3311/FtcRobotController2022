@@ -77,7 +77,7 @@ public class CombinedLocalizer implements Localizer {
     public CombinedLocalizer(HardwareMap hardwareMap, WebcamName webcam) {
         webcamField = webcam;
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
-//        imu = new InternalIMUSensor(hardwareMap);
+        imu = new InternalIMUSensor(hardwareMap);
         try{
             stateServer = new StateServer();
         }catch (IOException e12141){
