@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.util.ConeDetection;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
@@ -22,7 +23,7 @@ public class AutonomousRelativeDemo extends LinearOpMode
     private boolean blueSide;
 
     @Override
-    public void runOpMode() throws InterruptedException
+    public void runOpMode()
     {
         MecanumDriveBase mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
@@ -37,16 +38,33 @@ public class AutonomousRelativeDemo extends LinearOpMode
         runtime.seconds();
         runtime.startTime();
 
+        RobotLog.ii("AutonomousRelativeDemo", "Driving forward 24 inches");
         RelativeDriveController waypoint1 = new RelativeDriveController(mecanumDriveBase, odoPods);
-        double distance = 100;
+
         // Drive foward and left one tile.
         waypoint1.setTarget(24, 0, 0);
-        while (distance > 1) {
-
-            distance = waypoint1.handleRelativeDrive();
-            telemetry.addData("Distance to target:", distance);
-            telemetry.update();
+        while (waypoint1.targetDistance() > 0.1) {
+            waypoint1.handleRelativeDrive();
         }
+        mecanumDriveBase.driveMotors(0.0,0.0,0.0, 0.0);
+
+
+        RobotLog.ii("AutonomousRelativeDemo", "Strafing left 24 inches");
+        RelativeDriveController waypoint2 = new RelativeDriveController(mecanumDriveBase, odoPods);
+        // Drive foward and left one tile.
+        waypoint2.setTarget(0, 24, 0);
+        while (waypoint2.targetDistance() > 0.1) {
+            waypoint2.handleRelativeDrive();
+        }
+
+        RobotLog.ii("AutonomousRelativeDemo", "Rotating 90 degrees to the right.");
+        RelativeDriveController waypoint3 = new RelativeDriveController(mecanumDriveBase, odoPods);
+        // Drive foward and left one tile.
+        waypoint3.setTarget(0, 0, 90);
+        while (waypoint3.targetHeadingError() > 1) {
+            waypoint3.handleRelativeDrive();
+        }
+
 
         stop();
     }

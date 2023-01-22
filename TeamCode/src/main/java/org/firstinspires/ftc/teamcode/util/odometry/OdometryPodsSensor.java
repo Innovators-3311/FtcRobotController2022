@@ -26,9 +26,9 @@ public class OdometryPodsSensor implements PositionChangeSensor {
 
     public OdometryPodsSensor(HardwareMap hardwareMap) {
         // change lf rb
-        leftPod   = new OdometryPod(hardwareMap, "lb");
-        rightPod  = new OdometryPod(hardwareMap, "lf",true);
-        centerPod = new OdometryPod(hardwareMap, "rf",true);
+        leftPod   = new OdometryPod(hardwareMap, "lb", true);
+        rightPod  = new OdometryPod(hardwareMap, "lf");
+        centerPod = new OdometryPod(hardwareMap, "rf");
         last_measurement = runtime.seconds();
     }
 

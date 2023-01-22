@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.controllers;
 
+import static java.lang.Math.sqrt;
+
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
@@ -11,10 +13,6 @@ public class RelativeDriveController {
     private final MecanumDriveBase mecanumDriveBase;
 
     public double speedFactor = 0.5;
-
-    private double forward = 0.0;
-    private double strafe = 0.0;
-    private double heading = 0.0;
 
     private final double initialForward;
     private final double initialStrafe;
@@ -40,9 +38,9 @@ public class RelativeDriveController {
         initialStrafe = state[1];
         initialHeading = state[2];
 
-        forwardControl = new SimplePIDControl(0.2, 0.0, 0.2);
-        strafeControl = new SimplePIDControl(0.2, 0.0, 0.2);
-        headingControl = new SimplePIDControl(0.1, 0.0, 0.2);
+        forwardControl = new SimplePIDControl(0.8, 0.1, 0.2);
+        strafeControl  = new SimplePIDControl(0.8, 0.1, 0.2);
+        headingControl = new SimplePIDControl(0.2, 0.1, 0.2);
     }
 
     /**
@@ -53,22 +51,45 @@ public class RelativeDriveController {
      * @param heading the degrees to turn right (negative is left).
      */
     public void setTarget(double forward, double strafe, double heading){
-        this.forwardControl.targetValue = forward;
-        this.strafeControl.targetValue = strafe;
-        this.headingControl.targetValue = heading;
+        this.forwardControl.targetValue = initialForward + forward;
+        this.strafeControl.targetValue = initialStrafe + strafe;
+        this.headingControl.targetValue = initialHeading + heading;
+    }
+
+    /**
+     * Compute the distance to the target
+     *
+     * @return distance to target location.
+     */
+    public double targetDistance() {
+        double[] state = odometryPodsSensor.getState();
+        double fwdErr = this.forwardControl.measuredError(state[0]);
+        double strErr = this.strafeControl.measuredError(state[1]);
+
+        return sqrt(fwdErr * fwdErr + strErr * strErr);
+    }
+
+    /**
+     * Compute the error in heading compared to the target heading
+     *
+     * @return distance to target location.
+     */
+    public double targetHeadingError() {
+        double[] state = odometryPodsSensor.getState();
+        return this.headingControl.measuredError(state[2]);
     }
 
     /**
      * Call this to drive the robot to the target you've assigned.
      *
-     * @return distance to the intended relative target.
      */
-    public double handleRelativeDrive(){
+    public void handleRelativeDrive(){
         double[] state = odometryPodsSensor.getState();
 
         double drive = forwardControl.update(state[0]);
-        double turn = headingControl.update(state[2]);
         double strafe = strafeControl.update(state[1]);
+        double turn = headingControl.update(state[2]);
+
         RobotLog.ii("RelativeDriveController",
                 "x %.2f, y %.2f, rot %.2f  /  drive: %.2f strafe: %.2f turn: %.2f",
                 state[0], state[1], state[2],
@@ -77,8 +98,5 @@ public class RelativeDriveController {
 
         double driveErr = forwardControl.targetValue - state[0];
         double strafeErr = strafeControl.targetValue - state[1];
-
-        // Return the distance to the intended target.
-        return Math.sqrt(driveErr * driveErr  + strafeErr * strafeErr);
     }
 }
