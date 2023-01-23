@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.hardware.bosch.BNO055IMU.SensorMode.IMU;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -24,13 +22,15 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 import java.util.Locale;
 
 @Autonomous(name="MezDoom", group="Exercises")
-
-public class MezImu  extends LinearOpMode {
+public class MezImu  extends LinearOpMode
+{
 
 
     private MecanumDriveBase mecanumDriveBase;
 
-    private DistanceSensor distanceSensor;
+    private DistanceSensor distanceSensorRight;
+    private DistanceSensor distanceSensorLeft;
+    private DistanceSensor distanceSensorCenter;
 
     // The IMU sensor object
     BNO055IMU imu;
@@ -46,45 +46,16 @@ public class MezImu  extends LinearOpMode {
     PIDController pidRotate, pidDrive, pidStrafe;
 
     // called when init button is  pressed.
-    @Override
-    public void runOpMode() throws InterruptedException {
 
-        initialize();
-
-
-        // Wait until we're told to go
-        waitForStart();
-
-        // Start the logging of measured acceleration
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-
-        // Loop and update the dashboard
-        while (opModeIsActive())
-        {
-
-            rotate(-90,  1);
-
-            telemetry.update();
-
-            sleep(1000);
-
-            rotate(90,  1);
-
-            telemetry.update();
-
-            sleep(1000);
-        }
-        stop();
-    }
-
-    private void initialize() {
+    private void initialize()
+    {
         initImu();
 
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 
-
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
-
+        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
+        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
+        distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
 
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
@@ -92,6 +63,129 @@ public class MezImu  extends LinearOpMode {
         pidRotate = new PIDController(.003, .00003, 0);
         telemetry.addData("Hit start", "");
         telemetry.update();
+    }
+
+
+    @Override
+    public void runOpMode() throws InterruptedException
+    {
+
+        initialize();
+
+
+        // Wait until we're told to go
+        waitForStart();
+
+//        findPole();
+
+        while(opModeIsActive())
+        {
+            double correction = AlignRobot();
+
+            double distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
+            double distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
+            double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+            telemetry.addData("correction", correction);
+            telemetry.addData("distanceL", distanceL);
+            telemetry.addData("distanceR", distanceR);
+            telemetry.addData("distanceC", distanceC);
+            telemetry.update();
+
+
+            // Both see it positave turn right
+            // Both see it negative turn left
+            if (distanceC < 24)
+            {
+                while (distanceC < 24)
+                {
+                    mecanumDriveBase.driveMotors(0.2, 0, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+
+            if (Math.abs(correction) < 1)
+            {
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+            else if (correction == -1000)
+            {
+                while (distanceL > 24)
+                {
+                    mecanumDriveBase.driveMotors(0, .3, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+            else if (correction == 1000)
+            {
+                while (distanceR > 24)
+                {
+                    mecanumDriveBase.driveMotors(0, -.3, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+            else
+            {
+                correction = correction / 10;
+//                mecanumDriveBase.driveMotors(0, correction, 0, 1);
+            }
+
+            if (correction > 0)
+            {
+                while (correction > 0 && distanceC > 24)
+                {
+                    mecanumDriveBase.driveMotors(0, -0.1, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+            else if (correction < 0)
+            {
+                while (correction < 0 && distanceC > 24)
+                {
+                    mecanumDriveBase.driveMotors(0, 0.1, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+
+            if (distanceC < 24)
+            {
+                while (distanceC < 1)
+                {
+                    mecanumDriveBase.driveMotors(0.2, 0, 0, 1);
+                }
+                mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            }
+
+            sleep(1000);
+
+        }
+
+
+
+
+
+
+        // Start the logging of measured acceleration
+//        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
+        // Loop and update the dashboard
+
+//            rotate(-120,  1);
+
+//            telemetry.update();
+
+//            sleep(1000);
+
+//            rotate(120,  1);
+
+//            telemetry.update();
+
+//            sleep(1000);
+
+//            closeDistanceRight(30);
+
+
+            sleep(10000);
+        stop();
     }
 
     private void initImu() {
@@ -303,11 +397,12 @@ public class MezImu  extends LinearOpMode {
 
                 mecanumDriveBase.driveMotors(0, -power, 0, 1);
 
-                distance = checkDistance(10.0, 30.0);
+                distance = checkDistance(0.0, 80.0);
                 if (distance != -1) {
                     //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
                     //    pidRotate.setSetpoint(pidRotate.getSetpoint());
                     //need to make this case enter only once
+                    break;
                 }
 
             } while (opModeIsActive() && !pidRotate.onTarget());
@@ -316,6 +411,16 @@ public class MezImu  extends LinearOpMode {
                 power = pidRotate.performPID(getAngle()); // power will be + on left turn.
                 //leftMotor.setPower(-power);
                 //rightMotor.setPower(power);
+
+                distance = checkDistance(0.0, 80.0);
+                if (distance != -1) {
+                    //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
+                    //    pidRotate.setSetpoint(pidRotate.getSetpoint());
+                    //need to make this case enter only once
+                    break;
+                }
+
+
                 mecanumDriveBase.driveMotors(0, -power, 0, 1);
 
             } while (opModeIsActive() && !pidRotate.onTarget());
@@ -324,6 +429,11 @@ public class MezImu  extends LinearOpMode {
         //rightMotor.setPower(0);
         //leftMotor.setPower(0);
         mecanumDriveBase.driveMotors(0, 0, 0, 1);
+
+        telemetry.addData("distance", distance);
+        telemetry.update();
+
+        sleep(10000);
 
         rotation = getAngle();
 
@@ -346,7 +456,7 @@ public class MezImu  extends LinearOpMode {
      */
     private double checkDistance(double innerBound, double outerBound)
     {
-        double distance = distanceSensor.getDistance(DistanceUnit.CM);
+        double distance = distanceSensorRight.getDistance(DistanceUnit.INCH);
 
         if (distance < outerBound && distance > innerBound)
         {
@@ -360,9 +470,67 @@ public class MezImu  extends LinearOpMode {
         return distance;
     }
 
+    private double AlignRobot()
+    {
+        double xCorrection = 0.0;
+        if (distanceSensorRight.getDistance(DistanceUnit.INCH) <= 30 && distanceSensorLeft.getDistance(DistanceUnit.INCH) <= 30)
+        {
+            xCorrection = (-distanceSensorRight.getDistance(DistanceUnit.INCH) + distanceSensorLeft.getDistance(DistanceUnit.INCH));
 
 
+            return xCorrection;
+        }
+        else if (distanceSensorRight.getDistance(DistanceUnit.INCH) > 30 && distanceSensorLeft.getDistance(DistanceUnit.INCH) <= 30)
+        {
+            return 1000;
+        }
+        else if (distanceSensorRight.getDistance(DistanceUnit.INCH) <= 30 && distanceSensorLeft.getDistance(DistanceUnit.INCH) > 30)
+        {
+            return -1000;
+        }
+        else
+        {
+            return -1;
+        }
+
+    }
+
+
+    private void findPole()
+    {
+        closeDistanceRight(8);
+        closeDistanceLeft(3);
+    }
+
+    private void closeDistanceLeft(double range)
+    {
+        while (distanceSensorLeft.getDistance(DistanceUnit.INCH) > range)
+        {
+            distance = distanceSensorLeft.getDistance(DistanceUnit.INCH);
+            telemetry.addData("distance", distance);
+            telemetry.update();
+
+            mecanumDriveBase.driveMotors(0, 0, 1, 0.5);
+        }
+
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+    }
+
+    private void closeDistanceRight(double range)
+    {
+        while (distanceSensorRight.getDistance(DistanceUnit.INCH) > range)
+        {
+            distance = distanceSensorRight.getDistance(DistanceUnit.INCH);
+            telemetry.addData("distance", distance);
+            telemetry.update();
+
+            mecanumDriveBase.driveMotors(0.3, 0, -0.1, 1);
+        }
+
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+    }
 }
+
 
 
 
