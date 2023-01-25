@@ -95,8 +95,5 @@ public class RelativeDriveController {
                 state[0], state[1], state[2],
                 drive, strafe, turn);
         this.mecanumDriveBase.driveMotors(drive, turn, strafe, speedFactor);
-
-        double driveErr = forwardControl.targetValue - state[0];
-        double strafeErr = strafeControl.targetValue - state[1];
     }
 }
