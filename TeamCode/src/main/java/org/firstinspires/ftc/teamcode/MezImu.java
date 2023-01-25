@@ -79,7 +79,7 @@ public class MezImu  extends LinearOpMode
         {
             telemetry.addData("Round " + round, "");
             telemetry.update();
-            basicRotate(-360, 0.15, true);
+            basicRotate(360, 0.2, true);
             telemetry.addData("done", "");
             telemetry.update();
             sleep(1500);
@@ -117,6 +117,8 @@ public class MezImu  extends LinearOpMode
             telemetry.addData("distanceR", distanceR);
             telemetry.addData("distanceC", distanceC);
             telemetry.update();
+
+
 
 
             // Both see it positive turn right
@@ -679,9 +681,9 @@ public class MezImu  extends LinearOpMode
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
-    private void basicRotate(int degrees, double power, boolean sensor)
+    private void basicRotate(double degrees, double power, boolean sensor)
     {
-        double  leftPower, rightPower, powerRate;
+        double powerRate = 0;
         double distance;
         double firstPole = 0;
         double secondPole  = 0;
@@ -695,10 +697,14 @@ public class MezImu  extends LinearOpMode
 
         if (degrees < 0)
         {   // turn right.
+            telemetry.addData("Turn right", "");
+            telemetry.update();
             powerRate = power;
         }
         else if (degrees > 0)
         {   // turn left.
+            telemetry.addData("Turn left", "");
+            telemetry.update();
             powerRate = -power;
         }
         else return;
@@ -720,7 +726,6 @@ public class MezImu  extends LinearOpMode
             {
                 if (opModeIsActive() && Math.abs(getAngle()) > Math.abs(degrees))
                 {
-                    //TODO: If right turn works, fill this in.
                     mecanumDriveBase.driveMotors(0, 0, 0, 0);
                     telemetry.addData("Stop", "");
                     telemetry.update();
@@ -774,15 +779,18 @@ public class MezImu  extends LinearOpMode
         {
             telemetry.addData("recentering on pole", "");
             telemetry.update();
-            double angleCorrection = (firstPole - secondPole) / 2;
+
             if (degrees > 0)
             {
-                basicRotate(-(int) angleCorrection, 0.2, false);
+                double angleCorrection = (firstPole - secondPole) / 2;
+                basicRotate((int) angleCorrection, 0.2, false);
             }
             else
             {
+                double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate((int) angleCorrection, 0.2, false);
             }
+
         }
     }
 
