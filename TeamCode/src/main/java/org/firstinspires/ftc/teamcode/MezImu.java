@@ -664,6 +664,93 @@ public class MezImu  extends LinearOpMode
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
 
     }
+
+
+    /**
+     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
+     * @param degrees Degrees to turn, + is left - is right
+     */
+    private void basicRotate(int degrees, double power, boolean sensor)
+    {
+        double  leftPower, rightPower, powerRate;
+        double distance;
+        double firstPole = 0;
+        double secondPole  = 0;
+        boolean recenterOnPole = false;
+
+        // restart imu movement tracking.
+        resetAngle();
+
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
+
+        if (degrees < 0)
+        {   // turn right.
+            powerRate = power;
+        }
+        else if (degrees > 0)
+        {   // turn left.
+            powerRate = -power;
+
+        }
+        else return;
+
+        // set power to rotate.
+        mecanumDriveBase.driveMotors(0, power, 0, 1);
+
+        boolean foundPole = false;
+
+        // rotate until turn is completed.
+        if (degrees < 0)
+        {
+            // On right turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() == 0) {}
+
+            while (opModeIsActive() && getAngle() > degrees)
+            {
+                //TODO: If left turn works, fill this in.
+            }
+        }
+        else    // left turn.
+            while (opModeIsActive() && getAngle() < degrees)
+            {
+                if (sensor)
+                {
+                    distance = checkDistance(0, 20);
+                    if ((distance != -1) && !foundPole)
+                    {
+                        firstPole = getAngle();
+                        foundPole = true;
+                    }
+
+                    distance = checkDistance(0, 20);
+                    if (foundPole && distance == -1)
+                    {
+                        mecanumDriveBase.driveMotors(0, 0, 0, 1);
+                        secondPole = getAngle();
+                        recenterOnPole = true;
+                        break;
+                    }
+                }
+            }
+
+        // turn the motors off.
+        mecanumDriveBase.driveMotors(0, 0, 0, 1);
+
+        // wait for rotation to stop.
+        sleep(1000);
+
+        // reset angle tracking on new heading.
+        resetAngle();
+
+        //turn back in the reverse direction to center on the scanned pole.
+        if (recenterOnPole)
+        {
+            double angleCorrection = firstPole - secondPole;
+            basicRotate((int)angleCorrection,0.2,false);
+        }
+    }
+
 }
 
 
