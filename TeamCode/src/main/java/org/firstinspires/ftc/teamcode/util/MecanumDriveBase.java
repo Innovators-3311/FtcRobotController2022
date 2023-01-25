@@ -20,7 +20,12 @@ public class MecanumDriveBase {
     public double leftPowerBack   = 0;
     public double speedFactor     = 0;
 
-    public MecanumDriveBase(HardwareMap hardwareMap, boolean autonomous)
+    /**
+     * Constructor for MecanumDriveBase from the hardware map
+     *
+     * @param hardwareMap the hardware map
+     */
+    public MecanumDriveBase(HardwareMap hardwareMap)
     {
         rb = hardwareMap.get(DcMotor.class, "rb");
         rf = hardwareMap.get(DcMotor.class, "rf");
@@ -35,16 +40,7 @@ public class MecanumDriveBase {
         // reset encoders
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Run Without Encoders
-        if (!autonomous)
-        {
-            setMotorMode(this.runMode);
-        }
-        else
-        {
-            setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-
+        // Just pick a runMode!
         setMotorMode(runMode);
 
         // Brake when power set to Zero
@@ -92,19 +88,20 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
-          leftPowerFront  = (drive + turn + strafe) * speedFactor;
-          rightPowerFront = (drive - turn - strafe) * speedFactor;
-          leftPowerBack   = (drive + turn - strafe) * speedFactor;
-          rightPowerBack  = (drive - turn + strafe) * speedFactor;
+          leftPowerFront  = (drive + turn + strafe);
+          rightPowerFront = (drive - turn - strafe);
+          leftPowerBack   = (drive + turn - strafe);
+          rightPowerBack  = (drive - turn + strafe);
 
           // This code is awful.
           double maxAbsVal = maxAbsVal(leftPowerFront, leftPowerBack,
                                        rightPowerFront, rightPowerBack);
+          maxAbsVal = Math.max(1.0, maxAbsVal);
 
-          lf.setPower(leftPowerFront/maxAbsVal);
-          rf.setPower(rightPowerFront/maxAbsVal);
-          lb.setPower(leftPowerBack/maxAbsVal);
-          rb.setPower(rightPowerBack/maxAbsVal);
+          lf.setPower(leftPowerFront/maxAbsVal * speedFactor);
+          rf.setPower(rightPowerFront/maxAbsVal * speedFactor);
+          lb.setPower(leftPowerBack/maxAbsVal * speedFactor);
+          rb.setPower(rightPowerBack/maxAbsVal * speedFactor);
       }
 
     /**
