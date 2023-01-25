@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
 import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
+import org.firstinspires.ftc.teamcode.util.odometry.JunctionAligner;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub1", group="!")
 public class InnoTeleOp extends OpMode {
@@ -13,6 +14,7 @@ public class InnoTeleOp extends OpMode {
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;
+    private JunctionAligner junctionAligner;
 
     public void init() {
         telemetry.addData("Status", "Initialized");
@@ -34,6 +36,7 @@ public class InnoTeleOp extends OpMode {
 //        towerController.handleIntake();
 //        towerController.handleGamepad(gamepad2);
         towerController.handleGamepad(gamepad2, telemetry);
+        junctionAligner.AlignRobot();
 
         mecanumDriveBase.driveBaseTelemetry(telemetry);
         telemetry.addData("TeleOp heading", localizer.getRotation() );
