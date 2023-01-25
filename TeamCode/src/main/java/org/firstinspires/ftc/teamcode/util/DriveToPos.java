@@ -56,13 +56,13 @@ public class DriveToPos {
      *
      * @return Final error distance (in inches)
      */
-    public void driveToPosition(){
+    public void driveToPosition()
+    {
         double DX = xTarget - localizer.x;
         double DY = yTarget - localizer.y;
         double distanceToTarget = distanceToTarget();
 
-        double[] driveVector = localizer.fieldToRobotFrame(DX/distanceToTarget,
-                DY/distanceToTarget);
+        double[] driveVector = localizer.fieldToRobotFrame(DX / distanceToTarget, DY / distanceToTarget);
 
         // Compute the turn that minimizes wrap-arounds.
         // Note that this is a heading change, so rotation and target are backwards
@@ -71,19 +71,42 @@ public class DriveToPos {
         double speedFactor = 1;
 
         // https://www.desmos.com/calculator/ln1qieke73
-        if (distanceToTarget < safeDistance) {
-            speedFactor = maxSpeedFactor/safeDistance*distanceToTarget;
+        if (distanceToTarget < safeDistance)
+        {
+            speedFactor = maxSpeedFactor / safeDistance * distanceToTarget;
         }
-        if(distanceToTarget<localizer.positionUncertainty){
+        if (distanceToTarget < localizer.positionUncertainty)
+        {
             speedFactor = 0;
         }
-
-
-
-        // Drive the motors!
-        mecanumDriveBase.driveMotors(driveVector[0], turn, driveVector[1], speedFactor);
-
     }
+        public void autoDriveToPosition()
+        {
+            double aDX = xTarget - localizer.x;
+            double aDY = yTarget - localizer.y;
+            double autoDistanceToTarget = distanceToTarget();
+
+            double[] aDriveVector = localizer.fieldToRobotFrame(aDX / autoDistanceToTarget, aDY / autoDistanceToTarget);
+
+            // Compute the turn that minimizes wrap-arounds.
+            // Note that this is a heading change, so rotation and target are backwards
+            // TODO: Fix handling heading change! -1 < turn < 1
+            double aTurn = localizer.smartAngleError(localizer.getRotation(), rotationTarget);
+            double atonomousSpeedFactor = 1;
+
+            // https://www.desmos.com/calculator/ln1qieke73
+            if (autoDistanceToTarget < safeDistance)
+            {
+                atonomousSpeedFactor = maxSpeedFactor / safeDistance * autoDistanceToTarget;
+            }
+            if (autoDistanceToTarget < localizer.positionUncertainty)
+            {
+                atonomousSpeedFactor = 0;
+            }
+
+            // Drive the motors!
+            mecanumDriveBase.driveMotors(aDriveVector[0], aTurn, aDriveVector[1], atonomousSpeedFactor);
+        }
 
     /**
      * Compute the distance from the robot to the target
