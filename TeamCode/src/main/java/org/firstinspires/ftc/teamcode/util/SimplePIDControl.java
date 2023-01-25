@@ -11,6 +11,10 @@ public class SimplePIDControl {
     //   * 1 means that the previous values don't matter at all (no averaging).
     public double alpha = 0.5;
 
+    public double minClamp = -1.0;
+    public double maxClamp =  1.0;
+
+
     // These follow the standard definitions
     public double p;
     public double i;
@@ -69,6 +73,16 @@ public class SimplePIDControl {
     }
 
     /**
+     * Returns a clamped value of the update function. clamped to [minClamp, maxClamp]
+     *
+     * @param val the measurement
+     * @return a clamped update result.
+     */
+    public double updateClamp(double val) {
+        return clamp(update(val), minClamp, maxClamp);
+    }
+
+    /**
      * Call this function inside the loop to update the PID calculations and set the optimal
      * motor power.
      */
@@ -93,15 +107,14 @@ public class SimplePIDControl {
 
         lastError = thisError;
 
-        double powerCalc = p * thisError + i * integratedError + d * averagedDerivative + feedForward;
-        return powerCalc;
-        /** Calculations for our custom PID control **/
+        return p * thisError + i * integratedError + d * averagedDerivative + feedForward;
+        /* Calculations for our custom PID control */
     }
 
     /**
      * Update the measurement with no feedforward input.
      *
-     * @param measurement
+     * @param measurement The measured value.
      * @return drive power value.
      */
     public double update(double measurement) {
@@ -152,7 +165,7 @@ public class SimplePIDControl {
      * seconds (or samples). The resulting compensated single error value is then scaled by the
      * single gain K_{p} to compute the control variable.
      *
-     * @param time
+     * @param time Time constant of the integrating function.
      */
     public void setIntegralTime(double time) {
         this.i = this.p / time;
@@ -174,11 +187,10 @@ public class SimplePIDControl {
      * seconds (or samples). The resulting compensated single error value is then scaled by the
      * single gain K_{p} to compute the control variable.
      *
-     * @param time
+     * @param time time constant of the derivative value.
      */
     public void setDerivativeTime(double time) {
         this.d = this.p * time;
     }
 
 }
-/**yaeoaeaoeoeaeoaeoaeoaoeaeoeet*/
