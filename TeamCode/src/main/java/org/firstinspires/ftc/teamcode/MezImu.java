@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
 import java.util.Locale;
+import java.util.concurrent.TimeoutException;
 
 @Autonomous(name="MezDoom", group="Exercises")
 public class MezImu  extends LinearOpMode
@@ -71,11 +72,19 @@ public class MezImu  extends LinearOpMode
     {
 
         initialize();
-
-
+        int round = 1;
         // Wait until we're told to go
         waitForStart();
-
+        while (opModeIsActive())
+        {
+            telemetry.addData("Round " + round, "");
+            telemetry.update();
+            basicRotate(-360, 0.15, true);
+            telemetry.addData("done", "");
+            telemetry.update();
+            sleep(1500);
+        }
+        sleep(50000);
         bullDogAttack();
 
 
@@ -518,7 +527,7 @@ public class MezImu  extends LinearOpMode
 
         if (distance < outerBound && distance > innerBound)
         {
-            //Will return the detected distance
+            distance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
         }
         else
         {
@@ -691,51 +700,68 @@ public class MezImu  extends LinearOpMode
         else if (degrees > 0)
         {   // turn left.
             powerRate = -power;
-
         }
         else return;
 
         // set power to rotate.
-        mecanumDriveBase.driveMotors(0, power, 0, 1);
+        mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
 
         boolean foundPole = false;
 
         // rotate until turn is completed.
-        if (degrees < 0)
+        if (!sensor)
         {
+            telemetry.addData("Simple turn", "");
+            telemetry.update();
             // On right turn we have to get off zero first.
             while (opModeIsActive() && getAngle() == 0) {}
 
-            while (opModeIsActive() && getAngle() > degrees)
+            while (opModeIsActive())
             {
-                //TODO: If left turn works, fill this in.
+                if (opModeIsActive() && Math.abs(getAngle()) > Math.abs(degrees))
+                {
+                    //TODO: If right turn works, fill this in.
+                    mecanumDriveBase.driveMotors(0, 0, 0, 0);
+                    telemetry.addData("Stop", "");
+                    telemetry.update();
+                    break;
+                }
             }
         }
-        else    // left turn.
-            while (opModeIsActive() && getAngle() < degrees)
+        else
+        {
+            // left turn.
+            while (opModeIsActive() && Math.abs(getAngle()) < Math.abs(degrees))
             {
                 if (sensor)
                 {
-                    distance = checkDistance(0, 20);
+                    telemetry.addData("Sensor in use","");
+                    telemetry.update();
+                    distance = checkDistance(0, 24);
                     if ((distance != -1) && !foundPole)
                     {
+                        telemetry.addData("found pole", "");
+                        telemetry.update();
                         firstPole = getAngle();
                         foundPole = true;
                     }
 
-                    distance = checkDistance(0, 20);
+                    distance = checkDistance(0, 24);
                     if (foundPole && distance == -1)
                     {
-                        mecanumDriveBase.driveMotors(0, 0, 0, 1);
+                        telemetry.addData("lost pole", "");
+                        telemetry.update();
+                        mecanumDriveBase.driveMotors(0, 0, 0, 0);
                         secondPole = getAngle();
                         recenterOnPole = true;
                         break;
                     }
                 }
             }
+        }
 
         // turn the motors off.
-        mecanumDriveBase.driveMotors(0, 0, 0, 1);
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
 
         // wait for rotation to stop.
         sleep(1000);
@@ -744,18 +770,20 @@ public class MezImu  extends LinearOpMode
         resetAngle();
 
         //turn back in the reverse direction to center on the scanned pole.
-        if (recenterOnPole)
+        if (recenterOnPole && sensor)
         {
-            double angleCorrection = firstPole - secondPole;
-            basicRotate((int)angleCorrection,0.2,false);
+            telemetry.addData("recentering on pole", "");
+            telemetry.update();
+            double angleCorrection = (firstPole - secondPole) / 2;
+            if (degrees > 0)
+            {
+                basicRotate(-(int) angleCorrection, 0.2, false);
+            }
+            else
+            {
+                basicRotate((int) angleCorrection, 0.2, false);
+            }
         }
     }
 
 }
-
-
-
-
-
-
-
