@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 import java.util.Locale;
 
 @Autonomous(name="MezDoom", group="Exercises")
-public class MezImu  extends LinearOpMode
+public class MezImu extends LinearOpMode
 {
 
 
@@ -35,10 +35,13 @@ public class MezImu  extends LinearOpMode
     Orientation angles;
     Acceleration gravity;
 
-    Orientation             lastAngles = new Orientation();
-    double                  globalAngle, power = .30, correction, strafeCorrection,  rotation;
+    Orientation lastAngles = new Orientation();
+    double  globalAngle;
+    double  correction;
+    double  rotation;
 
     double distance;
+    double toPole;
 
     PIDController pidRotate, pidDrive, pidStrafe;
 
@@ -63,182 +66,11 @@ public class MezImu  extends LinearOpMode
         telemetry.update();
     }
 
-
-    @Override
-    public void runOpMode() throws InterruptedException
+    /**
+     * Init the IMU code
+     */
+    private void initImu()
     {
-
-        initialize();
-        int round = 1;
-        // Wait until we're told to go
-        waitForStart();
-        while (opModeIsActive())
-        {
-            telemetry.addData("Round " + round, "");
-            telemetry.update();
-            basicRotate(360, 0.2, true);
-            telemetry.addData("done", "");
-            telemetry.update();
-            sleep(1500);
-        }
-        sleep(50000);
-        bullDogAttack();
-
-
-//        findPole();
-
-//        while(opModeIsActive()) {
-//            double distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
-//            double distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
-//            double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-//            telemetry.addData("correction", correction);
-//            telemetry.addData("distanceL", distanceL);
-//            telemetry.addData("distanceR", distanceR);
-//            telemetry.addData("distanceC", distanceC);
-//            telemetry.update();
-//            sleep(1000);
-//        }
-
-        rotate(90,  0.3);
-        sleep(1000000);
-
-        while(opModeIsActive())
-        {
-            double correction = AlignRobot();
-
-            double distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
-            double distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
-            double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-            telemetry.addData("correction", correction);
-            telemetry.addData("distanceL", distanceL);
-            telemetry.addData("distanceR", distanceR);
-            telemetry.addData("distanceC", distanceC);
-            telemetry.update();
-
-
-
-
-            // Both see it positive turn right
-            // Both see it negative turn left
-            sleep(500);
-            if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
-            {
-                while (distanceSensorCenter.getDistance(DistanceUnit.INCH) > 8 && distanceSensorRight.getDistance(DistanceUnit.INCH) > 5 && distanceSensorLeft.getDistance(DistanceUnit.INCH) > 5)
-                {
-                    mecanumDriveBase.driveMotors(0.2, 0, 0, 1);
-                    telemetry.addData("distanceC ", distanceSensorCenter.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("distanceR ", distanceSensorRight.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("distanceL ", distanceSensorLeft.getDistance(DistanceUnit.INCH));
-                    telemetry.update();
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-//            else
-//            {
-//                findPole(18);
-//            }
-
-            correction = AlignRobot();
-
-//            if (Math.abs(correction) < 1)
-//            {
-//                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//            }
-
-            sleep(500);
-            if (correction == -1000)  //right see it, left does not
-            {
-                while (distanceSensorLeft.getDistance(DistanceUnit.INCH) > 24)
-                {
-                    //Turn right until left sensor see it.
-                    mecanumDriveBase.driveMotors(0, -.3, 0, 1);
-                    telemetry.addData("distanceL ", distanceSensorLeft.getDistance(DistanceUnit.INCH));
-                    telemetry.update();
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-            else if (correction == 1000) // left see it, left does not
-            {
-                while (distanceSensorRight.getDistance(DistanceUnit.INCH) > 24)
-                {
-                    // turn left untill sensor see it
-                    mecanumDriveBase.driveMotors(0, .3, 0, 1);
-                    telemetry.addData("distanceR ", distanceSensorRight.getDistance(DistanceUnit.INCH));
-                    telemetry.update();
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-
-            correction = AlignRobot();
-
-//            else
-//            {
-//                correction = correction / 10;
-////                mecanumDriveBase.driveMotors(0, correction, 0, 1);
-//            }
-            sleep(500);
-
-            if (correction > 0.25 && correction < 100)
-            {
-                while (correction >= 0.25 && distanceSensorCenter.getDistance(DistanceUnit.INCH)  > 24)
-                {
-                    correction = AlignRobot();
-                    mecanumDriveBase.driveMotors(0, 0.3, 0, 1);
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-            else if (correction < 0.25 && correction > 100)
-            {
-                while (correction <= 0.25 && distanceSensorCenter.getDistance(DistanceUnit.INCH)  > 24)
-                {
-                    correction = AlignRobot();
-                    mecanumDriveBase.driveMotors(0, -0.3, 0, 1);
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-
-            correction = AlignRobot();
-
-            if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
-            {
-                while (distanceSensorCenter.getDistance(DistanceUnit.INCH) > 4)
-                {
-                    mecanumDriveBase.driveMotors(0.2, 0, 0, 1);
-                    telemetry.addData("distanceC ", distanceSensorCenter.getDistance(DistanceUnit.INCH));
-                    telemetry.update();
-                }
-                mecanumDriveBase.driveMotors(0, 0, 0, 0);
-            }
-
-            telemetry.addData("Done", "");
-            telemetry.update();
-            sleep(1000);
-
-        }
-
-        // Start the logging of measured acceleration
-//        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-
-        // Loop and update the dashboard
-
-//            rotate(-120,  1);
-
-//            telemetry.update();
-
-//            sleep(1000);
-
-//            rotate(120,  1);
-
-//            telemetry.update();
-
-//            sleep(1000);
-
-//            closeDistanceRight(30);
-
-        stop();
-    }
-
-    private void initImu() {
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
         // provide positional information.
@@ -258,7 +90,34 @@ public class MezImu  extends LinearOpMode
 
         // Set up our telemetry dashboard
         composeTelemetry();
+    }
 
+    @Override
+    public void runOpMode() throws InterruptedException
+    {
+
+        initialize();
+        // Wait until we're told to go
+
+
+        waitForStart();
+
+        basicRotate(120, 0.2, true);
+        toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 3.5;
+        // drive straight to pole using toPole
+
+//        while(opModeIsActive()) {
+//            double distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
+//            double distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
+//            double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+//            telemetry.addData("correction", correction);
+//            telemetry.addData("distanceL", distanceL);
+//            telemetry.addData("distanceR", distanceR);
+//            telemetry.addData("distanceC", distanceC);
+//            telemetry.update();
+//            sleep(1000);
+//        }
+        stop();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -344,8 +203,6 @@ public class MezImu  extends LinearOpMode
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 
-
-
     /**
      * Resets the cumulative angle tracking to zero.
      */
@@ -382,138 +239,6 @@ public class MezImu  extends LinearOpMode
 
         return globalAngle;
     }
-
-    /**
-     * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
-     *
-     * @param degrees Degrees to turn, + is left - is right
-     */
-    private double rotate(int degrees, double power) {
-        // restart imu angle tracking.
-        telemetry.addData("Rotating", "");
-        telemetry.update();
-        resetAngle();
-
-        // if degrees > 359 we cap at 359 with same sign as original degrees.
-        if (Math.abs(degrees) > 359) degrees = (int) Math.copySign(359, degrees);
-
-        // start pid controller. PID controller will monitor the turn angle with respect to the
-        // target angle and reduce power as we approach the target angle. This is to prevent the
-        // robots momentum from overshooting the turn after we turn off the power. The PID controller
-        // reports onTarget() = true when the difference between turn angle and target angle is within
-        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
-        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
-        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
-        // turning the robot back toward the setpoint value.
-
-        pidRotate.reset();
-        pidRotate.setSetpoint(degrees);
-        pidRotate.setInputRange(0, degrees);
-        pidRotate.setOutputRange(0, power);
-        pidRotate.setTolerance(1);
-        pidRotate.enable();
-
-        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-        // clockwise (right).
-
-        // rotate until turn is completed.
-
-        if (degrees < 0) {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0) {
-                //leftMotor.setPower(power);
-                //rightMotor.setPower(-power);
-
-                mecanumDriveBase.driveMotors(0, power, 0, 1);
-
-                telemetry.addData("rotate off zero", "angle: " + getAngle() + "degrees:" + degrees);
-                telemetry.update();
-
-                sleep(100);
-            }
-
-            do {
-                power = pidRotate.performPID(getAngle()); // power will be - on right turn.
-                //leftMotor.setPower(-power);
-                //rightMotor.setPower(power);
-
-                telemetry.addData("rotate2", "angle2: " + getAngle() + "degrees:" + degrees);
-                telemetry.addData("rotate2", "power: " + power +" setpoint: " + pidRotate.getSetpoint());
-                telemetry.addData("1 imu heading", lastAngles.firstAngle);
-                telemetry.addData("2 global heading", globalAngle);
-                telemetry.addData("3 correction", correction);
-                telemetry.addData("4 turn rotation", rotation);
-                telemetry.update();
-
-                mecanumDriveBase.driveMotors(0, -power, 0, 1);
-
-                distance = checkDistance(0.0, 80.0);
-                if (distance != -1) {
-                    //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
-                    //    pidRotate.setSetpoint(pidRotate.getSetpoint());
-                    //need to make this case enter only once
-                    break;
-                }
-
-            } while (opModeIsActive() && !pidRotate.onTarget());
-        } else    // left turn.
-            do {
-                power = pidRotate.performPID(getAngle()); // power will be + on left turn.
-                //leftMotor.setPower(-power);
-                //rightMotor.setPower(power);
-
-                distance = checkDistance(0.0, 15.0);
-                if (distance != -1)
-                {
-                    /*
-                    Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-                    while (checkDistance(0.0, 80.0) < 30)
-                    {
-
-                        //do nothing
-                    }
-                    mecanumDriveBase.driveMotors(0, -power, 0, 1);
-                    Orientation angles2 = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-                    double deltaAngle = angles2.firstAngle - angles.firstAngle;
-*/
-
-
-                    //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
-                    //    pidRotate.setSetpoint(pidRotate.getSetpoint());
-                    //need to make this case enter only once
-                    break;
-                }
-
-
-                mecanumDriveBase.driveMotors(0, -power, 0, 1);
-
-            } while (opModeIsActive() && !pidRotate.onTarget());
-
-        // turn the motors off.
-        //rightMotor.setPower(0);
-        //leftMotor.setPower(0);
-        mecanumDriveBase.driveMotors(0, 0, 0, 1);
-
-        telemetry.addData("distance", distance);
-        telemetry.update();
-
-//        sleep(10000);
-
-        rotation = getAngle();
-
-        // wait for rotation to stop.
-        sleep(500);
-
-        // reset angle tracking on new heading.
-        resetAngle();
-
-        //TODO: return the number of degrees it did turn.  (in case distance preempted turn)
-        return 0.0;
-    }
-
-
 
     /**
      * Check to see if the sensor detects an object within the range provided.
@@ -565,126 +290,20 @@ public class MezImu  extends LinearOpMode
 
     }
 
-    private void bullDogAttack()
-    {
-        double distanceL, distanceR, distanceC = 0.0;
-
-        double drivePower = 0.0;
-
-        //normally would continue until button is unpressed, but have no controller
-        for (int i = 0; i < 1000; i++)
-        {
-            double correction = AlignRobot();
-
-            distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-            distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
-            distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
-
-            telemetry.addData("distanceC ", distanceC);
-            telemetry.addData("distanceR ", distanceR);
-            telemetry.addData("distanceL ", distanceL);
-            telemetry.addData("correction ", correction);
-            //telemetry.addData("correction/50" , correction / 50);
-            telemetry.update();
-
-            if (distanceC > 100)
-            {
-                drivePower = 0;
-            }
-            else if (distanceC < 30 && distanceC > 8)
-            {
-                drivePower = 0.2;
-            }
-            else if (distanceC < 8)
-            {
-                drivePower = -0.2;
-            }
-            //drivePower = 0;
-
-            if (Math.abs(correction) < 1)
-            {
-                mecanumDriveBase.driveMotors(drivePower, 0, 0, 0);
-            }
-            else if (correction == -1000)  //right see it, left does not
-            {
-                //Turn right until left sensor see it.
-                mecanumDriveBase.driveMotors(0, .2, 0, 1);
-            }
-            else if (correction == 1000) // left see it, left does not
-            {
-                // turn left untill sensor see it
-                mecanumDriveBase.driveMotors(0, -.2, 0, 1);
-            }
-            else
-            {
-                correction = correction / 10;
-                if (correction < -.1)
-                mecanumDriveBase.driveMotors(drivePower, -0.2, 0, 1);
-                else if (correction > 0.1)
-                    mecanumDriveBase.driveMotors(drivePower, 0.2, 0, 1);
-                else
-                    mecanumDriveBase.driveMotors(drivePower, correction, 0, 1);
-
-            }
-
-        }
-    }
-
-    private void findPole(double range)
-    {
-        turnRightTillPole(range);
-        if (distanceSensorCenter.getDistance(DistanceUnit.INCH) > range)
-        {
-            turnLeftTillPole(range);
-        }
-    }
-
-    private void turnRightTillPole(double range)
-    {
-        elapsedTime.reset();
-        elapsedTime.startTime();
-        while (distanceSensorCenter.getDistance(DistanceUnit.INCH) > range && elapsedTime.seconds() < 3)
-        {
-            distance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-            telemetry.addData("distance", distance);
-            telemetry.update();
-
-
-            mecanumDriveBase.driveMotors(0, 0.2, 0, 1);
-        }
-
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-    }
-
-    private void turnLeftTillPole(double range)
-    {
-        elapsedTime.reset();
-        elapsedTime.startTime();
-
-        while (distanceSensorCenter.getDistance(DistanceUnit.INCH) > range && elapsedTime.seconds() < 6) {
-            distance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-            telemetry.addData("distance", distance);
-            telemetry.update();
-
-            mecanumDriveBase.driveMotors(0, -0.2, 0, 1);
-        }
-
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-
-    }
-
-
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
+     * @param power Power setting from 0 to 1
+     * @param sensor Boolean indicating if to stop on center sensor detection
      */
     private void basicRotate(double degrees, double power, boolean sensor)
     {
         double powerRate = 0;
-        double distance;
+        double distance = 0;
         double firstPole = 0;
         double secondPole  = 0;
         boolean recenterOnPole = false;
+        boolean foundPole = false;
 
         // restart imu movement tracking.
         resetAngle();
@@ -704,12 +323,11 @@ public class MezImu  extends LinearOpMode
             telemetry.update();
             powerRate = -power;
         }
-        else return;
+        else return; //angle is 0
 
         // set power to rotate.
         mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
 
-        boolean foundPole = false;
 
         // rotate until turn is completed.
         if (!sensor)
@@ -730,7 +348,7 @@ public class MezImu  extends LinearOpMode
                 }
             }
         }
-        else
+        else           //Following code only used if sensor is in play
         {
             // left turn.
             while (opModeIsActive() && Math.abs(getAngle()) < Math.abs(degrees))
@@ -742,19 +360,22 @@ public class MezImu  extends LinearOpMode
                     distance = checkDistance(0, 24);
                     if ((distance != -1) && !foundPole)
                     {
-                        telemetry.addData("found pole", "");
-                        telemetry.update();
+                        //telemetry.addData("found pole", "");
+                        //telemetry.update();
                         firstPole = getAngle();
+                        telemetry.addData("Angle #1:", firstPole);
                         foundPole = true;
                     }
 
                     distance = checkDistance(0, 24);
                     if (foundPole && distance == -1)
                     {
-                        telemetry.addData("lost pole", "");
-                        telemetry.update();
+                        //telemetry.addData("lost pole", "");
+                        //telemetry.update();
                         mecanumDriveBase.driveMotors(0, 0, 0, 0);
+                        sleep(100);
                         secondPole = getAngle();
+                        telemetry.addData("Angle #2:", secondPole);
                         recenterOnPole = true;
                         break;
                     }
@@ -766,7 +387,7 @@ public class MezImu  extends LinearOpMode
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
 
         // wait for rotation to stop.
-        sleep(1000);
+        sleep(300);
 
         // reset angle tracking on new heading.
         resetAngle();
@@ -774,21 +395,151 @@ public class MezImu  extends LinearOpMode
         //turn back in the reverse direction to center on the scanned pole.
         if (recenterOnPole && sensor)
         {
-            telemetry.addData("recentering on pole", "");
-            telemetry.update();
+            //telemetry.addData("recentering on pole", "");
+            //telemetry.update();
 
             if (degrees > 0)
             {
                 double angleCorrection = (firstPole - secondPole) / 2;
-                basicRotate((int) angleCorrection, 0.2, false);
+                basicRotate(angleCorrection, 0.2, false);
+                int temp = (int)angleCorrection;
+                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
             }
             else
             {
                 double angleCorrection = (firstPole - secondPole) / 2;
-                basicRotate((int) angleCorrection, 0.2, false);
-            }
+                basicRotate(angleCorrection, 0.2, false);
 
+                int temp = (int)angleCorrection;
+                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
+            }
+            telemetry.update();
         }
     }
 
+
+//    private double rotate(int degrees, double power) {
+//        // restart imu angle tracking.
+//        telemetry.addData("Rotating", "");
+//        telemetry.update();
+//        resetAngle();
+//
+//        // if degrees > 359 we cap at 359 with same sign as original degrees.
+//        if (Math.abs(degrees) > 359) degrees = (int) Math.copySign(359, degrees);
+//
+//        // start pid controller. PID controller will monitor the turn angle with respect to the
+//        // target angle and reduce power as we approach the target angle. This is to prevent the
+//        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+//        // reports onTarget() = true when the difference between turn angle and target angle is within
+//        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+//        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+//        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+//        // turning the robot back toward the setpoint value.
+//
+//        pidRotate.reset();
+//        pidRotate.setSetpoint(degrees);
+//        pidRotate.setInputRange(0, degrees);
+//        pidRotate.setOutputRange(0, power);
+//        pidRotate.setTolerance(1);
+//        pidRotate.enable();
+//
+//        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+//        // clockwise (right).
+//
+//        // rotate until turn is completed.
+//
+//        if (degrees < 0) {
+//            // On right turn we have to get off zero first.
+//            while (opModeIsActive() && getAngle() == 0) {
+//                //leftMotor.setPower(power);
+//                //rightMotor.setPower(-power);
+//
+//                mecanumDriveBase.driveMotors(0, power, 0, 1);
+//
+//                telemetry.addData("rotate off zero", "angle: " + getAngle() + "degrees:" + degrees);
+//                telemetry.update();
+//
+//                sleep(100);
+//            }
+//
+//            do {
+//                power = pidRotate.performPID(getAngle()); // power will be - on right turn.
+//                //leftMotor.setPower(-power);
+//                //rightMotor.setPower(power);
+//
+//                telemetry.addData("rotate2", "angle2: " + getAngle() + "degrees:" + degrees);
+//                telemetry.addData("rotate2", "power: " + power +" setpoint: " + pidRotate.getSetpoint());
+//                telemetry.addData("1 imu heading", lastAngles.firstAngle);
+//                telemetry.addData("2 global heading", globalAngle);
+//                telemetry.addData("3 correction", correction);
+//                telemetry.addData("4 turn rotation", rotation);
+//                telemetry.update();
+//
+//                mecanumDriveBase.driveMotors(0, -power, 0, 1);
+//
+//                distance = checkDistance(0.0, 80.0);
+//                if (distance != -1) {
+//                    //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
+//                    //    pidRotate.setSetpoint(pidRotate.getSetpoint());
+//                    //need to make this case enter only once
+//                    break;
+//                }
+//
+//            } while (opModeIsActive() && !pidRotate.onTarget());
+//        } else    // left turn.
+//            do {
+//                power = pidRotate.performPID(getAngle()); // power will be + on left turn.
+//                //leftMotor.setPower(-power);
+//                //rightMotor.setPower(power);
+//
+//                distance = checkDistance(0.0, 15.0);
+//                if (distance != -1)
+//                {
+//                    /*
+//                    Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//
+//                    while (checkDistance(0.0, 80.0) < 30)
+//                    {
+//
+//                        //do nothing
+//                    }
+//                    mecanumDriveBase.driveMotors(0, -power, 0, 1);
+//                    Orientation angles2 = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//
+//                    double deltaAngle = angles2.firstAngle - angles.firstAngle;
+//*/
+//
+//
+//                    //WE SEE SOMETHING IN THE GIVEN RANGE.  STOP NOW!!!!!!
+//                    //    pidRotate.setSetpoint(pidRotate.getSetpoint());
+//                    //need to make this case enter only once
+//                    break;
+//                }
+//
+//
+//                mecanumDriveBase.driveMotors(0, -power, 0, 1);
+//
+//            } while (opModeIsActive() && !pidRotate.onTarget());
+//
+//        // turn the motors off.
+//        //rightMotor.setPower(0);
+//        //leftMotor.setPower(0);
+//        mecanumDriveBase.driveMotors(0, 0, 0, 1);
+//
+//        telemetry.addData("distance", distance);
+//        telemetry.update();
+//
+////        sleep(10000);
+//
+//        rotation = getAngle();
+//
+//        // wait for rotation to stop.
+//        sleep(500);
+//
+//        // reset angle tracking on new heading.
+//        resetAngle();
+//
+//        //TODO: return the number of degrees it did turn.  (in case distance preempted turn)
+//        return 0.0;
+//    }
 }

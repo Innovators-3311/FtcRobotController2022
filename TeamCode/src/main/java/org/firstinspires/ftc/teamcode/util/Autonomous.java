@@ -203,6 +203,7 @@ public class Autonomous extends LinearOpMode
     //Set target then multiply by one with negative if you want to go backwards no negative input
     private void driveStraight(double target, int forward, double speed)
     {
+
         speed *= forward;
         leftFrontPos = mecanumDriveBase.lf.getCurrentPosition();
         if (forward == 1)

@@ -176,10 +176,10 @@ public class SamIMUTest extends LinearOpMode
             {
                 // Use PID with imu input to drive in a straight line.
                 correction = pidDrive.performPID(getAngle());
-                correction = 0;
+//                correction *= 0.100;
                 //Pass the correction value into the turn param.  No idea what kind of range will
                 //be on this value.  Should be small value like 0.1 or less I would hope.
-                mecanumDriveBase.driveMotors(speed, 0, correction, 1);
+                mecanumDriveBase.driveMotors(speed, correction, 0, 1);
 
                 telemetry.addData("1 imu heading", lastAngles.firstAngle);
                 telemetry.addData("2 global heading", globalAngle);
@@ -197,7 +197,7 @@ public class SamIMUTest extends LinearOpMode
                 // Use PID with imu input to drive in a straight line.
                 correction = pidDrive.performPID(getAngle());
 
-                mecanumDriveBase.driveMotors(speed, 0, correction, 1);
+                mecanumDriveBase.driveMotors(speed, correction, 0, 1);
 
                 telemetry.addData("1 imu heading", lastAngles.firstAngle);
                 telemetry.addData("2 global heading", globalAngle);
