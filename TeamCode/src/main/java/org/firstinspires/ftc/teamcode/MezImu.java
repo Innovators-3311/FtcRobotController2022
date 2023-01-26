@@ -103,7 +103,7 @@ public class MezImu extends LinearOpMode
         waitForStart();
 
         basicRotate(120, 0.2, true);
-        toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 3.5;
+        toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4.5;
         // drive straight to pole using toPole
 
 //        while(opModeIsActive()) {
