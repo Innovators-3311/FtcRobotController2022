@@ -84,6 +84,8 @@ public class MecanumDriveBase {
      */
       public void driveMotors(double drive,double turn,double strafe,double speedFactor)
       {
+
+          // Negative turn is left
           leftPowerFront  = (drive + turn + strafe) * speedFactor;
           rightPowerFront = (drive - turn - strafe) * speedFactor;
           leftPowerBack   = (drive + turn - strafe) * speedFactor;
