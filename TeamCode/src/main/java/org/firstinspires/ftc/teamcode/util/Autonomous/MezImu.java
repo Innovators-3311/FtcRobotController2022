@@ -236,7 +236,6 @@ public class MezImu extends LinearOpMode
         }
         else           //Following code only used if sensor is in play
         {
-            // left turn.
             while (opModeIsActive() && Math.abs(getAngle()) < Math.abs(degrees))
             {
                 if (sensor)
