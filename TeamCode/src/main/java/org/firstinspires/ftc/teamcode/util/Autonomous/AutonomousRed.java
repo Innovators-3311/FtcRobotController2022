@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,16 +8,22 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
+import org.firstinspires.ftc.teamcode.util.ConeDetection;
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.util.TeamDetection;
+import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
-public class AutonomousBlue extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousRed", group = "autonomous")
+public class AutonomousRed extends LinearOpMode
 {
 
     private MecanumDriveBase mecanumDriveBase;
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
+    private TowerController towerController;
     private CameraInitSingleton cameraInitSingleton;
     private WebcamName webcam;
 
@@ -45,6 +51,8 @@ public class AutonomousBlue extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
 //        try {
 //            stateServer = new StateServer();
 //        } catch (IOException e) {
@@ -92,9 +100,12 @@ public class AutonomousBlue extends LinearOpMode
 
 //        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
+
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
-        telemetry.addData("Hit", "start when ready", "");
+
+        telemetry.addData("Intialized", "");
         telemetry.update();
+
         while (!opModeIsActive())
         {
             zone = coneDetection.detector(telemetry, hardwareMap, webcam);
@@ -106,7 +117,7 @@ public class AutonomousBlue extends LinearOpMode
 
         // Waits till start button is pressed
         waitForStart();
-        /*************/
+
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -121,10 +132,13 @@ public class AutonomousBlue extends LinearOpMode
 //        }
 
         /******  Take 45 */
-        driveScrew(250);
+        driveScrew(200);
         driveUBar(1750);
 
         blueSide = teamDetection.showTeam(telemetry);
+
+        blueSide = false;
+
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
 
@@ -150,7 +164,14 @@ public class AutonomousBlue extends LinearOpMode
 */
 
 
+
+
+
+
         /************************/
+
+
+
         //Drive to first pole
         driveScrew(200);
         driveStraight(ticksPerInch * 30, 1, 0.3);
@@ -165,18 +186,18 @@ public class AutonomousBlue extends LinearOpMode
         }
         else
         {
-            turnInPlace(ticksPerDegree * 45, 1, 0.3);
+            turnInPlace(ticksPerDegree * 43, 1, 0.3);
         }
         Thread.sleep(1000);
-        driveStraight(ticksPerInch * 6, 1, 0.5);
+        driveStraight(ticksPerInch * 4, 1, 0.5);
         Thread.sleep(1000);
         intake.setPower(-1);
         Thread.sleep(1000);
         intake.setPower(0);
 
-        // park
+        // pickup cone
         driveScrew(100);
-        driveStraight(ticksPerInch * 4.5, -1, 0.5);
+        driveStraight(ticksPerInch * 4, -1, 0.5);
         Thread.sleep(500);
         driveUBar(0);
         if (blueSide)
@@ -185,7 +206,7 @@ public class AutonomousBlue extends LinearOpMode
         }
         else
         {
-            turnInPlace(ticksPerDegree * 45, 1, 0.3);
+            turnInPlace(ticksPerDegree * 55, 1, 0.3);
         }
         Thread.sleep(500);
 //        driveStraight(ticksPerInch * 30, 1, 0.5);
@@ -221,9 +242,13 @@ public class AutonomousBlue extends LinearOpMode
 
             case 2:
                 if (blueSide)
-                {}
+                {
+
+                }
                 else
-                {}
+                {
+
+                }
                 break;
 
             case 3:
@@ -237,6 +262,7 @@ public class AutonomousBlue extends LinearOpMode
                 }
                 break;
         }
+
 
 //        Thread.sleep(500);
 //        driveStraight(ticksPerInch * 18, 1, 0.5);
@@ -411,13 +437,13 @@ public class AutonomousBlue extends LinearOpMode
         }
         Thread.sleep(500);
         driveUBar(-3250);
-        driveStraight(ticksPerInch * 47, 1, 0.5); // 63,847
+        driveStraight(ticksPerInch * 49, 1, 0.5); // 63,847
         Thread.sleep(500);
         //strafes to pole
         //        driveStrafe(ticksPerInch * 10.2, -1, .5);
         if (blueSide)
         {
-            driveStrafe(ticksPerInch * 11.5, -1, 0.5);
+            driveStrafe(ticksPerInch * 12, -1, 0.5);
 //            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
 //            {
 //                mecanumDriveBase.driveMotors(0, 0, -0.5, 1);
@@ -425,7 +451,7 @@ public class AutonomousBlue extends LinearOpMode
         }
         else
         {
-            driveStrafe(ticksPerInch * 11.5, 1, 0.5);
+            driveStrafe(ticksPerInch * 12, 1, 0.5);
 //            while (distanceSensor.getDistance(DistanceUnit.INCH) < 3.75)
 //            {
 //                mecanumDriveBase.driveMotors(0, 0, 0.5, 1);

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +9,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
+import org.firstinspires.ftc.teamcode.util.ConeDetection;
+import org.firstinspires.ftc.teamcode.util.DriveToPos;
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
