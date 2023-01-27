@@ -57,7 +57,7 @@ public class AutonomousBlue extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
