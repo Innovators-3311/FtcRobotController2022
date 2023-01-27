@@ -66,7 +66,7 @@ public class MezImu extends LinearOpMode
     {
         initImu();
 
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         elapsedTime = new ElapsedTime();
 
         distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");

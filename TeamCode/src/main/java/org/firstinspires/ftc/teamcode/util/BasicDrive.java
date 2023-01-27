@@ -11,7 +11,7 @@ public class BasicDrive extends OpMode
     @Override
     public void init()
     {
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         telemetry.addData("!", "Jit start");
         telemetry.update();
     }

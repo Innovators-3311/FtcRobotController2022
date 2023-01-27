@@ -28,7 +28,7 @@ public class TeleOpBabyModeStub extends OpMode
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
-        localizer          = new CombinedLocalizer(hardwareMap);
+        localizer          = new CombinedLocalizer(hardwareMap, webcam);
         mecanumDriveBase   = new MecanumDriveBase(hardwareMap);
         babyModeController = new BabyModeController(mecanumDriveBase, localizer);
         towerController    = new TowerController(hardwareMap,telemetry);

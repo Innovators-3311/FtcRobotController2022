@@ -33,7 +33,7 @@ public class AutonomousM2Sensor extends LinearOpMode {
 
     public void initialization()
     {
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
         distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
         elapsedTime = new ElapsedTime();

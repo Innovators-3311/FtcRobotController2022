@@ -114,131 +114,143 @@ public class JunctionHomingController {
         return distance;
     }
 
+    public double getDistance(){
+        return distanceSensorCenter.getDistance(DistanceUnit.INCH);
+    }
+
     /**
-         * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
-         * @param degrees Degrees to turn, + is left - is right
-         * @param power Power setting from 0 to 1
-         * @param sensor Boolean indicating if to stop on center sensor detection
-         */
-        private void basicRotate(double degrees, double power, boolean sensor)
+     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
+     * @param degrees Degrees to turn, + is left - is right
+     * @param power Power setting from 0 to 1
+     * @param sensor Boolean indicating if to stop on center sensor detection
+     */
+    public void rotate(double degrees, double power, boolean sensor)
+    {
+        double powerRate = 0;
+        double distance = 0;
+        double firstPole = 0;
+        double secondPole  = 0;
+        boolean recenterOnPole = false;
+        boolean foundPole = false;
+
+        // restart imu movement tracking.
+        resetAngle();
+
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
+
+        if (degrees < 0)
+        {   // turn right.
+            telemetry.addData("Turn right", "");
+            telemetry.update();
+            powerRate = power;
+        }
+        else if (degrees > 0)
+        {   // turn left.
+            telemetry.addData("Turn left", "");
+            telemetry.update();
+            powerRate = -power;
+        }
+        else return; //angle is 0
+
+        // set power to rotate.
+        mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
+
+
+        // rotate until turn is completed.
+        if (!sensor)
         {
-            double powerRate = 0;
-            double distance = 0;
-            double firstPole = 0;
-            double secondPole  = 0;
-            boolean recenterOnPole = false;
-            boolean foundPole = false;
+            telemetry.addData("Simple turn", "");
+            telemetry.update();
+            // On right turn we have to get off zero first.
+            while (getAngle() == 0) {}
 
-            // restart imu movement tracking.
-            resetAngle();
-
-            // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-            // clockwise (right).
-
-            if (degrees < 0)
-            {   // turn right.
-                telemetry.addData("Turn right", "");
-                telemetry.update();
-                powerRate = power;
-            }
-            else if (degrees > 0)
-            {   // turn left.
-                telemetry.addData("Turn left", "");
-                telemetry.update();
-                powerRate = -power;
-            }
-            else return; //angle is 0
-
-            // set power to rotate.
-            mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
-
-
-            // rotate until turn is completed.
-            if (!sensor)
+            while (true)
             {
-                telemetry.addData("Simple turn", "");
-                telemetry.update();
-                // On right turn we have to get off zero first.
-                while (getAngle() == 0) {}
-
-                while (true)
+                if (Math.abs(getAngle()) > Math.abs(degrees))
                 {
-                    if (Math.abs(getAngle()) > Math.abs(degrees))
+                    mecanumDriveBase.driveMotors(0, 0, 0, 0);
+                    telemetry.addData("Stop", "");
+                    telemetry.update();
+                    break;
+                }
+            }
+        }
+        else           //Following code only used if sensor is in play
+        {
+            // left turn.
+            while (Math.abs(getAngle()) < Math.abs(degrees))
+            {
+                if (sensor)
+                {
+                    telemetry.addData("Sensor in use","");
+                    telemetry.update();
+                    distance = checkDistance(0, 24);
+                    if ((distance != -1) && !foundPole)
                     {
+                        //telemetry.addData("found pole", "");
+                        //telemetry.update();
+                        firstPole = getAngle();
+                        telemetry.addData("Angle #1:", firstPole);
+                        foundPole = true;
+                    }
+
+                    distance = checkDistance(0, 24);
+                    if (foundPole && distance == -1)
+                    {
+                        //telemetry.addData("lost pole", "");
+                        //telemetry.update();
                         mecanumDriveBase.driveMotors(0, 0, 0, 0);
-                        telemetry.addData("Stop", "");
-                        telemetry.update();
+                        sleep(100); //TODO
+                        secondPole = getAngle();
+                        telemetry.addData("Angle #2:", secondPole);
+                        recenterOnPole = true;
                         break;
                     }
                 }
             }
-            else           //Following code only used if sensor is in play
+        }
+
+        // turn the motors off.
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+
+        // wait for rotation to stop.
+//        sleep(300); //TODO
+
+        // reset angle tracking on new heading.
+        resetAngle();
+
+        //turn back in the reverse direction to center on the scanned pole.
+        if (recenterOnPole && sensor)
+        {
+
+
+            if (degrees > 0)
             {
-                // left turn.
-                while (Math.abs(getAngle()) < Math.abs(degrees))
-                {
-                    if (sensor)
-                    {
-                        telemetry.addData("Sensor in use","");
-                        telemetry.update();
-                        distance = checkDistance(0, 24);
-                        if ((distance != -1) && !foundPole)
-                        {
-                            //telemetry.addData("found pole", "");
-                            //telemetry.update();
-                            firstPole = getAngle();
-                            telemetry.addData("Angle #1:", firstPole);
-                            foundPole = true;
-                        }
-
-                        distance = checkDistance(0, 24);
-                        if (foundPole && distance == -1)
-                        {
-                            //telemetry.addData("lost pole", "");
-                            //telemetry.update();
-                            mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//                            sleep(100);TODO
-                            secondPole = getAngle();
-                            telemetry.addData("Angle #2:", secondPole);
-                            recenterOnPole = true;
-                            break;
-                        }
-                    }
-                }
+                double angleCorrection = (firstPole - secondPole) / 2;
+                rotate(angleCorrection, power, false);
+                int temp = (int)angleCorrection;
+                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
             }
-
-            // turn the motors off.
-            mecanumDriveBase.driveMotors(0, 0, 0, 0);
-
-            // wait for rotation to stop.
-//            sleep(300);TODO
-
-            // reset angle tracking on new heading.
-            resetAngle();
-
-            //turn back in the reverse direction to center on the scanned pole.
-            if (recenterOnPole && sensor)
+            else
             {
-                //telemetry.addData("recentering on pole", "");
-                //telemetry.update();
+                double angleCorrection = (firstPole - secondPole) / 2;
+                rotate(angleCorrection, power, false);
 
-                if (degrees > 0)
-                {
-                    double angleCorrection = (firstPole - secondPole) / 2;
-                    basicRotate(angleCorrection, 0.2, false);
-                    int temp = (int)angleCorrection;
-                    telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
-                }
-                else
-                {
-                    double angleCorrection = (firstPole - secondPole) / 2;
-                    basicRotate(angleCorrection, 0.2, false);
-
-                    int temp = (int)angleCorrection;
-                    telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
-                }
-                telemetry.update();
+                int temp = (int)angleCorrection;
+                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
             }
+            telemetry.update();
+        }
+    }
+
+    public final void sleep(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException var4) {
+            Thread.currentThread().interrupt();
         }
 
     }
+
+}
