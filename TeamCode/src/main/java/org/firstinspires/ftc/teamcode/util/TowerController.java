@@ -25,15 +25,15 @@ public class TowerController
     private boolean screwA;
     private boolean uBarA;
 
-    private final int HIGH_SCREW_PRESET = -1258;
-    private final int MEDIUM_SCREW_PRESET = 0;
-    private final int LOW_SCREW_PRESET = 0;
-    private final int PICKUP_SCREW_PRESET = 0;
+    private final int HIGH_SCREW_PRESET = -361;
+    private final int MEDIUM_SCREW_PRESET = -3305;
+    private final int LOW_SCREW_PRESET = 29;
+    private final int PICKUP_SCREW_PRESET = -1621;
 
-    private final int HIGH_UBAR_PRESET = 2444;
-    private final int MEDIUM_UBAR_PRESET = 0;
-    private final int LOW_UBAR_PRESET = 0;
-    private final int PICKUP_UBAR_PRESET = 0;
+    private final int HIGH_UBAR_PRESET = -2449;
+    private final int MEDIUM_UBAR_PRESET = -2445;
+    private final int LOW_UBAR_PRESET = -1150;
+    private final int PICKUP_UBAR_PRESET = -4551;
 
     // Ubar field
     private DcMotor uBar;
@@ -304,15 +304,11 @@ public class TowerController
     {
         if (gamepad.y)
         {
-            uBarY = true;
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             screw.setTargetPosition(HIGH_SCREW_PRESET);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
-        }
-        if (uBarY && screw.getCurrentPosition() > 2670)
-        {
-            uBarY = false;
+
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(HIGH_UBAR_PRESET);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -322,32 +318,14 @@ public class TowerController
 
     private void middlePoll(Gamepad gamepad)
     {
-        if (gamepad.x && screw.getCurrentPosition() >= 2700 && uBar.getCurrentPosition() > 0)
+        if (gamepad.x)
         {
             uBarX = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(MEDIUM_UBAR_PRESET);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
-        }
-        else if (gamepad.x && !(screw.getCurrentPosition() >= 2700))
-        {
-            screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(MEDIUM_SCREW_PRESET);
-            screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            screw.setPower(1);
-            if (screw.getCurrentPosition() >= 2662)
-            {
-                uBarX = true;
-                uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                uBar.setTargetPosition(MEDIUM_UBAR_PRESET);
-                uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                uBar.setPower(1);
-            }
-        }
-        if (uBarX && uBar.getCurrentPosition() < -2900)
-        {
-            uBarX = false;
+
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             screw.setTargetPosition(MEDIUM_SCREW_PRESET);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -359,15 +337,11 @@ public class TowerController
     {
         if (gamepad.b && !gamepad.start)
         {
-            uBarB = true;
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             screw.setTargetPosition(LOW_SCREW_PRESET);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             screw.setPower(1);
-        }
-        if (screw.getCurrentPosition() > 2700 && uBarB)
-        {
-            uBarB = false;
+
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(LOW_UBAR_PRESET);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -376,34 +350,13 @@ public class TowerController
     }
     private void pickUp(Gamepad gamepad)
     {
-        if (gamepad.a && screw.getCurrentPosition() > 2700)
+        if (gamepad.a)
         {
-            screwA = true;
             uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             uBar.setTargetPosition(PICKUP_UBAR_PRESET);
             uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             uBar.setPower(1);
-        }
-        else if (gamepad.a)
-        {
-            uBarA = true;
-            screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            screw.setTargetPosition(PICKUP_SCREW_PRESET);
-            screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            screw.setPower(1);
-        }
-        if (uBarA && screw.getCurrentPosition() > 2700)
-        {
-            uBarA = false;
-            screwA = true;
-            uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            uBar.setTargetPosition(PICKUP_UBAR_PRESET);
-            uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            uBar.setPower(1);
-        }
-        if (screwA && uBar.getCurrentPosition() > -300)
-        {
-            screwA = false;
+
             screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             screw.setTargetPosition(PICKUP_SCREW_PRESET);
             screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);

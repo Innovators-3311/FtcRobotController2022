@@ -52,7 +52,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        }
 //        teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         combinedLocalizer = new CombinedLocalizer(hardwareMap);
         driveToPos = new DriveToPos(combinedLocalizer, mecanumDriveBase);
 //        towerController = new TowerController(hardwareMap, telemetry);
