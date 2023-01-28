@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
+@Disabled
 public class AutonomousBlue extends LinearOpMode
 {
 

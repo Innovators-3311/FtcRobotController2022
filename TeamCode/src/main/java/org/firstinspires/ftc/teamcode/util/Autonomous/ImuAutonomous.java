@@ -16,6 +16,7 @@ import static com.qualcomm.hardware.bosch.BNO055IMU.SensorMode.IMU;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -35,7 +36,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @Autonomous(name="Drive Avoid PID", group="Exercises")
-//@Disabled
+@Disabled
 public class ImuAutonomous extends LinearOpMode
 {
     private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303

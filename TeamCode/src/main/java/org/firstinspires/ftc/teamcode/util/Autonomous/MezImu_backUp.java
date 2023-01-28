@@ -78,7 +78,7 @@ public class MezImu_backUp extends LinearOpMode
         {
             telemetry.addData("Round " + round, "");
             telemetry.update();
-            basicRotate(120, 0.5, true);  //left 90 or find pole
+            basicRotate(120, 0.2, true);  //left 90 or find pole
 
             sleep(10000);
             basicRotate(-90, 0.5, false);  //right 90 or find pole

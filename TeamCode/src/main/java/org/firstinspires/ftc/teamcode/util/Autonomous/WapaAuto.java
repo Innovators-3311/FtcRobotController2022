@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import java.util.Locale;
 
 @Autonomous(name="Autonomous", group="Exercises")
-public class MezImu extends LinearOpMode
+public class WapaAuto extends LinearOpMode
 {
 
 
@@ -37,6 +37,7 @@ public class MezImu extends LinearOpMode
 
     private DcMotor screw;
     private DcMotor uBar;
+    private DcMotor intake;
 
     // The IMU sensor object
     BNO055IMU imu;
@@ -75,6 +76,19 @@ public class MezImu extends LinearOpMode
 
         screw = hardwareMap.get(DcMotor.class, "screw");
         uBar = hardwareMap.get(DcMotor.class, "uBar");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+
+        screw.setDirection(DcMotor.Direction.REVERSE);
+        uBar.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.FORWARD);
+
+        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
@@ -113,25 +127,27 @@ public class MezImu extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-
+        //Initialize
         initialize();
+
         // Wait until we're told to go
-
-
         waitForStart();
 
         driveStraight(ticksPerInch * 70, 1, 0.5);
         sleep(500);
+        driveScrew(0);
+        driveUBar(0);
         driveStraight(ticksPerInch * 10, -1, 0.5);
         sleep(500);
-        basicRotate(180, 0.5, false);
         sleep(500);
         if (blueTeam)
         {
+            basicRotate(-90, 0.5, false);
             basicRotate(120, 0.2, true);
         }
         else
         {
+            basicRotate(90, 0.5, false);
             basicRotate(-120, 0.2, true);
         }
 
@@ -139,24 +155,15 @@ public class MezImu extends LinearOpMode
         {
             toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4.5;
             driveStraight(ticksPerInch * toPole, -1, 0.5);
-
-        }
-        else
-        {
-            park();
-        }
-
-/*        while(opModeIsActive()) {
-            double distanceL = distanceSensorLeft.getDistance(DistanceUnit.INCH);
-            double distanceR = distanceSensorRight.getDistance(DistanceUnit.INCH);
-            double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
-            telemetry.addData("correction", correction);
-            telemetry.addData("distanceL", distanceL);
-            telemetry.addData("distanceR", distanceR);
-            telemetry.addData("distanceC", distanceC);
-            telemetry.update();
             sleep(1000);
-        } */
+            intake.setPower(1);
+            sleep(1000);
+            intake.setPower(0);
+            driveStraight(ticksPerInch * toPole, 1, 0.5);
+        }
+
+
+
         stop();
     }
 
@@ -174,6 +181,34 @@ public class MezImu extends LinearOpMode
         uBar.setTargetPosition(target);
         uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         uBar.setPower(1);
+    }
+
+    private void driveStraight(double target, int forward, double speed)
+    {
+        speed *= forward;
+        leftFrontPos = mecanumDriveBase.lf.getCurrentPosition();
+        if (forward == 1)
+        {
+            leftFrontPos += target;
+            while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
+            {
+                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+        else
+        {
+            leftFrontPos -= target;
+            while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
+            {
+                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
+                telemetry.update();
+            }
+        }
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+//        encoderLogging();
     }
 
     /**
@@ -301,39 +336,6 @@ public class MezImu extends LinearOpMode
             }
             telemetry.update();
         }
-    }
-
-    private void driveStraight(double target, int forward, double speed)
-    {
-        speed *= forward;
-        leftFrontPos = mecanumDriveBase.lf.getCurrentPosition();
-        if (forward == 1)
-        {
-            leftFrontPos += target;
-            while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
-            {
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
-                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        else
-        {
-            leftFrontPos -= target;
-            while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
-            {
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
-                telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
-                telemetry.update();
-            }
-        }
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-//        encoderLogging();
-    }
-
-    private void park()
-    {
-
     }
 
     //----------------------------------------------------------------------------------------------

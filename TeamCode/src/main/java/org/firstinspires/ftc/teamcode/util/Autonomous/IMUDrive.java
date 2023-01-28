@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.Autonomous;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CompassSensor;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="IMUDrive",group="73")
+@Disabled
 public class IMUDrive extends OpMode {
 
 
