@@ -106,6 +106,15 @@ public class MecanumDriveBase {
       }
 
     /**
+     * Returns the absolute maximum power on any drive motor.
+     *
+     * @return max abs power [0,1]
+     */
+    public double maxMotorPower(){
+          return maxAbsVal(lf.getPower(), rf.getPower(), lb.getPower(), rb.getPower());
+      }
+
+    /**
      * maxAbsVal returns the maximum absolute value among an arbitrary number of arguments.
      *
      * @param values an arbitrary number of values.

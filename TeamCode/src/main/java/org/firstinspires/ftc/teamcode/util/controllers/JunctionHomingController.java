@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,12 +15,30 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.util.enums.JunctionType;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
+class JunctionDistances {
+    private static final double low = 9.9;
+    // Touching the pole.
+    private static final double close = 3;
+
+    public static double getDistance(JunctionType junctionType){
+        if (junctionType == JunctionType.HIGH) return close;
+        if (junctionType == JunctionType.MEDIUM) return close;
+        if (junctionType == JunctionType.LOW) return low;
+        return 0;
+    }
+}
+
 public class JunctionHomingController {
+    private static final int SWEEP_ANGLE = 90;
+    private static final double POSITION_TOLERANCE = 1.0;
+    private static final double MAX_DISTANCE = 24;
+
     private Telemetry telemetry;
     private MecanumDriveBase mecanumDriveBase;
     private BNO055IMU imu;
     private DistanceSensor distanceSensorCenter;
     private RelativeDriveController relativeDrive;
+
 
     Orientation lastAngles = new Orientation();
     double  globalAngle;
@@ -99,27 +118,35 @@ public class JunctionHomingController {
      *
      * @param junctionType The type of junction we're aligning to (LOW, MEDIUM, HIGH)
      */
-    public void alignToPoleLeft(JunctionType junctionType) {
-        rotate(90, 0.6, true);
+    public boolean alignToPoleLeft(JunctionType junctionType) {
+        // Turn left and look for a junction.
+        double measDist = rotate(SWEEP_ANGLE, 0.5, true);
 
-        // Target distance from pole after alignment for cone delivery.
-        double distanceTo= 0;
+        // measDist is the minimum measured distance. If it's over maxDistance,
+        if (measDist > 24){
+            RobotLog.ii("JunctionHomingController", "No Junction Found");
 
-        if(junctionType == JunctionType.LOW){distanceTo = 1;}
-        else if(junctionType == JunctionType.MEDIUM){distanceTo = 1;}
-        else if(junctionType == JunctionType.HIGH){distanceTo = 1;}
+            rotate(-SWEEP_ANGLE, 0.5, false);
+            return false;
+        }
+        // Compute distance to the pole.
+        double forward = measDist - JunctionDistances.getDistance(junctionType);
 
-        double forward = getDistance() - distanceTo;
+        RobotLog.ii("JunctionHomingController", "Approaching %s junction. Measured distance: %f",
+                junctionType.toString(), measDist);
 
-        relativeDrive.setTarget(forward, 0, 0);
-        while (relativeDrive.targetDistance() > 0.1) {
+        relativeDrive.setTarget(-forward, 0, 0);
+        relativeDrive.speedFactor = 0.6;
+
+        while (relativeDrive.driving()) {
             relativeDrive.handleRelativeDrive();
         }
 
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
+        RobotLog.ii("JunctionHomingController", "Completed drive. Measured distance: %f",
+                getDistance());
 
-        rotate(-20, 0.4, false);
-        rotate(40, 0.2, true);
+        return (measDist < MAX_DISTANCE);
     }
 
     /**
@@ -219,17 +246,18 @@ public class JunctionHomingController {
 
                     telemetry.addData("Sensor in use","");
                     telemetry.update();
-                    distance = checkDistance(0, 24);
+                    distance = checkDistance(0, MAX_DISTANCE);
                     if ((distance != -1) && !foundPole)
                     {
                         //telemetry.addData("found pole", "");
                         //telemetry.update();
                         firstPole = getAngle();
+                        RobotLog.ii("JunctionHomingController", "Found Right Edge. Angle: %f", firstPole);
                         telemetry.addData("Angle #1:", firstPole);
                         foundPole = true;
                     }
 
-                    distance = checkDistance(0, 24);
+                    distance = checkDistance(0, MAX_DISTANCE);
                     if (foundPole && distance == -1)
                     {
                         //telemetry.addData("lost pole", "");
@@ -237,6 +265,7 @@ public class JunctionHomingController {
                         mecanumDriveBase.driveMotors(0, 0, 0, 0);
                         sleep(100); //TODO
                         secondPole = getAngle();
+                        RobotLog.ii("JunctionHomingController", "Found Left Edge. Angle: %f", secondPole);
                         telemetry.addData("Angle #2:", secondPole);
                         recenterOnPole = true;
                         break;
@@ -249,7 +278,7 @@ public class JunctionHomingController {
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
 
         // wait for rotation to stop.
-//        sleep(300); //TODO
+        sleep(100); //TODO
 
         // reset angle tracking on new heading.
         resetAngle();
@@ -257,23 +286,14 @@ public class JunctionHomingController {
         //turn back in the reverse direction to center on the scanned pole.
         if (recenterOnPole && sensor)
         {
+            double degreesSign = degrees / Math.abs(degrees);
+            double angleCorrection = Math.abs(firstPole - secondPole) / 2;
+            RobotLog.ii("JunctionHomingController", "Applying Angle Correction: %f", angleCorrection);
+            rotate(-degreesSign * angleCorrection, power, false);
+            RobotLog.ii("JunctionHomingController", "Completed Angle Correction");
 
-
-            if (degrees > 0)
-            {
-                double angleCorrection = (firstPole - secondPole) / 2;
-                rotate(angleCorrection, power, false);
-                int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
-            }
-            else
-            {
-                double angleCorrection = (firstPole - secondPole) / 2;
-                rotate(angleCorrection, power, false);
-
-                int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
-            }
+            int temp = (int)angleCorrection;
+            telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
             telemetry.update();
         }
         return minDistance;

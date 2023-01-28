@@ -46,7 +46,8 @@ public class AutonomousJunctionHomingTest extends LinearOpMode
 //        junctionHomingController.rotate(-30, 1, false);
         RobotLog.ii("AutonomousJunctionHomingTest", "Searching for a cone.");
 
-        junctionHomingController.alignToPoleLeft(JunctionType.LOW);
+        boolean success = junctionHomingController.alignToPoleLeft(JunctionType.LOW);
+
 
         sleep(1);
         stop();
