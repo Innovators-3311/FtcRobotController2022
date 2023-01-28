@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.util.enums.JunctionType;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 public class JunctionHomingController {
@@ -18,15 +19,17 @@ public class JunctionHomingController {
     private MecanumDriveBase mecanumDriveBase;
     private BNO055IMU imu;
     private DistanceSensor distanceSensorCenter;
+    private RelativeDriveController relativeDrive;
 
     Orientation lastAngles = new Orientation();
     double  globalAngle;
 
 
-    public JunctionHomingController(Telemetry telemetry, MecanumDriveBase mecanumDriveBase, HardwareMap hardwareMap) {
+    public JunctionHomingController(Telemetry telemetry, MecanumDriveBase mecanumDriveBase, HardwareMap hardwareMap, RelativeDriveController relativeDriveController) {
         this.telemetry = telemetry;
         this.mecanumDriveBase = mecanumDriveBase;
         distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
+        this.relativeDrive = relativeDriveController;
         initImu(hardwareMap);
 
     }
@@ -91,7 +94,33 @@ public class JunctionHomingController {
         imu.initialize(parameters);
     }
 
+    /**
+     * Align to the pole on the left corner.
+     *
+     * @param junctionType The type of junction we're aligning to (LOW, MEDIUM, HIGH)
+     */
+    public void alignToPoleLeft(JunctionType junctionType) {
+        rotate(90, 0.6, true);
 
+        // Target distance from pole after alignment for cone delivery.
+        double distanceTo= 0;
+
+        if(junctionType == JunctionType.LOW){distanceTo = 1;}
+        else if(junctionType == JunctionType.MEDIUM){distanceTo = 1;}
+        else if(junctionType == JunctionType.HIGH){distanceTo = 1;}
+
+        double forward = getDistance() - distanceTo;
+
+        relativeDrive.setTarget(forward, 0, 0);
+        while (relativeDrive.targetDistance() > 0.1) {
+            relativeDrive.handleRelativeDrive();
+        }
+
+        mecanumDriveBase.driveMotors(0, 0, 0, 0);
+
+        rotate(-20, 0.4, false);
+        rotate(40, 0.2, true);
+    }
 
     /**
      * Check to see if the sensor detects an object within the range provided.
@@ -123,8 +152,10 @@ public class JunctionHomingController {
      * @param degrees Degrees to turn, + is left - is right
      * @param power Power setting from 0 to 1
      * @param sensor Boolean indicating if to stop on center sensor detection
+     *
+     * @return double Distance to the pole. -1 if no pole.
      */
-    public void rotate(double degrees, double power, boolean sensor)
+    public double rotate(double degrees, double power, boolean sensor)
     {
         double powerRate = 0;
         double distance = 0;
@@ -132,6 +163,7 @@ public class JunctionHomingController {
         double secondPole  = 0;
         boolean recenterOnPole = false;
         boolean foundPole = false;
+        double minDistance = 1e9;
 
         // restart imu movement tracking.
         resetAngle();
@@ -151,7 +183,7 @@ public class JunctionHomingController {
             telemetry.update();
             powerRate = -power;
         }
-        else return; //angle is 0
+        else return -1; //angle is 0
 
         // set power to rotate.
         mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
@@ -183,6 +215,8 @@ public class JunctionHomingController {
             {
                 if (sensor)
                 {
+                    minDistance = Math.min(minDistance, getDistance());
+
                     telemetry.addData("Sensor in use","");
                     telemetry.update();
                     distance = checkDistance(0, 24);
@@ -242,6 +276,7 @@ public class JunctionHomingController {
             }
             telemetry.update();
         }
+        return minDistance;
     }
 
     public final void sleep(long milliseconds) {

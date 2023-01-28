@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.util.enums.JunctionType;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.controllers.JunctionHomingController;
 import org.firstinspires.ftc.teamcode.util.controllers.RelativeDriveController;
@@ -28,8 +29,8 @@ public class AutonomousJunctionHomingTest extends LinearOpMode
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
 
-        junctionHomingController = new JunctionHomingController(telemetry, mecanumDriveBase, hardwareMap);
         relativeDriveController = new RelativeDriveController(mecanumDriveBase, odoPods);
+        junctionHomingController = new JunctionHomingController(telemetry, mecanumDriveBase, hardwareMap, relativeDriveController);
 
         telemetry.addData("Hit", "start when ready", "");
         telemetry.update();
@@ -45,12 +46,7 @@ public class AutonomousJunctionHomingTest extends LinearOpMode
 //        junctionHomingController.rotate(-30, 1, false);
         RobotLog.ii("AutonomousJunctionHomingTest", "Searching for a cone.");
 
-        junctionHomingController.rotate(90, 0.6, true);
-        double forward = junctionHomingController.getDistance() - 3;
-        driveDistance(forward);
-        mecanumDriveBase.driveMotors(0, 0, 0, 1);
-        junctionHomingController.rotate(-20, 0.4, false);
-        junctionHomingController.rotate(40, 0.2, true);
+        junctionHomingController.alignToPoleLeft(JunctionType.LOW);
 
         sleep(1);
         stop();
