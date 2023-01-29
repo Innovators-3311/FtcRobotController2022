@@ -141,12 +141,14 @@ public class WapaAuto extends LinearOpMode
     {
         //Initialize
         initialize();
-        zone = coneDetection.detector(telemetry);
+//        zone = coneDetection.detector(telemetry);
         RobotLog.ii("WapaAuto", "Waiting for start..");
         // Wait until we're told to go
         waitForStart();
 
         zone = coneDetection.detector(telemetry);
+
+
 
         //        RobotLog.ii("WapaAuto", "Right Turn sensor sweep");
 //        telemetry.addData("Right Turn sensor sweep", "");
@@ -162,14 +164,15 @@ public class WapaAuto extends LinearOpMode
 //        }
 
 
-        elapsedTime.reset();
-        //Detect the cone.  If not found then move along... move along...
-        elapsedTime.startTime();
-        while (elapsedTime.seconds() < 10 && zone == -1)
-        {
-            zone = coneDetection.detector(telemetry);
-
-        }
+//        elapsedTime.reset();
+//        //Detect the cone.  If not found then move along... move along...
+//        elapsedTime.startTime();
+//        while (elapsedTime.seconds() < 10 && zone == -1)
+//        {
+//            zone = coneDetection.detector(telemetry);
+//            telemetry.addData("Searching for cone: ", elapsedTime.seconds());
+//            telemetry.update();
+//        }
 
         telemetry.addData("Detected zone", zone);
         RobotLog.ii("Detected zone:", "%d", zone);
@@ -190,7 +193,11 @@ public class WapaAuto extends LinearOpMode
         //driveStraight(ticksPerInch * 62, 1, 0.3);
         driveStraight(ticksPerInch * 62, 1, 0.3);
 
-        sleep(5000);
+        driveScrew(500);
+        //sleep(5000);
+        //driveScrew(1);
+
+        //sleep(5000);
 //        driveStraight(ticksPerInch * 24, -1, 0.3);
 //
 //
@@ -249,8 +256,16 @@ public class WapaAuto extends LinearOpMode
             if (zone ==  3)
             {
                 driveScrew(1);
-                driveStraight(ticksPerInch * 24, 1, 0.5);
+                driveStraight(ticksPerInch * 16, 1, 0.5);
             }
+        }
+        else if (zone == 2)
+        {
+            double ang2 = 0 - angles.firstAngle;
+            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
+            telemetry.update();
+            sleep(5000);
+            basicRotate(ang2, 0.5, false);
         }
 
         //TODO: Do we want to make sure the arm is in the right place to free fall to the
