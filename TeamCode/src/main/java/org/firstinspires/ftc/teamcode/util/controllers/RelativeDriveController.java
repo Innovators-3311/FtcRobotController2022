@@ -58,13 +58,13 @@ public class RelativeDriveController {
      * @param strafe the distance to strafe left (negative is right).
      * @param heading the degrees to turn right (negative is left).
      */
-    public void setTarget(double forward, double strafe, double heading){
+    public void setRelativeTarget(double forward, double strafe, double heading){
         RobotLog.ii("RelativeDriveController", "Set Target to: %f %f %f",
                 forward, strafe, heading);
+        resetInitialPosition();
         this.forwardControl.targetValue = initialForward + forward;
         this.strafeControl.targetValue = initialStrafe + strafe;
         this.headingControl.targetValue = initialHeading + heading;
-//        resetInitialPosition();
     }
 
     /**

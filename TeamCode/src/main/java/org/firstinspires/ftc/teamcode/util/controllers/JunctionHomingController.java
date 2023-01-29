@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.controllers;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -29,6 +30,27 @@ class JunctionDistances {
 }
 
 public class JunctionHomingController {
+
+    public enum CenteringState
+    {
+        IDLE,
+        TURNING,
+        FIRST_EDGE,
+        RECENTER,
+        DONE,
+    }
+
+    public enum AligningState{
+        IDLE,
+        CENTERING,
+        DRIVING, FAILED, DONE
+    }
+
+    public CenteringState centeringState = CenteringState.IDLE;
+    public AligningState aligningState = AligningState.IDLE;
+
+    private JunctionType junctionType;
+
     private static final int SWEEP_ANGLE = 90;
     private static final double POSITION_TOLERANCE = 1.0;
     private static final double MAX_DISTANCE = 24;
@@ -38,7 +60,15 @@ public class JunctionHomingController {
     private BNO055IMU imu;
     private DistanceSensor distanceSensorCenter;
     private RelativeDriveController relativeDrive;
+    private JunctionType junction = JunctionType.LOW;
 
+    private double powerRate = 0;
+    private double power = 0.6;
+    private double degrees;
+    private double firstPoleEdge =0.0;
+    private double secondPoleEdge =0.0;
+    private double centerAngle = 0.0;
+    private double minDistance = 1e9;
 
     Orientation lastAngles = new Orientation();
     double  globalAngle;
@@ -114,30 +144,66 @@ public class JunctionHomingController {
     }
 
     /**
-     * Align to the pole on the left corner.
-     *
-     * @param junctionType The type of junction we're aligning to (LOW, MEDIUM, HIGH)
+     * Call the state if we're aligning to a pole.
      */
-    public boolean alignToPoleLeft(JunctionType junctionType) {
-        // Turn left and look for a junction.
-        double measDist = rotate(SWEEP_ANGLE, 0.5, true);
+    public void delegateAligningState(){
+        if (aligningState == AligningState.CENTERING) stateCentering();
+        if (aligningState == AligningState.DRIVING) stateDriving();
+    }
 
-        // measDist is the minimum measured distance. If it's over maxDistance,
-        if (measDist > 24){
-            RobotLog.ii("JunctionHomingController", "No Junction Found");
+    /**
+     * Handle the centering state.
+     */
+    public void stateCentering(){
+        delegateCenteringState();
 
-            rotate(-SWEEP_ANGLE, 0.5, false);
-            return false;
+        if (centeringState == CenteringState.DONE){
+            // Transition to Driving.  Set up Relative Drive.
+            aligningState = AligningState.DRIVING;
+            RobotLog.ii("JunctionHomingController", "Centered Complete. Entering Driving.");
+            double measDist = getDistance();
+
+            if (measDist > MAX_DISTANCE){
+                RobotLog.ee("JunctionHomingController",
+                        "After junction alignment, measured Distance (%f) > max distance (%f)",
+                        measDist, MAX_DISTANCE);
+                aligningState = AligningState.FAILED;
+            }
+
+            double forward = measDist - JunctionDistances.getDistance(junctionType);
+
+            relativeDrive.setRelativeTarget(-forward, 0, 0);
+            relativeDrive.speedFactor = power;
         }
+    }
+
+    private void stateDriving(){
+        relativeDrive.handleRelativeDrive();
+        if (!relativeDrive.driving()) {
+            mecanumDriveBase.driveMotors(0,0,0,0);
+            RobotLog.ii("JunctionHomingController", "Aligned to pole.");
+            aligningState = AligningState.DONE;
+        }
+    }
+
+    public void setJunctionType(JunctionType junctionType){
+        this.junctionType = junctionType;
+    }
+
+    public boolean alignToPole(JunctionType junctionType, double sweepAngle){
+        // BLOCKING FUNCTION CALL
+        // Turn left and look for a junction.
+        double measDist = junctionCenter(sweepAngle, power);
+
         // Compute distance to the pole.
         double forward = measDist - JunctionDistances.getDistance(junctionType);
 
         RobotLog.ii("JunctionHomingController", "Approaching %s junction. Measured distance: %f",
                 junctionType.toString(), measDist);
 
-        relativeDrive.setTarget(-forward, 0, 0);
-        relativeDrive.speedFactor = 0.6;
-
+        relativeDrive.setRelativeTarget(-forward, 0, 0);
+        relativeDrive.speedFactor = power;
+        // BLOCKING FUNCTION CALL
         while (relativeDrive.driving()) {
             relativeDrive.handleRelativeDrive();
         }
@@ -150,13 +216,31 @@ public class JunctionHomingController {
     }
 
     /**
+     * Align to the pole on the left corner.
+     *
+     * @param junctionType The type of junction we're aligning to (LOW, MEDIUM, HIGH)
+     */
+    public boolean alignToPoleLeft(JunctionType junctionType) {
+        return alignToPole(junctionType, SWEEP_ANGLE);
+    }
+
+    /**
+     * Align to the pole on the left corner.
+     *
+     * @param junctionType The type of junction we're aligning to (LOW, MEDIUM, HIGH)
+     */
+    public boolean alignToPoleRight(JunctionType junctionType) {
+        return alignToPole(junctionType, -SWEEP_ANGLE);
+    }
+
+    /**
      * Check to see if the sensor detects an object within the range provided.
      * @param innerBound minimum range detection.
      * @param outerBound maximum range of detection.
      */
     private double checkDistance(double innerBound, double outerBound)
     {
-        double distance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+        double distance = getDistance();
 
         if (distance < outerBound && distance > innerBound)
         {
@@ -170,135 +254,142 @@ public class JunctionHomingController {
         return distance;
     }
 
+    /**
+     * Gets the distance in inches.
+     *
+     * @return double the measured distance in inches
+     */
     public double getDistance(){
         return distanceSensorCenter.getDistance(DistanceUnit.INCH);
+    }
+
+    /**
+     * Nonblocking idle function
+     */
+    public void stateIdle(){
+        // Idling . . . Do nothing?
+    }
+
+    public void setDegrees(double degrees) {
+        if (degrees < 0)
+        {   // turn right.
+            powerRate = power;
+        }
+        else if (degrees > 0)
+        {   // turn left.
+            powerRate = -power;
+        }
+        this.degrees = degrees;
+
+        RobotLog.ii("JunctionHomingController", "Set degrees to %f", this.degrees);
+    }
+
+    public boolean checkTurnComplete(){
+        if (Math.abs(getAngle()) > Math.abs(degrees)) {
+            // STOP
+            mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            centeringState = CenteringState.DONE;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Nonblocking handler for the turning state.
+     */
+    public void stateTurning(){
+        // set power to rotate.
+        mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
+        checkTurnComplete();
+
+        double distance = checkDistance(0, MAX_DISTANCE);
+        if (distance != -1){
+            firstPoleEdge = getAngle();
+            RobotLog.ii("JunctionHomingController", "Found First Edge. Angle: %f", firstPoleEdge);
+            centeringState = CenteringState.FIRST_EDGE;
+        }
+    }
+
+    /**
+     * First Edge state control.
+     */
+    public void stateFirstEdge(){
+        // set power to rotate.
+        mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
+        checkTurnComplete();
+
+        double distance = checkDistance(0, MAX_DISTANCE);
+        minDistance = Math.min(minDistance, getDistance());
+
+        if (distance == -1){
+            secondPoleEdge = getAngle();
+            RobotLog.ii("JunctionHomingController", "Found Second Edge. Angle: %f", secondPoleEdge);
+            centerAngle = (firstPoleEdge + secondPoleEdge) / 2.0;
+            centeringState = CenteringState.RECENTER;
+        }
+    }
+
+    /**
+     * Recenter state control.
+     */
+    public void stateRecenter(){
+        // set power to rotate.
+        mecanumDriveBase.driveMotors(0, -powerRate, 0, 1);
+
+        if (Math.abs(getAngle()) < Math.abs(centerAngle)) {
+            mecanumDriveBase.driveMotors(0, 0, 0, 0);
+            centeringState = CenteringState.DONE;
+        }
+    }
+
+    /**
+     * Called when we want to be in a non-blocking for loop.
+     */
+    public void delegateCenteringState(){
+        if(centeringState == CenteringState.IDLE) stateIdle();
+        if(centeringState == CenteringState.TURNING) stateTurning();
+        if(centeringState == CenteringState.FIRST_EDGE) stateFirstEdge();
+        if(centeringState == CenteringState.RECENTER) stateRecenter();
+    }
+
+    public void startCentering() {
+        // Start turning!
+        centeringState = CenteringState.TURNING;
+        minDistance = 1e9;
+
+        // restart imu movement tracking.
+        resetAngle();
     }
 
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
      * @param power Power setting from 0 to 1
-     * @param sensor Boolean indicating if to stop on center sensor detection
      *
      * @return double Distance to the pole. -1 if no pole.
      */
-    public double rotate(double degrees, double power, boolean sensor)
+    public double junctionCenter(double degrees, double power)
     {
-        double powerRate = 0;
-        double distance = 0;
-        double firstPole = 0;
-        double secondPole  = 0;
-        boolean recenterOnPole = false;
-        boolean foundPole = false;
-        double minDistance = 1e9;
+        setDegrees(degrees);
+        setPower(power);
+        startCentering();
 
-        // restart imu movement tracking.
-        resetAngle();
+        while(centeringState != CenteringState.DONE)
+            delegateCenteringState();
 
-        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-        // clockwise (right).
-
-        if (degrees < 0)
-        {   // turn right.
-            telemetry.addData("Turn right", "");
-            telemetry.update();
-            powerRate = power;
-        }
-        else if (degrees > 0)
-        {   // turn left.
-            telemetry.addData("Turn left", "");
-            telemetry.update();
-            powerRate = -power;
-        }
-        else return -1; //angle is 0
-
-        // set power to rotate.
-        mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
-
-
-        // rotate until turn is completed.
-        if (!sensor)
-        {
-            telemetry.addData("Simple turn", "");
-            telemetry.update();
-            // On right turn we have to get off zero first.
-            while (getAngle() == 0) {}
-
-            while (true)
-            {
-                if (Math.abs(getAngle()) > Math.abs(degrees))
-                {
-                    mecanumDriveBase.driveMotors(0, 0, 0, 0);
-                    telemetry.addData("Stop", "");
-                    telemetry.update();
-                    break;
-                }
-            }
-        }
-        else           //Following code only used if sensor is in play
-        {
-            // left turn.
-            while (Math.abs(getAngle()) < Math.abs(degrees))
-            {
-                if (sensor)
-                {
-                    minDistance = Math.min(minDistance, getDistance());
-
-                    telemetry.addData("Sensor in use","");
-                    telemetry.update();
-                    distance = checkDistance(0, MAX_DISTANCE);
-                    if ((distance != -1) && !foundPole)
-                    {
-                        //telemetry.addData("found pole", "");
-                        //telemetry.update();
-                        firstPole = getAngle();
-                        RobotLog.ii("JunctionHomingController", "Found Right Edge. Angle: %f", firstPole);
-                        telemetry.addData("Angle #1:", firstPole);
-                        foundPole = true;
-                    }
-
-                    distance = checkDistance(0, MAX_DISTANCE);
-                    if (foundPole && distance == -1)
-                    {
-                        //telemetry.addData("lost pole", "");
-                        //telemetry.update();
-                        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-                        sleep(100); //TODO
-                        secondPole = getAngle();
-                        RobotLog.ii("JunctionHomingController", "Found Left Edge. Angle: %f", secondPole);
-                        telemetry.addData("Angle #2:", secondPole);
-                        recenterOnPole = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // turn the motors off.
-        mecanumDriveBase.driveMotors(0, 0, 0, 0);
-
-        // wait for rotation to stop.
-        sleep(100); //TODO
-
-        // reset angle tracking on new heading.
-        resetAngle();
-
-        //turn back in the reverse direction to center on the scanned pole.
-        if (recenterOnPole && sensor)
-        {
-            double degreesSign = degrees / Math.abs(degrees);
-            double angleCorrection = Math.abs(firstPole - secondPole) / 2;
-            RobotLog.ii("JunctionHomingController", "Applying Angle Correction: %f", angleCorrection);
-            rotate(-degreesSign * angleCorrection, power, false);
-            RobotLog.ii("JunctionHomingController", "Completed Angle Correction");
-
-            int temp = (int)angleCorrection;
-            telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
-            telemetry.update();
-        }
         return minDistance;
     }
 
+    private void setPower(double power)
+    {
+        this.power = power;
+    }
+
+    /**
+     * Copied in from the OpMode class.
+     *
+     * @param milliseconds how long to sleep
+     */
     public final void sleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -306,6 +397,35 @@ public class JunctionHomingController {
             Thread.currentThread().interrupt();
         }
 
+    }
+
+    /**
+     *
+     * @param driver
+     * @param accessory
+     */
+    public void handleGamepad(Gamepad driver, Gamepad accessory){
+        if      (accessory.y){setJunctionType(JunctionType.HIGH);}
+        else if (accessory.x){setJunctionType(JunctionType.LOW); }
+        else if (accessory.b){setJunctionType(JunctionType.MEDIUM);}
+
+        if(driver.left_bumper){
+            if (aligningState == AligningState.IDLE) {
+                RobotLog.ii("JunctionHomingController", "Beginning Junction Alignment from IDLE");
+                aligningState = AligningState.CENTERING;
+                startCentering();
+            }
+            if (aligningState == AligningState.DONE) {
+                RobotLog.ii("JunctionHomingController", "Beginning Junction Alignment from DONE");
+                aligningState = AligningState.CENTERING;
+                startCentering();
+            }
+            // Calls the handling function for the appropriate state.
+            delegateAligningState();
+        } else {
+            aligningState = AligningState.IDLE;
+            centeringState = CenteringState.IDLE;
+        }
     }
 
 }
