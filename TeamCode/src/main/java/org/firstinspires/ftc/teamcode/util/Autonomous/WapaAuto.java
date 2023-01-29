@@ -5,15 +5,20 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
+
 import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
 import org.firstinspires.ftc.teamcode.util.ConeDetection;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -24,12 +29,12 @@ import java.util.Locale;
 @Autonomous(name="Autonomous", group="Exercises")
 public class WapaAuto extends LinearOpMode
 {
-
-
+    private CameraInitSingleton cameraInitSingleton;
+   // private WebcamName webcam;
+    private ConeDetection coneDetection;
     private MecanumDriveBase mecanumDriveBase;
     private ElapsedTime elapsedTime;
     private TeamDetection teamDetection;
-    private ConeDetection coneDetection;
 
     private DistanceSensor distanceSensorRight;
     private DistanceSensor distanceSensorLeft;
@@ -55,9 +60,11 @@ public class WapaAuto extends LinearOpMode
     double distance;
     double toPole = 0;
     double leftFrontPos;
+    double RightFrontPos;
+    double LeftBackPos;
 
-    boolean blueTeam;
-    int zone; // TODO init these values
+    boolean blueTeam = true;
+    int zone = -1; // TODO init these values
 
     PIDController pidRotate, pidDrive, pidStrafe;
 
@@ -67,11 +74,12 @@ public class WapaAuto extends LinearOpMode
     {
         initImu();
 
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
         elapsedTime = new ElapsedTime();
 
-        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
-        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
         distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
 
         screw = hardwareMap.get(DcMotor.class, "screw");
@@ -80,7 +88,7 @@ public class WapaAuto extends LinearOpMode
 
         screw.setDirection(DcMotor.Direction.REVERSE);
         uBar.setDirection(DcMotor.Direction.REVERSE);
-        intake.setDirection(DcMotor.Direction.FORWARD);
+        intake.setDirection(DcMotor.Direction.REVERSE);
 
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,11 +122,15 @@ public class WapaAuto extends LinearOpMode
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+
+
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+
 
         // Set up our telemetry dashboard
         composeTelemetry();
@@ -129,39 +141,128 @@ public class WapaAuto extends LinearOpMode
     {
         //Initialize
         initialize();
-
+        zone = coneDetection.detector(telemetry);
+        RobotLog.ii("WapaAuto", "Waiting for start..");
         // Wait until we're told to go
         waitForStart();
 
-        driveStraight(ticksPerInch * 70, 1, 0.5);
+        zone = coneDetection.detector(telemetry);
+
+        //        RobotLog.ii("WapaAuto", "Right Turn sensor sweep");
+//        telemetry.addData("Right Turn sensor sweep", "");
+//        telemetry.update();
+//        basicRotate(-120, 0.3, true);
+//
+//        while (opModeIsActive())
+//        {
+//            double dis = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+//            telemetry.addData("Debug", "Distance: " + dis);
+//            telemetry.update();
+//            sleep(1000);
+//        }
+
+
+        elapsedTime.reset();
+        //Detect the cone.  If not found then move along... move along...
+        elapsedTime.startTime();
+        while (elapsedTime.seconds() < 10 && zone == -1)
+        {
+            zone = coneDetection.detector(telemetry);
+
+        }
+
+        telemetry.addData("Detected zone", zone);
+        RobotLog.ii("Detected zone:", "%d", zone);
+        telemetry.update();
+        sleep(3000);
+        //If the detection failed, then select a random zone to park in.  1/3 change of getting it
+        //correct
+        if (zone == -1)
+        {
+            zone = 2;
+        }
+
+//        while (opModeIsActive())
+//        {
+//            telemetry.update();
+//        }
+
+        //driveStraight(ticksPerInch * 62, 1, 0.3);
+        driveStraight(ticksPerInch * 62, 1, 0.3);
+
+        sleep(5000);
+//        driveStraight(ticksPerInch * 24, -1, 0.3);
+//
+//
+//        driveStraight(ticksPerInch * 24, 1, 0.3);
         sleep(500);
-        driveScrew(0);
-        driveUBar(0);
-        driveStraight(ticksPerInch * 10, -1, 0.5);
-        sleep(500);
-        sleep(500);
+        driveScrew(3333);
+        driveUBar(-1800);
+        //driveStraight(ticksPerInch * 6, -1, 0.3);
+        driveStraight(ticksPerInch * 8, -1, 0.3);
+        sleep(5000);
         if (blueTeam)
         {
-            basicRotate(-90, 0.5, false);
-            basicRotate(120, 0.2, true);
+            basicRotate(-75, 0.5, false);
+            sleep(500);
+            basicRotate(-120, 0.3, true);
         }
         else
         {
-            basicRotate(90, 0.5, false);
-            basicRotate(-120, 0.2, true);
+            basicRotate(75, 0.5, false);
+            sleep(500);
+            basicRotate(120, 0.3, true);
         }
 
         if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
         {
-            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4.5;
-            driveStraight(ticksPerInch * toPole, -1, 0.5);
+            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4;
+
+            telemetry.addData("Pole", toPole);
+            RobotLog.ii("Pole:", "%f", toPole);
+
+            driveStraight(ticksPerInch * toPole, -1, 0.2);
             sleep(1000);
             intake.setPower(1);
             sleep(1000);
             intake.setPower(0);
-            driveStraight(ticksPerInch * toPole, 1, 0.5);
+            driveStraight(ticksPerInch * (toPole + 4), 1, 0.3);
         }
 
+        //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
+        //heading and turn robot to face 90 or -90.
+        double ang = getAngle();
+        if ((zone == 1) || (zone == 3))
+        {
+            //angles.firstAngle;
+            double ang2 = 90 - angles.firstAngle;
+            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
+            telemetry.update();
+            sleep(5000);
+            basicRotate(ang2, 0.5, false);
+            if (zone ==  1)
+            {
+                driveScrew(1);
+                driveStraight(ticksPerInch * 24, -1, 0.5);
+                basicRotate(-90, 0.5, false);
+            }
+            if (zone ==  3)
+            {
+                driveScrew(1);
+                driveStraight(ticksPerInch * 24, 1, 0.5);
+            }
+        }
+
+        //TODO: Do we want to make sure the arm is in the right place to free fall to the
+        driveScrew(1);
+        elapsedTime.reset();
+        //Detect the cone.  If not found then move along... move along...
+        elapsedTime.startTime();
+        while (elapsedTime.seconds() < 10)
+        {
+
+        }
+        //zero position for tele-op.
 
 
         stop();
@@ -187,12 +288,21 @@ public class WapaAuto extends LinearOpMode
     {
         speed *= forward;
         leftFrontPos = mecanumDriveBase.lf.getCurrentPosition();
+        RightFrontPos = mecanumDriveBase.rf.getCurrentPosition();
+        LeftBackPos = mecanumDriveBase.lb.getCurrentPosition();
+
+        RobotLog.ii("od wheels:", "LF %f RF %f LB: %f", LeftBackPos, RightFrontPos,LeftBackPos);
+
+        // Use gyro to drive in a straight line.
+        correction = checkDirection();
+
+
         if (forward == 1)
         {
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                mecanumDriveBase.driveMotors(speed, -.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
                 telemetry.update();
             }
@@ -278,7 +388,7 @@ public class WapaAuto extends LinearOpMode
                 {
                     telemetry.addData("Sensor in use","");
                     telemetry.update();
-                    distance = checkDistance(0, 12);
+                    distance = checkDistance(0, 20);
                     if ((distance != -1) && !foundPole)
                     {
                         //telemetry.addData("found pole", "");
@@ -288,7 +398,7 @@ public class WapaAuto extends LinearOpMode
                         foundPole = true;
                     }
 
-                    distance = checkDistance(0, 12);
+                    distance = checkDistance(0, 20);
                     if (foundPole && distance == -1)
                     {
                         //telemetry.addData("lost pole", "");
@@ -330,7 +440,6 @@ public class WapaAuto extends LinearOpMode
             {
                 double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate(angleCorrection, 0.2, false);
-
                 int temp = (int)angleCorrection;
                 telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
             }
@@ -357,19 +466,19 @@ public class WapaAuto extends LinearOpMode
             }
         });
 
-        telemetry.addLine()
-                .addData("status", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return imu.getSystemStatus().toShortString();
-                    }
-                })
-                .addData("calib", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return imu.getCalibrationStatus().toString();
-                    }
-                });
+//        telemetry.addLine()
+//                .addData("status", new Func<String>() {
+//                    @Override
+//                    public String value() {
+//                        return imu.getSystemStatus().toShortString();
+//                    }
+//                })
+//                .addData("calib", new Func<String>() {
+//                    @Override
+//                    public String value() {
+//                        return imu.getCalibrationStatus().toString();
+//                    }
+//                });
 
         telemetry.addLine()
                 .addData("heading", new Func<String>() {
@@ -391,22 +500,22 @@ public class WapaAuto extends LinearOpMode
                     }
                 });
 
-        telemetry.addLine()
-                .addData("grvty", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return gravity.toString();
-                    }
-                })
-                .addData("mag", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return String.format(Locale.getDefault(), "%.3f",
-                                Math.sqrt(gravity.xAccel * gravity.xAccel
-                                        + gravity.yAccel * gravity.yAccel
-                                        + gravity.zAccel * gravity.zAccel));
-                    }
-                });
+//        telemetry.addLine()
+//                .addData("grvty", new Func<String>() {
+//                    @Override
+//                    public String value() {
+//                        return gravity.toString();
+//                    }
+//                })
+//                .addData("mag", new Func<String>() {
+//                    @Override
+//                    public String value() {
+//                        return String.format(Locale.getDefault(), "%.3f",
+//                                Math.sqrt(gravity.xAccel * gravity.xAccel
+//                                        + gravity.yAccel * gravity.yAccel
+//                                        + gravity.zAccel * gravity.zAccel));
+//                    }
+//                });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -635,4 +744,30 @@ public class WapaAuto extends LinearOpMode
 //        //TODO: return the number of degrees it did turn.  (in case distance preempted turn)
 //        return 0.0;
 //    }
+
+
+    /**
+     * See if we are moving in a straight line and if not return a power correction value.
+     * @return Power adjustment, + is adjust left - is adjust right.
+     */
+    private double checkDirection()
+    {
+        // The gain value determines how sensitive the correction is to direction changes.
+        // You will have to experiment with your robot to get small smooth direction changes
+        // to stay on a straight line.
+        double correction, angle, gain = .10;
+
+        angle = getAngle();
+
+        if (angle == 0)
+            correction = 0;             // no adjustment.
+        else
+            correction = -angle;        // reverse sign of angle for correction.
+
+        correction = correction * gain;
+
+        RobotLog.ii("Correction:", "" + correction);
+        return correction;
+    }
+
 }

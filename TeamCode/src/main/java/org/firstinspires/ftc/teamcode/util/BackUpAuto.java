@@ -54,7 +54,7 @@ public class BackUpAuto extends LinearOpMode
 //        }
 
         teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
+        coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
@@ -92,7 +92,7 @@ public class BackUpAuto extends LinearOpMode
 
         screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        zone = coneDetection.detector(telemetry, hardwareMap, webcam);
+        zone = coneDetection.detector(telemetry);
         blueSide = teamDetection.showTeam(telemetry);
 
         driveScrewUp(500, 0.5);

@@ -62,7 +62,7 @@ public class AutonomousRed extends LinearOpMode
 //        }
 
         teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
+        coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
@@ -110,7 +110,7 @@ public class AutonomousRed extends LinearOpMode
 
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap, webcam);
+            zone = coneDetection.detector(telemetry);
         }
         if (zone == -1)
         {

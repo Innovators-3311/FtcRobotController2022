@@ -53,8 +53,8 @@ public class MezImu_backUp extends LinearOpMode
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
         elapsedTime = new ElapsedTime();
 
-        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
-        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
+//        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
+//        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
         distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
 
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
@@ -121,8 +121,8 @@ public class MezImu_backUp extends LinearOpMode
             double distanceC = distanceSensorCenter.getDistance(DistanceUnit.INCH);
             telemetry.addData("correction", correction);
             telemetry.addData("distanceL", distanceL);
-            telemetry.addData("distanceR", distanceR);
-            telemetry.addData("distanceC", distanceC);
+//            telemetry.addData("distanceR", distanceR);
+//            telemetry.addData("distanceC", distanceC);
             telemetry.update();
 
 
@@ -137,8 +137,8 @@ public class MezImu_backUp extends LinearOpMode
                 {
                     mecanumDriveBase.driveMotors(0.2, 0, 0, 1);
                     telemetry.addData("distanceC ", distanceSensorCenter.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("distanceR ", distanceSensorRight.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("distanceL ", distanceSensorLeft.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("distanceR ", distanceSensorRight.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("distanceL ", distanceSensorLeft.getDistance(DistanceUnit.INCH));
                     telemetry.update();
                 }
                 mecanumDriveBase.driveMotors(0, 0, 0, 0);

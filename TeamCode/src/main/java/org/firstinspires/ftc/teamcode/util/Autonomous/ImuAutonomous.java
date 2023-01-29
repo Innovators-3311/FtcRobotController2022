@@ -78,7 +78,7 @@ public class ImuAutonomous extends LinearOpMode
     private void initialize()
     {
 //        teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
+//        coneDetection = new ConeDetection(hardwareMap, );
         mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
 //        towerController = new TowerController(hardwareMap, telemetry);
 

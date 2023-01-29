@@ -59,7 +59,7 @@ public class TowerController
 
         // init screw to bottom level
         driveScrewUp(500,0.5, telemetry);
-        driveScrewDown(10000, 1, telemetry);
+        driveScrewDown(10000, 0.5, telemetry);
 
         // Make sure Screw will go the right way
         screw.setDirection(DcMotor.Direction.REVERSE);

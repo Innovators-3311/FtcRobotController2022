@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 import java.util.List;
 
 public class ConeDetection
@@ -63,19 +65,24 @@ public class ConeDetection
 
     private int coneNumber = -1;
 
-    public int detector(Telemetry telemetry, HardwareMap hardwareMap, WebcamName webcam)
+    public ConeDetection(HardwareMap hardwareMap, WebcamName webcam)
     {
         initVuforia(hardwareMap, webcam);
         initTfod(hardwareMap);
-
         if (tfod != null)
         {
             tfod.activate();
-            tfod.setZoom(2.5, 10.0/10.0);
+            //tfod.setZoom(3, 10.0/10.0);
+            tfod.setZoom(4, 10.0/10.0);
 
             //tfod.setClippingMargins(400, 300, 50, 0);
             //tfod.setZoom(1, 1);
         }
+    }
+
+    public int detector(Telemetry telemetry)
+    {
+
 
         boolean flag = true;
         while (flag)
