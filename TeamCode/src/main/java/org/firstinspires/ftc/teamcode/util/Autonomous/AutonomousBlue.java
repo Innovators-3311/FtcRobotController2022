@@ -685,6 +685,7 @@ public class AutonomousBlue extends LinearOpMode
     {
         screwLevel -= screwTarget;
         // Sets direction
+
         screw.setDirection(DcMotor.Direction.FORWARD);
         screw.setTargetPosition(screwLevel);
         // sets run mode
