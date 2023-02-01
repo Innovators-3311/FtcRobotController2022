@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -13,6 +14,8 @@ import java.util.List;
 
 public class ConeDetection
 {
+
+    ElapsedTime elapsedTime = new ElapsedTime();
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -69,6 +72,7 @@ public class ConeDetection
     {
         initVuforia(hardwareMap, webcam);
         initTfod(hardwareMap);
+        elapsedTime = new ElapsedTime();
         if (tfod != null)
         {
             tfod.activate();
@@ -85,7 +89,9 @@ public class ConeDetection
 
 
         boolean flag = true;
-        while (flag)
+        elapsedTime.reset();
+        elapsedTime.startTime();
+        while (flag && elapsedTime.seconds() < 7.5)
         {
 //            telemetry.addData("", "%s", "while (flag)");
 //            telemetry.update();
