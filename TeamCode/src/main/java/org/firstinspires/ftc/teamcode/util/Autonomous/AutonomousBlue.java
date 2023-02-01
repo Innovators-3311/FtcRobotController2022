@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,9 +8,15 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
+import org.firstinspires.ftc.teamcode.util.ConeDetection;
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousBlue", group = "autonomous")
+@Disabled
 public class AutonomousBlue extends LinearOpMode
 {
 
@@ -17,6 +24,7 @@ public class AutonomousBlue extends LinearOpMode
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
+    private CameraInitSingleton cameraInitSingleton;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -49,8 +57,8 @@ public class AutonomousBlue extends LinearOpMode
 //        }
 
         teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
@@ -94,7 +102,7 @@ public class AutonomousBlue extends LinearOpMode
         telemetry.update();
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap);
+            zone = coneDetection.detector(telemetry);
         }
         if (zone == -1)
         {
@@ -103,7 +111,7 @@ public class AutonomousBlue extends LinearOpMode
 
         // Waits till start button is pressed
         waitForStart();
-
+        /*************/
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -121,7 +129,6 @@ public class AutonomousBlue extends LinearOpMode
         driveScrew(250);
         driveUBar(1750);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
         blueSide = teamDetection.showTeam(telemetry);
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
@@ -678,6 +685,7 @@ public class AutonomousBlue extends LinearOpMode
     {
         screwLevel -= screwTarget;
         // Sets direction
+
         screw.setDirection(DcMotor.Direction.FORWARD);
         screw.setTargetPosition(screwLevel);
         // sets run mode

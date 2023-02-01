@@ -4,6 +4,9 @@ package org.firstinspires.ftc.teamcode.proto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 
@@ -12,6 +15,8 @@ import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 public class BasicAutonomous extends LinearOpMode
 {
     private MecanumDriveBase mecanumDriveBase;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
     // Initialize motors
     private DcMotor leftFront;
     private DcMotor rightFront;
@@ -29,7 +34,7 @@ public class BasicAutonomous extends LinearOpMode
     private int leftBackPos;
     private int rightBackPos;
 
-    private final double ticksPerInch = (8192 * 1) / (2 * 3.1415); // == 1303
+    private final double ticksPerInch = (8192) / (2 * 3.1415); // == 1303
 
     private final double degree = ticksPerInch * 4.8 / 90;
 
@@ -39,7 +44,9 @@ public class BasicAutonomous extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         leftFrontPos = 0;
         rightFrontPos = 0;
         leftBackPos = 0;
@@ -180,9 +187,9 @@ public class BasicAutonomous extends LinearOpMode
 
     private void turnInPlace2(double target, int right, double speed)
     {
-    target *= right;
+        target *= right;
 
-    target = target + mecanumDriveBase.lb.getCurrentPosition();
+        target = target + mecanumDriveBase.lb.getCurrentPosition();
 
 
         telemetry.addData("target = ", target);
@@ -223,7 +230,7 @@ public class BasicAutonomous extends LinearOpMode
                 double drift = correctionStart - mecanumDriveBase.lb.getCurrentPosition();
 
                 double forward = pidControl.update(drift);
-                double clampForward = pidControl.clamp(forward, -1, 1);
+                double clampForward = SimplePIDControl.clamp(forward, -1, 1);
                 mecanumDriveBase.driveMotors(1, 0.00, 0, 1);
 //                mecanumDriveBase.driveMotors(clampForward * 0.5, 0.00, strafeSpeed, 1);
                 //mecanumDriveBase.driveMotors(0, 0, speed, 1);

@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 import java.util.List;
 
 public class ConeDetection
 {
+
+    ElapsedTime elapsedTime = new ElapsedTime();
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -63,22 +68,30 @@ public class ConeDetection
 
     private int coneNumber = -1;
 
-    public int detector(Telemetry telemetry, HardwareMap hardwareMap)
+    public ConeDetection(HardwareMap hardwareMap, WebcamName webcam)
     {
-        initVuforia(hardwareMap);
+        initVuforia(hardwareMap, webcam);
         initTfod(hardwareMap);
-
+        elapsedTime = new ElapsedTime();
         if (tfod != null)
         {
             tfod.activate();
-            tfod.setZoom(2.5, 10.0/10.0);
+            //tfod.setZoom(3, 10.0/10.0);
+            tfod.setZoom(4, 10.0/10.0);
 
             //tfod.setClippingMargins(400, 300, 50, 0);
             //tfod.setZoom(1, 1);
         }
+    }
+
+    public int detector(Telemetry telemetry)
+    {
+
 
         boolean flag = true;
-        while (flag)
+        elapsedTime.reset();
+        elapsedTime.startTime();
+        while (flag && elapsedTime.seconds() < 7.5)
         {
 //            telemetry.addData("", "%s", "while (flag)");
 //            telemetry.update();
@@ -150,17 +163,19 @@ public class ConeDetection
      * Initialize the Vuforia localization engine.
      */
 
-    private void initVuforia(HardwareMap hardwareMap)
+    private void initVuforia(HardwareMap hardwareMap, WebcamName webcam)
     {
+
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = webcam;
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
     }
 
     /**
@@ -174,6 +189,8 @@ public class ConeDetection
         tfodParameters.minResultConfidence = 0.70f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
+
+
         this.tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio

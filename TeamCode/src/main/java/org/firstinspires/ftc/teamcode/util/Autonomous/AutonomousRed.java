@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,19 +8,26 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.CameraInitSingleton;
+import org.firstinspires.ftc.teamcode.util.ConeDetection;
+import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.util.TeamDetection;
+import org.firstinspires.ftc.teamcode.util.TowerController;
 import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousTestOfDooooooooooooooooooooom", group = "autonomous")
-public class AutonomousTestOfDeath extends LinearOpMode
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousRed", group = "autonomous")
+@Disabled
+public class AutonomousRed extends LinearOpMode
 {
-    private CombinedLocalizer combinedLocalizer;
-    private DriveToPos driveToPos;
+
     private MecanumDriveBase mecanumDriveBase;
     private TeamDetection teamDetection;
     private ConeDetection coneDetection;
     private StateServer stateServer;
-
+    private TowerController towerController;
+    private CameraInitSingleton cameraInitSingleton;
+    private WebcamName webcam;
 
     private DcMotor screw;
     private DcMotor uBar;
@@ -45,30 +53,31 @@ public class AutonomousTestOfDeath extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        webcam = cameraInitSingleton.getWebcam();
 //        try {
 //            stateServer = new StateServer();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-//        teamDetection = new TeamDetection(hardwareMap);
-        coneDetection = new ConeDetection();
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
-        combinedLocalizer = new CombinedLocalizer(hardwareMap);
-        driveToPos = new DriveToPos(combinedLocalizer, mecanumDriveBase);
+
+        teamDetection = new TeamDetection(hardwareMap);
+        coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
-//        screw = hardwareMap.get(DcMotor.class, "screw");
-//        uBar = hardwareMap.get(DcMotor.class, "uBar");
-//        intake = hardwareMap.get(DcMotor.class, "intake");
+        screw = hardwareMap.get(DcMotor.class, "screw");
+        uBar = hardwareMap.get(DcMotor.class, "uBar");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
-//        highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
-//        lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
+        highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
+        lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
 
-//        screw.setDirection(DcMotor.Direction.FORWARD);
-//        uBar.setDirection(DcMotor.Direction.REVERSE);
-//        intake.setDirection(DcMotor.Direction.FORWARD);
+        screw.setDirection(DcMotor.Direction.FORWARD);
+        uBar.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.FORWARD);
 
             // Run Without Encoders
 //        mecanumDriveBase.lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -76,46 +85,41 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        mecanumDriveBase.lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        mecanumDriveBase.rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-//        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             // Brake when power set to Zero
 //        mecanumDriveBase.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        mecanumDriveBase.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        screw.setDirection(DcMotorSimple.Direction.REVERSE);
+        screw.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //        zone = coneDetection.detector(telemetry, hardwareMap);
 //        blueSide = teamDetection.showTeam(telemetry);
 
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceSensor;
 
-//...
-
-/*...*/
-
         telemetry.addData("Intialized", "");
         telemetry.update();
 
         while (!opModeIsActive())
         {
-            zone = coneDetection.detector(telemetry, hardwareMap);
-            waitForStart();
+            zone = coneDetection.detector(telemetry);
         }
         if (zone == -1)
         {
             zone = 2;
         }
-        //crunch crunch crunch
+
         // Waits till start button is pressed
-        coneDetection.tfod.setZoom(1, 16/9);
-        combinedLocalizer.measureState();
+        waitForStart();
+
         ElapsedTime runtime = new ElapsedTime();
         runtime.seconds();
         runtime.startTime();
@@ -130,14 +134,17 @@ public class AutonomousTestOfDeath extends LinearOpMode
 //        }
 
         /******  Take 45 */
-//        driveScrew(200);
-//        driveUBar(1750);
+        driveScrew(200);
+        driveUBar(1750);
 
-        zone = coneDetection.detector(telemetry, hardwareMap);
-//        blueSide = teamDetection.showTeam(telemetry);
-//        blueSide = false;
+        blueSide = teamDetection.showTeam(telemetry);
+
+        blueSide = false;
+
         telemetry.addData("", "On blue side? " + blueSide + " parking zone is equal to " + zone);
         telemetry.update();
+
+        //Thread.sleep(3000);
 /*
         driveStraight(ticksPerInch *18, 1, 0.5);
         Thread.sleep(1000);
@@ -158,18 +165,21 @@ public class AutonomousTestOfDeath extends LinearOpMode
         intake.setPower(0);
 */
 
-        /************************/
-        //Drive to first pole
-        driveStraight(ticksPerInch * 3, 1, 1);
-        turnInPlace(ticksPerDegree * 45, -1, 1);
-        driveToPos.setTarget(5,36, 0);
-        driveToPos.driveToPosition();
 
-//        driveScrew(200);
+
+
+
+
+        /************************/
+
+
+
+        //Drive to first pole
+        driveScrew(200);
         driveStraight(ticksPerInch * 30, 1, 0.3);
         Thread.sleep(1000);
         driveStraight(ticksPerInch * 6, -1, 0.3);
-//        driveUBar(1750);
+        driveUBar(1750);
         Thread.sleep(1000);
         //Turn to middle poll
         if (blueSide)
@@ -188,10 +198,10 @@ public class AutonomousTestOfDeath extends LinearOpMode
         intake.setPower(0);
 
         // pickup cone
-//        driveScrew(100);
+        driveScrew(100);
         driveStraight(ticksPerInch * 4, -1, 0.5);
         Thread.sleep(500);
-//        driveUBar(0);
+        driveUBar(0);
         if (blueSide)
         {
             turnInPlace(ticksPerDegree * 45, -1, 0.3);
@@ -526,7 +536,6 @@ public class AutonomousTestOfDeath extends LinearOpMode
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                combinedLocalizer.measureState();
                 mecanumDriveBase.driveMotors(speed, 0, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
                 telemetry.update();
@@ -537,14 +546,12 @@ public class AutonomousTestOfDeath extends LinearOpMode
             leftFrontPos -= target;
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
-                combinedLocalizer.measureState();
                 mecanumDriveBase.driveMotors(speed, 0, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
                 telemetry.update();
             }
         }
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
-        combinedLocalizer.measureState();
 //        encoderLogging();
     }
 
@@ -633,7 +640,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
             while (mecanumDriveBase.lb.getCurrentPosition() >= leftBackPos)
             {
                 mecanumDriveBase.driveMotors(0, speed, 0, 1);
-                combinedLocalizer.measureState();
+
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
                 telemetry.addData("rf pos = ", mecanumDriveBase.rf.getCurrentPosition());
@@ -647,7 +654,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
             while (mecanumDriveBase.lb.getCurrentPosition() <= leftBackPos)
             {
                 mecanumDriveBase.driveMotors(0, speed, 0, 1);
-                combinedLocalizer.measureState();
+
                 telemetry.addData("target = ", target);
                 telemetry.addData("lb pos = ", mecanumDriveBase.lb.getCurrentPosition());
                 telemetry.addData("rf pos ", mecanumDriveBase.rf.getCurrentPosition());
@@ -655,25 +662,25 @@ public class AutonomousTestOfDeath extends LinearOpMode
 
             }
         }
-        combinedLocalizer.measureState();
+
         mecanumDriveBase.driveMotors(0, 0, 0, 0);
     }
 
-//    private void driveScrew(int target)
-//    {
-//        screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        screw.setTargetPosition(target);
-//        screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        screw.setPower(1);
-//    }
-//
-//    private void driveUBar(int target)
-//    {
-//        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        uBar.setTargetPosition(target);
-//        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        uBar.setPower(1);
-//    }
+    private void driveScrew(int target)
+    {
+        screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        screw.setTargetPosition(target);
+        screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        screw.setPower(1);
+    }
+
+    private void driveUBar(int target)
+    {
+        uBar.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        uBar.setTargetPosition(target);
+        uBar.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        uBar.setPower(1);
+    }
 
 //    private void driveUBarSpecial(int target) throws InterruptedException
 //    {
@@ -752,6 +759,11 @@ public class AutonomousTestOfDeath extends LinearOpMode
         screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         screwLevel = 0;
     }
+
+
+
+
+
 }
 
 

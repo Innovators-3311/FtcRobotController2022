@@ -55,10 +55,10 @@ public class CombinedLocalizer implements Localizer {
 //    private GyroSensor gyro;
     private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
-    private WebcamName webcam = null;
+    private WebcamName webcamField = null;
     private List<VuforiaTrackable> allTrackables   = null;
     VuforiaTrackable trackable;
-    private boolean targetVisible                  = false;
+    public boolean targetVisible                  = false;
     private boolean targetWasVisible                  = false;
     private StateServer stateServer;
     private double lastT                           =  0;
@@ -74,8 +74,8 @@ public class CombinedLocalizer implements Localizer {
      *
      * @param hardwareMap a hardware map.
      */
-    public CombinedLocalizer(HardwareMap hardwareMap) {
-        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+    public CombinedLocalizer(HardwareMap hardwareMap, WebcamName webcam) {
+        webcamField = webcam;
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
         imu = new InternalIMUSensor(hardwareMap);
         try{
@@ -139,7 +139,7 @@ public class CombinedLocalizer implements Localizer {
 
         OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 0, 0));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 90, 0));
 
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
@@ -225,8 +225,8 @@ public class CombinedLocalizer implements Localizer {
     public double[] robotToFieldFrame(double x,double y){
         double rotation = getRotation();
         double[] retVal ={
-                 Math.cos(rotation *Math.PI/180)*x-Math.sin(rotation *Math.PI/180)*y,
-                 Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+                 Math.cos(rotation *Math.PI/180)*x + -Math.sin(rotation *Math.PI/180)*y,
+                 Math.sin(rotation *Math.PI/180)*x + Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
 
@@ -241,8 +241,8 @@ public class CombinedLocalizer implements Localizer {
     public double[] fieldToRobotFrame(double x,double y){
         double rotation = getRotation();
         double[] retVal ={
-                Math.cos(rotation *Math.PI/180)*x+Math.sin(rotation *Math.PI/180)*y,
-                -Math.sin(rotation *Math.PI/180)*x+Math.cos(rotation *Math.PI/180)*y}; //how.TODO
+                Math.cos(rotation *Math.PI/180)*x + Math.sin(rotation *Math.PI/180)*y,
+               -Math.sin(rotation *Math.PI/180)*x + Math.cos(rotation *Math.PI/180)*y}; //how.TODO
         return retVal;
     }
     /**
@@ -269,7 +269,7 @@ public class CombinedLocalizer implements Localizer {
             double k = headingUncertainty / (headingUncertainty + vuforiaHeadingUncertainty); //Kalman gain for a Kalman filter
             // express the rotation of the robot in degrees.
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            double vuforiaHeading = rotation.thirdAngle%360;
+            double vuforiaHeading = -rotation.thirdAngle%360;
             double err = smartAngleError(vuforiaHeading, heading);
             heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
@@ -306,7 +306,8 @@ public class CombinedLocalizer implements Localizer {
     /**
      * Measures changes in state and incorporates them into our state estimates.
      */
-    public void measureState(){
+    // KEEP PRIVATE
+    private void measureState(){
         measureVuforiaPosition();
         measureVuforiaHeading();
         measurePodChange();
