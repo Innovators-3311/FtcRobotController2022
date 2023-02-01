@@ -67,7 +67,7 @@ public class WapaAutoMedium extends LinearOpMode
     double LeftBackPos;
 
     boolean blueTeam = true;
-    int zone = -1; // TODO init these values
+    int zone = -1;
 
     PIDController pidRotate, pidDrive, pidStrafe;
 

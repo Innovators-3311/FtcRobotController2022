@@ -67,7 +67,7 @@ public class WapaAutoHigh extends LinearOpMode
     double LeftBackPos;
 
     boolean blueTeam = true;
-    int zone = -1; // TODO init these values
+    int zone = -1;
 
     PIDController pidRotate, pidDrive, pidStrafe;
 
@@ -144,16 +144,11 @@ public class WapaAutoHigh extends LinearOpMode
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-
-
-
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-
 
         // Set up our telemetry dashboard
         composeTelemetry();
@@ -167,11 +162,8 @@ public class WapaAutoHigh extends LinearOpMode
         //Initialize
         initialize();
 
-//        testScrew();
-
         //Detecting the code before waitForStart may have been causing us issues.  At any point it
         //is not needed here, and the init preview still works and will ID the code that it sees.
-//        zone = coneDetection.detector(telemetry);
         RobotLog.ii("WAPA Auto", "Waiting for start..");
 
         telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
@@ -180,8 +172,6 @@ public class WapaAutoHigh extends LinearOpMode
 
         // Wait until we're told to go
         waitForStart();
-
-        //testScrew();
 
         zone = coneDetection.detector(telemetry);
 
@@ -227,7 +217,6 @@ public class WapaAutoHigh extends LinearOpMode
         //If we still see the pole after rotation...
         if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
         {
-            //TODO: sensor moved.  Need to check this value again
             toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 6;
 
             telemetry.addData("Pole", toPole);
@@ -238,7 +227,6 @@ public class WapaAutoHigh extends LinearOpMode
             intake.setPower(1);
             sleep(1000);
             intake.setPower(0);
-            //TODO why adding six here?
             driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
         }
 
@@ -274,6 +262,7 @@ public class WapaAutoHigh extends LinearOpMode
             sleep(250);
             basicRotate(ang2, 0.5, false);
         }
+        driveUBar(1000);
 
         //TODO: Do we want to make sure the arm is in the right place to free fall to the
         // TODO: remove this
