@@ -29,7 +29,7 @@ public class CompTeleOp extends OpMode
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
-        localizer = new CombinedLocalizer(hardwareMap, webcam);
+//        localizer = new CombinedLocalizer(hardwareMap, webcam);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         towerController = new TowerController(hardwareMap, telemetry);
         OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
@@ -40,8 +40,8 @@ public class CompTeleOp extends OpMode
     }
     @Override
     public void loop() {
-        localizer.displayTelemetry(telemetry);
-        localizer.handleTracking();
+//        localizer.displayTelemetry(telemetry);
+//        localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
         mecanumDriveBase.driveBaseTelemetry(telemetry);
         towerController.handleGamepad(gamepad2, telemetry);
