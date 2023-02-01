@@ -55,7 +55,6 @@ public class TeleOpTesting extends OpMode
 //        towerController.handleScrew();
 //        towerController.handleIntake();
 //        towerController.handleGamepad(gamepad2);
-        towerController.handleGamepad(gamepad2, telemetry);
 
         mecanumDriveBase.driveBaseTelemetry(telemetry);
 //        telemetry.addData("TeleOp heading", localizer.getRotation() );

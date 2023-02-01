@@ -217,7 +217,8 @@ public class WapaAutoHigh extends LinearOpMode
         //If we still see the pole after rotation...
         if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
         {
-            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 6;
+            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 7
+            ;
 
             telemetry.addData("Pole", toPole);
             RobotLog.ii("WAPA distance to move to pole:", "%f", toPole);
