@@ -40,8 +40,9 @@ public class MecanumDriveBase {
         // reset encoders
         setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Just pick a runMode!
-        setMotorMode(runMode);
+
+        // Run Without Encoders
+        setMotorMode(this.runMode);
 
         // Brake when power set to Zero
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -102,6 +103,15 @@ public class MecanumDriveBase {
           rf.setPower(rightPowerFront/maxAbsVal * speedFactor);
           lb.setPower(leftPowerBack/maxAbsVal * speedFactor);
           rb.setPower(rightPowerBack/maxAbsVal * speedFactor);
+      }
+
+    /**
+     * Returns the absolute maximum power on any drive motor.
+     *
+     * @return max abs power [0,1]
+     */
+    public double maxMotorPower(){
+          return maxAbsVal(lf.getPower(), rf.getPower(), lb.getPower(), rb.getPower());
       }
 
     /**

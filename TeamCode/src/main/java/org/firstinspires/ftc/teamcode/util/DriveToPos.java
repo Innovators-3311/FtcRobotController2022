@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.util.RobotLog;
+
+import org.firstinspires.ftc.robotcore.external.State;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.localizers.CombinedLocalizer;
+import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 
 public class DriveToPos {
     private final CombinedLocalizer localizer;
@@ -13,6 +18,8 @@ public class DriveToPos {
     private double rotationStart = 0;
     private final double safeDistance = 7;
     public double maxSpeedFactor = 1.0;
+
+    private StateServer stateServer = null;
 
     /**
      * Constructor for Relative Drive Controller
@@ -80,7 +87,7 @@ public class DriveToPos {
             speedFactor = 0;
         }
     }
-        public void autoDriveToPosition()
+        public void autoDriveToPosition(Telemetry telemetry)
         {
             double aDX = xTarget - localizer.x;
             double aDY = yTarget - localizer.y;
@@ -88,11 +95,26 @@ public class DriveToPos {
 
             double[] aDriveVector = localizer.fieldToRobotFrame(aDX / autoDistanceToTarget, aDY / autoDistanceToTarget);
 
+
             // Compute the turn that minimizes wrap-arounds.
             // Note that this is a heading change, so rotation and target are backwards
             // TODO: Fix handling heading change! -1 < turn < 1
             double aTurn = localizer.smartAngleError(localizer.getRotation(), rotationTarget);
-            double atonomousSpeedFactor = 1;
+            aTurn = SimplePIDControl.clamp(aTurn, -1, 1);
+
+            RobotLog.ii("DriveToPos", "Field: %2f, %2f / Robot: %2f, %2f, Rotation: %2f",
+                    aDX, aDY,
+                    aDriveVector[0], aDriveVector[1],
+                    localizer.getRotation() - rotationTarget
+                    );
+
+            double atonomousSpeedFactor = maxSpeedFactor;
+
+//            telemetry.addData("DriveTo", "aDX(%.2f), aDY(%.2f), DTT(%.2f), rb(%.2f)", aDX, aDY, autoDistanceToTarget);
+            telemetry.addData("", "aDX: " + aDX + " aDY: " + aDY + " DTT: " + autoDistanceToTarget);
+
+            telemetry.addData("", "aDriveVector[0]: " + aDriveVector[0] + "aDriveVector[1]: " + aDriveVector[1] +" aTurn: " + aTurn);
+            telemetry.update();
 
             // https://www.desmos.com/calculator/ln1qieke73
             if (autoDistanceToTarget < safeDistance)
@@ -105,7 +127,8 @@ public class DriveToPos {
             }
 
             // Drive the motors!
-            mecanumDriveBase.driveMotors(aDriveVector[0], aTurn, aDriveVector[1], atonomousSpeedFactor);
+//            mecanumDriveBase.driveMotors(aDriveVector[0], aTurn, aDriveVector[1], atonomousSpeedFactor);
+            mecanumDriveBase.driveMotors(aDriveVector[0], 0.1 * aTurn, aDriveVector[1], atonomousSpeedFactor);
         }
 
     /**
