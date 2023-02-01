@@ -25,23 +25,19 @@ public class TeleOpTesting extends OpMode
 //    private CombinedLocalizer localizer = null;
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
-//    private PacManTurnToPos pacMan;
-    private RelativeDriveController relativeDrive;
     private JunctionHomingController junctionHoming;
-    private CameraInitSingleton cameraInitSingleton;
-    private WebcamName webcam;
-    private OdometryPodsSensor odoPods;
 
     public void init() {
-        odoPods = new OdometryPodsSensor(hardwareMap);
-        cameraInitSingleton = new CameraInitSingleton(hardwareMap);
-        webcam = cameraInitSingleton.getWebcam();
+        OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
+        CameraInitSingleton cameraInitSingleton = new CameraInitSingleton(hardwareMap);
+        WebcamName webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
 //        localizer = new CombinedLocalizer(hardwareMap,webcam);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
-        relativeDrive = new RelativeDriveController(mecanumDriveBase, odoPods);
+        //    private PacManTurnToPos pacMan;
+        RelativeDriveController relativeDrive = new RelativeDriveController(mecanumDriveBase, odoPods);
         towerController = new TowerController(hardwareMap, telemetry);
-        junctionHoming = new JunctionHomingController(telemetry,mecanumDriveBase,hardwareMap,relativeDrive);
+        junctionHoming = new JunctionHomingController(telemetry,mecanumDriveBase,hardwareMap, relativeDrive);
 //        localizer = new LocalizerIMU(hardwareMap);
 //        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
@@ -51,6 +47,8 @@ public class TeleOpTesting extends OpMode
 //        localizer.displayTelemetry(telemetry);
 //        localizer.handleTracking();
         mecanumDriveBase.gamepadController(gamepad1);
+
+        // This overrides mecanumDriveBase commands.
         junctionHoming.handleGamepad(gamepad1, gamepad2);
 //        towerController.handleUBar();
         towerController.handleGamepad(gamepad2, telemetry);

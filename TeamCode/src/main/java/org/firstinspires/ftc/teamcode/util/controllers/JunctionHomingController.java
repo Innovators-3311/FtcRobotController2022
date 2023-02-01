@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 class JunctionDistances {
     private static final double low = 9.9;
     // Touching the pole.
-    private static final double close = 3;
+    private static final double close = 4.5;
 
     public static double getDistance(JunctionType junctionType){
         if (junctionType == JunctionType.HIGH) return close;
@@ -55,11 +55,11 @@ public class JunctionHomingController {
     private static final double POSITION_TOLERANCE = 1.0;
     private static final double MAX_DISTANCE = 24;
 
-    private Telemetry telemetry;
-    private MecanumDriveBase mecanumDriveBase;
+    private final Telemetry telemetry;
+    private final MecanumDriveBase mecanumDriveBase;
     private BNO055IMU imu;
-    private DistanceSensor distanceSensorCenter;
-    private RelativeDriveController relativeDrive;
+    private final DistanceSensor distanceSensorCenter;
+    private final RelativeDriveController relativeDrive;
     private JunctionType junction = JunctionType.LOW;
 
     private double powerRate = 0;
@@ -284,6 +284,11 @@ public class JunctionHomingController {
         RobotLog.ii("JunctionHomingController", "Set degrees to %f", this.degrees);
     }
 
+    /**
+     * Check if the turn is complete.
+     *
+     * @return is it complete or still working?
+     */
     public boolean checkTurnComplete(){
         if (Math.abs(getAngle()) > Math.abs(degrees)) {
             // STOP
@@ -300,7 +305,9 @@ public class JunctionHomingController {
     public void stateTurning(){
         // set power to rotate.
         mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
-        checkTurnComplete();
+        if (checkTurnComplete()){
+            return;
+        }
 
         double distance = checkDistance(0, MAX_DISTANCE);
         if (distance != -1){
@@ -316,7 +323,9 @@ public class JunctionHomingController {
     public void stateFirstEdge(){
         // set power to rotate.
         mecanumDriveBase.driveMotors(0, powerRate, 0, 1);
-        checkTurnComplete();
+        if (checkTurnComplete()){
+            return;
+        }
 
         double distance = checkDistance(0, MAX_DISTANCE);
         minDistance = Math.min(minDistance, getDistance());
@@ -400,9 +409,10 @@ public class JunctionHomingController {
     }
 
     /**
+     * Handle the logic for the gamepad.
      *
-     * @param driver
-     * @param accessory
+     * @param driver The driver's gamepad
+     * @param accessory The accessory gamepad
      */
     public void handleGamepad(Gamepad driver, Gamepad accessory){
         if      (accessory.y){setJunctionType(JunctionType.HIGH);}
@@ -413,16 +423,22 @@ public class JunctionHomingController {
             if (aligningState == AligningState.IDLE) {
                 RobotLog.ii("JunctionHomingController", "Beginning Junction Alignment from IDLE");
                 aligningState = AligningState.CENTERING;
-                startCentering();
-            }
-            if (aligningState == AligningState.DONE) {
-                RobotLog.ii("JunctionHomingController", "Beginning Junction Alignment from DONE");
-                aligningState = AligningState.CENTERING;
+                setDegrees(90);
                 startCentering();
             }
             // Calls the handling function for the appropriate state.
             delegateAligningState();
-        } else {
+        } else if (driver.right_bumper){
+            if (aligningState == AligningState.IDLE) {
+                RobotLog.ii("JunctionHomingController", "Beginning Junction Alignment from IDLE");
+                aligningState = AligningState.CENTERING;
+                setDegrees(-90);
+                startCentering();
+            }
+            // Calls the handling function for the appropriate state.
+            delegateAligningState();
+        }
+        else {
             aligningState = AligningState.IDLE;
             centeringState = CenteringState.IDLE;
         }
