@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.Autonomous;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -58,7 +57,7 @@ public class AutonomousBlue extends LinearOpMode
 
         teamDetection = new TeamDetection(hardwareMap);
         coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 //        towerController = new TowerController(hardwareMap, telemetry);
 
 //        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");

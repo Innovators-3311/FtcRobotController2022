@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import java.security.acl.LastOwnerException;
+
+
 public class FieldObstacle {
     private double xpos;
     private double ypos;
@@ -8,6 +11,7 @@ public class FieldObstacle {
         this.xpos = xpos;
         this.ypos = ypos;
     }
+
 
     /**
      * Compute the distance from a given point to this obstacle.

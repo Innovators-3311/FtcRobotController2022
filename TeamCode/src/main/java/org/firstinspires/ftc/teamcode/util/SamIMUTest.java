@@ -66,7 +66,7 @@ public class SamIMUTest extends LinearOpMode
     private void initialize()
     {
 //        teamDetection = new TeamDetection(hardwareMap);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 

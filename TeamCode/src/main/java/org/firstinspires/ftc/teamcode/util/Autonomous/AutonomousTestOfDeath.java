@@ -63,7 +63,7 @@ public class AutonomousTestOfDeath extends LinearOpMode
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
         combinedLocalizer = new CombinedLocalizer(hardwareMap, webcam);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         driveToPos = new DriveToPos(combinedLocalizer, mecanumDriveBase);
 
         telemetry.addData("Intialized", "");

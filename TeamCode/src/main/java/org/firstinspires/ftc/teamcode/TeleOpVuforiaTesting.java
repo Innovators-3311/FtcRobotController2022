@@ -25,7 +25,7 @@ public class TeleOpVuforiaTesting extends OpMode
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
         localizer = new CombinedLocalizer(hardwareMap, webcam);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
 //        towerController = new TowerController(hardwareMap);
         pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
