@@ -79,7 +79,7 @@ public class WapaAutoHigh extends LinearOpMode
 
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         teamDetection = new TeamDetection(hardwareMap);
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
         elapsedTime = new ElapsedTime();
 

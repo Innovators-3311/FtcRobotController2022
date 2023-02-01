@@ -83,7 +83,7 @@ public class TestScrewUbar extends LinearOpMode
 
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
 
-        mecanumDriveBase = new MecanumDriveBase(hardwareMap, false);
+        mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
         teamDetection = new TeamDetection(hardwareMap);
         elapsedTime = new ElapsedTime();
