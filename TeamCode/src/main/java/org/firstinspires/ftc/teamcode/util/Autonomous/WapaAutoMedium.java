@@ -258,8 +258,6 @@ public class WapaAutoMedium extends LinearOpMode
                 double ang3 = -90 - (getHeading() - 90);
                 RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang3,getHeading());
                 basicRotate(ang3, 0.5, false);
-
-                driveStraight(ticksPerInch * 5, -1, 0.5);
             }
             if (zone ==  3)
             {
@@ -447,6 +445,13 @@ public class WapaAutoMedium extends LinearOpMode
             if (degrees > 0)
             {
                 double angleCorrection = (firstPole - secondPole) / 2;
+
+                if (angleCorrection > 10.0)
+                {
+                    angleCorrection = angleCorrection + 2;
+                    RobotLog.ii("WAPA Angle Correction: Added 2", "%f ", angleCorrection);
+                }
+
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
                 telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);

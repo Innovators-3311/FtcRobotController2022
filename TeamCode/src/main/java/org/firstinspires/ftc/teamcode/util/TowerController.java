@@ -26,10 +26,10 @@ public class TowerController
     private boolean uBarA;
 
     //TODO may need changed
-    private final int HIGH_SCREW_PRESET = 0;
-    private final int MEDIUM_SCREW_PRESET = -3305;
-    private final int LOW_SCREW_PRESET = 0;
-    private final int PICKUP_SCREW_PRESET = -767;
+    private final int HIGH_SCREW_PRESET = -100;
+    private final int MEDIUM_SCREW_PRESET = -3405;
+    private final int LOW_SCREW_PRESET = -100;
+    private final int PICKUP_SCREW_PRESET = -867;
 
     private final int HIGH_UBAR_PRESET = -2266;
     private final int MEDIUM_UBAR_PRESET = -2266;

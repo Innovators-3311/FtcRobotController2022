@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.util.localizers.StateServer;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AutonomousRelativeConcept", group = "autonomous")
+@Disabled
 public class AutonomousRelativeDemo extends LinearOpMode
 {
 

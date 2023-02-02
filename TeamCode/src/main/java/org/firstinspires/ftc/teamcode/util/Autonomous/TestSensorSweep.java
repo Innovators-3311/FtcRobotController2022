@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.Autonomous;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import java.util.Locale;
 
 @Autonomous(name="TestSensorSweep", group="Exercises")
+@Disabled
 public class TestSensorSweep extends LinearOpMode
 {
     private CameraInitSingleton cameraInitSingleton;

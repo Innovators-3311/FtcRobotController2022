@@ -312,6 +312,7 @@ public class WapaAutoHigh extends LinearOpMode
  //       RobotLog.ii("WAPA screw:", "%f", screw.getCurrentPosition());
         //give time for the screw to get to location before stop()
         driveUBar(-1600);
+        driveScrew(3400);
         sleep(3000);
 
         //zero position for tele-op.
