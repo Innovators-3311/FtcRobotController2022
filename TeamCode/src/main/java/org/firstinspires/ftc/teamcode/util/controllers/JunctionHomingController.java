@@ -416,8 +416,8 @@ public class JunctionHomingController {
      */
     public void handleGamepad(Gamepad driver, Gamepad accessory){
         if      (accessory.y){setJunctionType(JunctionType.HIGH);}
-        else if (accessory.x){setJunctionType(JunctionType.LOW); }
-        else if (accessory.b){setJunctionType(JunctionType.MEDIUM);}
+        else if (accessory.x){setJunctionType(JunctionType.MEDIUM); }
+        else if (accessory.b){setJunctionType(JunctionType.LOW);}
 
         if(driver.left_bumper){
             if (aligningState == AligningState.IDLE) {
