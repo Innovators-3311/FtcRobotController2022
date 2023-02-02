@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.enums.JunctionType;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 class JunctionDistances {
-    private static final double low = 7.9;
+    private static final double low = 10;
     // Touching the pole.
     private static final double close = 3.0;
 
