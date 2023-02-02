@@ -263,7 +263,7 @@ public class WapaAutoHigh extends LinearOpMode
                 }
                 if (zone == 3)
                 {
-                    driveStraight(ticksPerInch * 16, 1, 0.5);
+                    driveStraight(ticksPerInch * 17, 1, 0.5);
 
                 }
             }
@@ -279,7 +279,7 @@ public class WapaAutoHigh extends LinearOpMode
                 basicRotate(ang2, 0.5, false);
                 if (zone == 1)
                 {
-                    driveStraight(ticksPerInch * 16, -1, 0.5);
+                    driveStraight(ticksPerInch * 17, -1, 0.5);
 
                 }
                 if (zone == 3)

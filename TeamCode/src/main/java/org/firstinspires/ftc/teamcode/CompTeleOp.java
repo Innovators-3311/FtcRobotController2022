@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
 public class CompTeleOp extends OpMode
 {
-    private CombinedLocalizer localizer        = null;
+//    private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;
@@ -35,7 +35,7 @@ public class CompTeleOp extends OpMode
         OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
         RelativeDriveController relativeDrive = new RelativeDriveController(mecanumDriveBase, odoPods);
         junctionHoming = new JunctionHomingController(telemetry, mecanumDriveBase, hardwareMap, relativeDrive);
-        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
+//        pacMan = new PacManTurnToPos(localizer, mecanumDriveBase);
         double max;
     }
     @Override
@@ -55,7 +55,7 @@ public class CompTeleOp extends OpMode
         telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());
         telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
         telemetry.addData("", "lb = " + mecanumDriveBase.lb.getCurrentPosition());
-        telemetry.addData("TeleOp heading", localizer.getRotation() );
+//        telemetry.addData("TeleOp heading", localizer.getRotation() );
         telemetry.update();
     }
 }

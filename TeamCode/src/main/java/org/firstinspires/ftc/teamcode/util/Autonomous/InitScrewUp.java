@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 import org.firstinspires.ftc.teamcode.util.TeamDetection;
 
-@Autonomous(name="screwInitAutonomous", group="Exercises")
+@Autonomous(name="screwInitTeleop", group="Exercises")
 public class InitScrewUp extends LinearOpMode
 {
     private CameraInitSingleton cameraInitSingleton;
@@ -123,6 +123,8 @@ public class InitScrewUp extends LinearOpMode
         waitForStart();
 
         driveScrew(3300);
+
+        sleep(50000);
 
 //        while(opModeIsActive())
 //        {
