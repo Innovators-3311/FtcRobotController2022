@@ -75,10 +75,7 @@ public class MecanumDriveBase {
           double drive = -gamepad.left_stick_y;
           double turn = gamepad.right_stick_x;
           double strafe = gamepad.left_stick_x;
-          if (gamepad.right_trigger != 0)
-          {
-              speedFactor = 1 - (0.4 * gamepad.right_trigger);
-          }
+          speedFactor = 1 - (0.6 * gamepad.right_trigger);
           driveMotors(drive, turn, strafe, speedFactor);
       }
 
