@@ -42,11 +42,15 @@ public class CompTeleOp extends OpMode
     public void loop() {
 //        localizer.displayTelemetry(telemetry);
 //        localizer.handleTracking();
-        mecanumDriveBase.gamepadController(gamepad1);
-        mecanumDriveBase.driveBaseTelemetry(telemetry);
         towerController.handleGamepad(gamepad2, telemetry);
         junctionHoming.handleGamepad(gamepad1,gamepad2);
-//        telemetry.addData("TeleOp heading", localizer.getHeading());
+        // If we're not homing, see what the driver wants.
+        if (junctionHoming.aligningState == JunctionHomingController.AligningState.IDLE) {
+            mecanumDriveBase.gamepadController(gamepad1);
+            mecanumDriveBase.driveBaseTelemetry(telemetry);
+        }
+
+        //        telemetry.addData("TeleOp heading", localizer.getHeading());
 //        pacMan.handlePacMan(gamepad1, telemetry);
         telemetry.addData("", "lf = " + mecanumDriveBase.lf.getCurrentPosition());
         telemetry.addData("", "rf = " + mecanumDriveBase.rf.getCurrentPosition());
