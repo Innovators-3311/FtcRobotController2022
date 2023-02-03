@@ -209,6 +209,6 @@ public class InitScrewDown extends LinearOpMode
         screw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         screw.setTargetPosition(target);
         screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        screw.setPower(0.5);
+        screw.setPower(0.4);
     }
 }

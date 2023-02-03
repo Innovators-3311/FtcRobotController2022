@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import java.util.Locale;
 
 @Autonomous(name="TestSensorSweep", group="Exercises")
-@Disabled
+//@Disabled
 public class TestSensorSweep extends LinearOpMode
 {
     private CameraInitSingleton cameraInitSingleton;
@@ -160,7 +160,43 @@ public class TestSensorSweep extends LinearOpMode
         composeTelemetry();
     }
 
+    private double getCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle;
+        return Math.abs(heading);
+    }
 
+    private double getCorrectedCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle - initAngle;
+        return Math.abs(heading);
+    }
+
+    private void  driveTest()
+    {
+
+        while(opModeIsActive())
+        {
+            driveStraight(ticksPerInch * 62, 1, 0.3);
+            sleep(5000);
+            driveStraight(ticksPerInch * 62, -1, 0.3);
+            sleep(5000);
+/*
+            driveStraight(ticksPerInch * 62, 1, 0.5);
+            sleep(5000);
+            driveStraight(ticksPerInch * 62, -1, 0.5);
+            sleep(5000);
+
+            driveStraight(ticksPerInch * 62, 1, 1);
+            sleep(5000);
+            driveStraight(ticksPerInch * 62, -1, 1);
+            sleep(5000);
+            */
+
+        }
+    }
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -169,6 +205,11 @@ public class TestSensorSweep extends LinearOpMode
         initialize();
 
 //        testScrew();
+
+        driveTest();
+
+        initAngle = getCompassHeading();
+
 
         //Detecting the code before waitForStart may have been causing us issues.  At any point it
         //is not needed here, and the init preview still works and will ID the code that it sees.
@@ -180,6 +221,16 @@ public class TestSensorSweep extends LinearOpMode
 
         // Wait until we're told to go
         waitForStart();
+
+        while(opModeIsActive())
+        {
+            telemetry.addData("init Heading: ", initAngle);
+            telemetry.addData("Compus Heading: ", getCompassHeading());
+            telemetry.addData("Corrected Heading: ", getCorrectedCompassHeading());
+            telemetry.update();
+        }
+
+
 
         while(opModeIsActive())
         {
@@ -325,7 +376,7 @@ public class TestSensorSweep extends LinearOpMode
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
                 //TODO: do we need turn value here as well?
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                mecanumDriveBase.driveMotors(speed, 0.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }

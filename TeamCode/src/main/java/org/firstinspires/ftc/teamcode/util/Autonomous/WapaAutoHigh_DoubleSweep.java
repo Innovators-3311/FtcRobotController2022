@@ -226,16 +226,17 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
         double firstSweepDistance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
         if (firstSweepDistance < 24)
         {
-
+/*
             if (firstSweepDistance > 10)
             {
-                driveStraight(ticksPerInch * 10, -1, 0.2);
+                RobotLog.ii("WAPA too far, getting closer: ", "%f", toPole);
+                driveStraight(ticksPerInch * 4, -1, 0.2);
                 basicRotate(-10, 0.5, false);
                 sleep(250);
                 basicRotate(25, 0.3, true);
 
             }
-
+*/
             toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 5;
 
             telemetry.addData("Pole", toPole);
@@ -251,7 +252,7 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
 
             //back away from pole
             //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
-            driveStraight(ticksPerInch * (firstSweepDistance + 3.5), 1, 0.2);
+            driveStraight(ticksPerInch * (firstSweepDistance), 1, 0.2);
         }
 
         //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
@@ -263,13 +264,16 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
             if (blueTeam)
             {
                 //angles.firstAngle;
-                double ang2 = 90 - angles.firstAngle + initAngle;
+//jrm                double ang2 = 90 - angles.firstAngle + initAngle;
                 double ang3 = angleToHeading(90);
+
+                double ang2 = getCorrectedCompassHeading() - 90;
+
                 telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
-                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
+                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f corrected Head: %f", angles.firstAngle, ang2, ang3, getCorrectedCompassHeading());
                 RobotLog.ii("WAPA :", " ang3 %f", ang3);
                 telemetry.update();
-                sleep(250);
+                sleep(300);
                 basicRotate(ang2, 0.5, false);
                 if (zone == 1)
                 {
@@ -284,8 +288,11 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
             }
             else
             {
-                double ang2 = 90 - angles.firstAngle + initAngle;
+                //jrm double ang2 = 90 - angles.firstAngle + initAngle;
                 double ang3 = angleToHeading(90);
+
+                double ang2 = getCorrectedCompassHeading() - 90;
+
                 telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
                 RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
                 RobotLog.ii("WAPA :", " ang3 %f", ang3);
@@ -382,8 +389,10 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
         if ((zone == 1) || (zone == 3))
         {
             //angles.firstAngle;
-            //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
-            double ang2 = -90 - getHeading();
+            //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));  //old
+
+            //double ang2 = -90 - getHeading(); //jrm took out for testing below
+            double ang2 = 270 - getCorrectedCompassHeading();
             RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang2,angles.firstAngle);
             telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
             telemetry.update();
@@ -395,8 +404,11 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
                 driveStraight(ticksPerInch * 24, -1, 0.5);
                 //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
                 double ang3 = -90 - (getHeading() - 90);
-                RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang3,getHeading());
-                basicRotate(ang3, 0.5, false);
+
+                double ang4 = 180 - getCorrectedCompassHeading();
+
+                RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang4,getHeading());
+                basicRotate(ang4, 0.5, false);
             }
             if (zone ==  3)
             {
@@ -450,7 +462,7 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                mecanumDriveBase.driveMotors(speed, -.02, 0, 1);
+                mecanumDriveBase.driveMotors(speed, -0.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -461,7 +473,7 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
                 //TODO: do we need turn value here as well?
-                mecanumDriveBase.driveMotors(speed, 0.1, 0, 1);
+                mecanumDriveBase.driveMotors(speed, 0.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -585,7 +597,7 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
                 double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
+//                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
                 RobotLog.ii("WAPA Angle Correction:", "%f ", angleCorrection);
             }
             else
@@ -593,7 +605,7 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
                 double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
+//                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
                 RobotLog.ii("WAPA Angle Correction:", "%f ", angleCorrection);
             }
             telemetry.update();
@@ -1018,4 +1030,19 @@ public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
 
         return ang.firstAngle;
     }
+
+    private double getCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle;
+        return Math.abs(heading);
+    }
+
+    private double getCorrectedCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle - initAngle;
+        return Math.abs(heading);
+    }
+
 }

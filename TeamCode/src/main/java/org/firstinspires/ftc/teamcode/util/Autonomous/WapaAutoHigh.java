@@ -236,13 +236,16 @@ public class WapaAutoHigh extends LinearOpMode
             sleep(1000);
             intake.setPower(0);
             //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
+            driveUBar(-1500);
+            driveScrew(3400);
+            sleep(500);
             driveStraight(ticksPerInch * (toPole + 3.5), 1, 0.3);
         }
 
         //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
         //heading and turn robot to face 90 or -90.
         double ang = getAngle();
-
+        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         if ((zone == 1) || (zone == 3))
         {
             if (blueTeam)
@@ -291,9 +294,24 @@ public class WapaAutoHigh extends LinearOpMode
         }
         else if (zone == 2)
         {
+            telemetry.update();
+            double ang2 = 0.0;
+            if (blueTeam)
+            {
+                //TODO: need correct calculation here
+                //ang2 = angles.firstAngle - 90;
+                ang2 = 45;
+            }
+            else
+            {
+                //ang2 = angles.firstAngle - 90;
+                ang2 = 45;
+            }
+
+
             //TODO: need correct calculation here
             double currHeading = checkOrientation();
-            double ang2 = 0 + angles.firstAngle + initAngle;
+            //jrm ang2 = 0 + angles.firstAngle + initAngle;
             double ang3 = angleToHeading(0);
             telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3) ;
             telemetry.update();
@@ -306,100 +324,10 @@ public class WapaAutoHigh extends LinearOpMode
 
         }
 
-//        driveScrew(50);
- //       RobotLog.ii("WAPA screw:", "%f", screw.getCurrentPosition());
-        //give time for the screw to get to location before stop()
-        driveUBar(-1600);
-        driveScrew(3400);
-        sleep(3000);
-
         //zero position for tele-op.
         stop();
     }
 
-    private void mediumPoleRun()
-    {
-
-        driveStraight(ticksPerInch * 2, 1, 0.3);
-        double heading = getHeading();
-        telemetry.addData("heading", heading);
-        telemetry.update();
-//        sleep(5000);
-//        basicRotate(-heading,0.3,false);
-        driveUBar(-1800);
-        //Drive Forward
-        driveStraight(ticksPerInch * 49, 1, 0.3);
-        sleep(100);
-        driveStraight(ticksPerInch * 3, -1, 0.3);
-
-//        driveScrew(100);
-
-
-        sleep(100);
-
-        if (blueTeam)
-        {
-            basicRotate(-120, 0.3, true);
-        }
-        else
-        {
-            basicRotate(120, 0.3, true);
-        }
-
-        if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
-        {
-            //TODO: sensor moved.  Need to check this value again
-            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4;
-
-            telemetry.addData("Pole", toPole + " raw: " + distanceSensorCenter.getDistance(DistanceUnit.INCH));
-            telemetry.update();
-            sleep(200);
-            RobotLog.ii("WAPA Pole:", "%f", toPole);
-
-            driveStraight(ticksPerInch * toPole, -1, 0.2);
-            sleep(1000);
-            intake.setPower(1);
-            sleep(1000);
-            intake.setPower(0);
-            driveStraight(ticksPerInch * (toPole), 1, 0.3);
-        }
-
-        if ((zone == 1) || (zone == 3))
-        {
-            //angles.firstAngle;
-            //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
-            double ang2 = -90 - getHeading();
-            RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang2,angles.firstAngle);
-            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
-            telemetry.update();
-            sleep(250);
-            basicRotate(ang2, 0.5, false);
-            if (zone ==  1)
-            {
-                driveScrew(1);
-                driveStraight(ticksPerInch * 24, -1, 0.5);
-                //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
-                double ang3 = -90 - (getHeading() - 90);
-                RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang3,getHeading());
-                basicRotate(ang3, 0.5, false);
-            }
-            if (zone ==  3)
-            {
-                driveScrew(1);
-                driveStraight(ticksPerInch * 16, 1, 0.5);
-            }
-        }
-        else if (zone == 2)
-        {
-            //TODO: need correct calculation here
-            double ang2 = 0 + angles.firstAngle;
-            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
-            telemetry.update();
-            sleep(5000);
-            basicRotate(ang2, 0.5, false);
-        }
-
-    }
 
     private void driveScrew(int target)
     {
@@ -435,7 +363,7 @@ public class WapaAutoHigh extends LinearOpMode
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                mecanumDriveBase.driveMotors(speed, -.02, 0, 1);
+                mecanumDriveBase.driveMotors(speed, -.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
