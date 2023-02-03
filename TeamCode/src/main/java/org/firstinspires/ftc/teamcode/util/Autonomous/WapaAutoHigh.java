@@ -195,7 +195,7 @@ public class WapaAutoHigh extends LinearOpMode
         }
 
         //Drive forward 62 inches
-        driveStraight(ticksPerInch * 62, 1, 0.3);
+        driveStraight(ticksPerInch * 58, 1, 0.3);
 
         //Raise screw and ubar to reach high pole
         sleep(250);
@@ -205,7 +205,7 @@ public class WapaAutoHigh extends LinearOpMode
         //driveStraight(ticksPerInch * 6, -1, 0.3);
 
         //Back up from moving the cone.
-        driveStraight(ticksPerInch * 8, -1, 0.3);
+        driveStraight(ticksPerInch * 4, -1, 0.3);
         sleep(250);
         if (blueTeam)
         {
@@ -225,7 +225,14 @@ public class WapaAutoHigh extends LinearOpMode
         //If we still see the pole after rotation...
         if (distanceSensorCenter.getDistance(DistanceUnit.INCH) < 24)
         {
-            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 5;
+            if (blueTeam)
+            {
+                toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 4.8;
+            }
+            else
+            {
+                toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 6;
+            }
 
             telemetry.addData("Pole", toPole);
             RobotLog.ii("WAPA distance to move to pole:", "%f", toPole);
@@ -236,16 +243,21 @@ public class WapaAutoHigh extends LinearOpMode
             sleep(1000);
             intake.setPower(0);
             //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
-            driveUBar(-1500);
-            driveScrew(3400);
-            sleep(500);
-            driveStraight(ticksPerInch * (toPole + 3.5), 1, 0.3);
+
+            if (blueTeam && zone != 2)
+            {
+                driveStraight(ticksPerInch * (toPole + 3), 1, 0.3);
+            }
+            else
+            {
+                driveStraight(ticksPerInch * (toPole + 2), 1, 0.3);
+            }
         }
 
         //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
         //heading and turn robot to face 90 or -90.
         double ang = getAngle();
-        uBar.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        driveScrew(3400);
         if ((zone == 1) || (zone == 3))
         {
             if (blueTeam)
@@ -272,23 +284,29 @@ public class WapaAutoHigh extends LinearOpMode
             }
             else
             {
-                double ang2 = 90 - angles.firstAngle + initAngle;
+                telemetry.update();
+                double ang2 = -(90 - angles.firstAngle + initAngle);
+                ang2 = -(90 - angles.firstAngle + initAngle);
                 double ang3 = angleToHeading(90);
                 telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
                 RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
                 RobotLog.ii("WAPA :", " ang3 %f", ang3);
                 telemetry.update();
                 sleep(250);
-                basicRotate(ang2, 0.5, false);
+
                 if (zone == 1)
                 {
-                    driveStraight(ticksPerInch * 17, -1, 0.5);
+                    ang2 = angles.firstAngle;
+                    basicRotate(ang2, 0.5, false);
+                    driveStraight(ticksPerInch * 20, 1, 0.5);
                 }
                 if (zone == 3)
                 {
-                    driveStraight(ticksPerInch * 22, 1, 0.5);
+                    ang2 = angles.firstAngle;
+                    basicRotate(ang2, 0.5, false);
+                    driveStraight(ticksPerInch * 22, -1, 0.5);
                     basicRotate(-90, 0.5, false);
-                    driveStraight(ticksPerInch * 2, 1, 0.5);
+                    driveStraight(ticksPerInch * 2, -1, 0.5);
                 }
             }
         }
@@ -323,7 +341,8 @@ public class WapaAutoHigh extends LinearOpMode
             RobotLog.ii("WAPA :", " currHeading = %f", currHeading);
 
         }
-
+        driveUBar(-1500);
+        sleep(100);
         //zero position for tele-op.
         stop();
     }
@@ -374,7 +393,7 @@ public class WapaAutoHigh extends LinearOpMode
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
                 //TODO: do we need turn value here as well?
-                mecanumDriveBase.driveMotors(speed, 0.1, 0, 1);
+                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
