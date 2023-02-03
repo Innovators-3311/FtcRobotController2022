@@ -25,9 +25,9 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 
 import java.util.Locale;
 
-@Autonomous(name="AutonomousMedium", group="Exercises")
-public class WapaAutoMedium extends LinearOpMode
-{
+@Autonomous(name="AutonomousHigh_DoubleSweep", group="Exercises")
+public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
+
     private CameraInitSingleton cameraInitSingleton;
    // private WebcamName webcam;
     private ConeDetection coneDetection;
@@ -110,6 +110,7 @@ public class WapaAutoMedium extends LinearOpMode
 
 
         initAngle = getHeading();
+//        RobotLog.ii("WAPA initAngle:", "%d", initAngle);
 
         blueTeam = teamDetection.showTeam(telemetry);
 
@@ -144,16 +145,11 @@ public class WapaAutoMedium extends LinearOpMode
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-
-
-
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-
 
         // Set up our telemetry dashboard
         composeTelemetry();
@@ -167,11 +163,8 @@ public class WapaAutoMedium extends LinearOpMode
         //Initialize
         initialize();
 
-//        testScrew();
-
         //Detecting the code before waitForStart may have been causing us issues.  At any point it
         //is not needed here, and the init preview still works and will ID the code that it sees.
-//        zone = coneDetection.detector(telemetry);
         RobotLog.ii("WAPA Auto", "Waiting for start..");
 
         telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
@@ -180,8 +173,6 @@ public class WapaAutoMedium extends LinearOpMode
 
         // Wait until we're told to go
         waitForStart();
-
-        //testScrew();
 
         zone = coneDetection.detector(telemetry);
 
@@ -193,8 +184,156 @@ public class WapaAutoMedium extends LinearOpMode
         //correct
         if (zone == -1)
         {
-            zone = 1;
+            if (blueTeam)
+            {
+                zone = 1;
+            }
+            else
+            {
+                zone = 3;
+            }
         }
+
+        //Drive forward 62 inches
+        driveStraight(ticksPerInch * 62, 1, 0.3);
+
+        //Raise screw and ubar to reach high pole
+        sleep(250);
+        driveScrew(3300);
+        sleep(4000);
+        driveUBar(-1800);
+        //driveStraight(ticksPerInch * 6, -1, 0.3);
+
+        //Back up from moving the cone.
+        driveStraight(ticksPerInch * 8, -1, 0.3);
+        sleep(250);
+        if (blueTeam)
+        {
+            //rotate to get near pole, then start a sweep for the pole
+            basicRotate(-75, 0.5, false);
+            sleep(250);
+            basicRotate(-120, 0.3, true);
+        }
+        else
+        {
+            //rotate to get near pole, then start a sweep for the pole
+            basicRotate(75, 0.5, false);
+            sleep(250);
+            basicRotate(120, 0.3, true);
+        }
+
+        //If we still see the pole after rotation...
+        double firstSweepDistance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+        if (firstSweepDistance < 24)
+        {
+
+            if (firstSweepDistance > 10)
+            {
+                driveStraight(ticksPerInch * 10, -1, 0.2);
+                basicRotate(-10, 0.5, false);
+                sleep(250);
+                basicRotate(25, 0.3, true);
+
+            }
+
+            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 5;
+
+            telemetry.addData("Pole", toPole);
+            RobotLog.ii("WAPA distance to move to pole:", "%f", toPole);
+
+            driveStraight(ticksPerInch * toPole, -1, 0.2);
+
+            //cone away!!!!!!!!!!!!!!!!!!!!!!!!!
+            sleep(1000);
+            intake.setPower(1);
+            sleep(1000);
+            intake.setPower(0);
+
+            //back away from pole
+            //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
+            driveStraight(ticksPerInch * (firstSweepDistance + 3.5), 1, 0.2);
+        }
+
+        //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
+        //heading and turn robot to face 90 or -90.
+        double ang = getAngle();
+
+        if ((zone == 1) || (zone == 3))
+        {
+            if (blueTeam)
+            {
+                //angles.firstAngle;
+                double ang2 = 90 - angles.firstAngle + initAngle;
+                double ang3 = angleToHeading(90);
+                telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
+                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
+                RobotLog.ii("WAPA :", " ang3 %f", ang3);
+                telemetry.update();
+                sleep(250);
+                basicRotate(ang2, 0.5, false);
+                if (zone == 1)
+                {
+                    driveStraight(ticksPerInch * 21, -1, 0.5);
+                    basicRotate(-90, 0.5, false);
+                }
+                if (zone == 3)
+                {
+                    driveStraight(ticksPerInch * 17, 1, 0.5);
+
+                }
+            }
+            else
+            {
+                double ang2 = 90 - angles.firstAngle + initAngle;
+                double ang3 = angleToHeading(90);
+                telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
+                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
+                RobotLog.ii("WAPA :", " ang3 %f", ang3);
+                telemetry.update();
+                sleep(250);
+                basicRotate(ang2, 0.5, false);
+                if (zone == 1)
+                {
+                    driveStraight(ticksPerInch * 17, -1, 0.5);
+                }
+                if (zone == 3)
+                {
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
+                    basicRotate(-90, 0.5, false);
+                    driveStraight(ticksPerInch * 2, 1, 0.5);
+                }
+            }
+        }
+        else if (zone == 2)
+        {
+            //TODO: need correct calculation here
+            double currHeading = checkOrientation();
+            double ang2 = 0 + angles.firstAngle + initAngle;
+            double ang3 = angleToHeading(0);
+            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3) ;
+            telemetry.update();
+            RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f  initAngle %f  currHeading = %f", angles.firstAngle, ang2, ang3, initAngle, currHeading);
+            sleep(250);
+            basicRotate(-ang2, 0.5, false);
+
+            currHeading = checkOrientation();
+            RobotLog.ii("WAPA :", " currHeading = %f", currHeading);
+
+        }
+
+//        driveScrew(50);
+ //       RobotLog.ii("WAPA screw:", "%f", screw.getCurrentPosition());
+        //give time for the screw to get to location before stop()
+        driveUBar(-1600);
+        driveScrew(3400);
+        sleep(3000);
+
+        //zero position for tele-op.
+        stop();
+    }
+
+    private void mediumPoleRun()
+    {
 
         driveStraight(ticksPerInch * 2, 1, 0.3);
         double heading = getHeading();
@@ -275,7 +414,6 @@ public class WapaAutoMedium extends LinearOpMode
             basicRotate(ang2, 0.5, false);
         }
 
-        stop();
     }
 
     private void driveScrew(int target)
@@ -312,7 +450,7 @@ public class WapaAutoMedium extends LinearOpMode
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                mecanumDriveBase.driveMotors(speed, -.01, 0, 1);
+                mecanumDriveBase.driveMotors(speed, -.02, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -323,7 +461,7 @@ public class WapaAutoMedium extends LinearOpMode
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
                 //TODO: do we need turn value here as well?
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                mecanumDriveBase.driveMotors(speed, 0.1, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -445,13 +583,6 @@ public class WapaAutoMedium extends LinearOpMode
             if (degrees > 0)
             {
                 double angleCorrection = (firstPole - secondPole) / 2;
-
-                if (angleCorrection > 10.0)
-                {
-                    angleCorrection = angleCorrection + 2;
-                    RobotLog.ii("WAPA Angle Correction: Added 2", "%f ", angleCorrection);
-                }
-
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
                 telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
@@ -502,7 +633,7 @@ public class WapaAutoMedium extends LinearOpMode
     double getHeading()
     {
 
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double heading =  angles.firstAngle;
 
         if (heading < 0)
@@ -513,6 +644,8 @@ public class WapaAutoMedium extends LinearOpMode
         {
            heading = heading - 180;
         }
+
+        RobotLog.ii("WAPA Init Heading:", "%f ", heading);
 
         return heading;
     }
@@ -867,7 +1000,7 @@ public class WapaAutoMedium extends LinearOpMode
             leftAngle = leftAngle + 360;
         }
 
-
+        RobotLog.ii("WAPA angleToHeading:", "org: " + origin + " des: " + destination + " right: " + rightAngle + " left: " + leftAngle);
         //return the faster/smaller direction.
         if (leftAngle < rightAngle)
         {
@@ -877,15 +1010,12 @@ public class WapaAutoMedium extends LinearOpMode
         {
             return rightAngle * -1;
         }
+    }
 
-        //Left-Hand Turn:   ((Origin - Destination) + 360) % 360
-        //Right-Hand Turn: ((Destination - Origin) + 360) % 360
+    private double checkOrientation()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-//        ((190 - 20) + 360) % 360 == 170 degree turn to the left.
-//        ((20 - 190) + 360) % 360 == 190 degree turn to the right
-
-//        90 - 135 = 45
-//        90 - 300 = -210    30
-
+        return ang.firstAngle;
     }
 }
