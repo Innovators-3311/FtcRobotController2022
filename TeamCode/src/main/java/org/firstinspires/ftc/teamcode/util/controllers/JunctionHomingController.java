@@ -53,7 +53,7 @@ public class JunctionHomingController {
 
     private static final int SWEEP_ANGLE = 90;
     private static final double POSITION_TOLERANCE = 1.0;
-    private static final double MAX_DISTANCE = 24;
+    private static final double MAX_DISTANCE = 14;
 
     private final Telemetry telemetry;
     private final MecanumDriveBase mecanumDriveBase;
@@ -63,7 +63,7 @@ public class JunctionHomingController {
     private JunctionType junction = JunctionType.LOW;
 
     private double powerRate = 0;
-    private double power = 0.6;
+    private double power = 0.3;
     private double degrees;
     private double firstPoleEdge =0.0;
     private double secondPoleEdge =0.0;

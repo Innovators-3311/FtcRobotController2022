@@ -91,7 +91,7 @@ public class ConeDetection
         boolean flag = true;
         elapsedTime.reset();
         elapsedTime.startTime();
-        while (flag && elapsedTime.seconds() < 7.5)
+        while (flag && elapsedTime.seconds() < 5)
         {
 //            telemetry.addData("", "%s", "while (flag)");
 //            telemetry.update();

@@ -236,7 +236,7 @@ public class WapaAutoHigh extends LinearOpMode
             sleep(1000);
             intake.setPower(0);
             //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
-            driveStraight(ticksPerInch * (toPole + 2.5), 1, 0.3);
+            driveStraight(ticksPerInch * (toPole + 3.5), 1, 0.3);
         }
 
         //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
@@ -248,7 +248,7 @@ public class WapaAutoHigh extends LinearOpMode
             if (blueTeam)
             {
                 //angles.firstAngle;
-                double ang2 = 90 - angles.firstAngle + initAngle - 4;
+                double ang2 = 90 - angles.firstAngle + initAngle;
                 double ang3 = angleToHeading(90);
                 telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
                 RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
@@ -260,7 +260,6 @@ public class WapaAutoHigh extends LinearOpMode
                 {
                     driveStraight(ticksPerInch * 21, -1, 0.5);
                     basicRotate(-90, 0.5, false);
-                    driveStraight(ticksPerInch * 2, 1, 0.5);
                 }
                 if (zone == 3)
                 {
@@ -281,7 +280,6 @@ public class WapaAutoHigh extends LinearOpMode
                 if (zone == 1)
                 {
                     driveStraight(ticksPerInch * 17, -1, 0.5);
-
                 }
                 if (zone == 3)
                 {
