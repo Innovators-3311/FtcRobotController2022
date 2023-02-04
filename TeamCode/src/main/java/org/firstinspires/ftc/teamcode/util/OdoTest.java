@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp(name = "OdoTest", group = "autonomous test")
+@Disabled
+
 public class OdoTest extends OpMode
 {
     private DcMotor lf;

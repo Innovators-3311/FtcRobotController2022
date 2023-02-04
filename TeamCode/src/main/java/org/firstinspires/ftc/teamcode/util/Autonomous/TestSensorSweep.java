@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 import java.util.Locale;
 
 @Autonomous(name="TestSensorSweep", group="Exercises")
-//@Disabled
+@Disabled
 public class TestSensorSweep extends LinearOpMode
 {
     private CameraInitSingleton cameraInitSingleton;

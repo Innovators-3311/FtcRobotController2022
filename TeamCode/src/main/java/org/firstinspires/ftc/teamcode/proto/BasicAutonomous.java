@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.proto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.util.SimplePIDControl;
 
 @Autonomous(name = "basicMezAutonomous", group = "2022 - 2023 AutonomousBlue")
-
+@Disabled
 public class BasicAutonomous extends LinearOpMode
 {
     private MecanumDriveBase mecanumDriveBase;

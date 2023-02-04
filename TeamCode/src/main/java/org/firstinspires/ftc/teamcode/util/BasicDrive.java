@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+@TeleOp(name = "Basic Drive", group = "basic drive")
+@Disabled
 public class BasicDrive extends OpMode
 {
     private MecanumDriveBase mecanumDriveBase;
