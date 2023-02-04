@@ -296,13 +296,13 @@ public class WapaAutoHigh extends LinearOpMode
 
                 if (zone == 1)
                 {
-                    ang2 = angles.firstAngle;
+                    ang2 = -45;
                     basicRotate(ang2, 0.5, false);
                     driveStraight(ticksPerInch * 20, 1, 0.5);
                 }
                 if (zone == 3)
                 {
-                    ang2 = angles.firstAngle;
+                    ang2 = -45;
                     basicRotate(ang2, 0.5, false);
                     driveStraight(ticksPerInch * 22, -1, 0.5);
                     basicRotate(-90, 0.5, false);
@@ -336,7 +336,7 @@ public class WapaAutoHigh extends LinearOpMode
             RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f  initAngle %f  currHeading = %f", angles.firstAngle, ang2, ang3, initAngle, currHeading);
             sleep(250);
             basicRotate(-ang2, 0.5, false);
-
+            driveStraight(ticksPerInch * 2, -1, 0.5);
             currHeading = checkOrientation();
             RobotLog.ii("WAPA :", " currHeading = %f", currHeading);
 

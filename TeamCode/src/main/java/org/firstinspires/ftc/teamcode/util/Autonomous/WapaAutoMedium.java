@@ -284,9 +284,6 @@ public class WapaAutoMedium extends LinearOpMode
             basicRotate(ang2, 0.5, false);
         }
 
-        //TODO unconmit this
-//        driveScrew(3400);
-
         stop();
     }
 
