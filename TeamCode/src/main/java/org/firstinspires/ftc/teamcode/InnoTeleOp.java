@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.util.controllers.PacManTurnToPos;
 import org.firstinspires.ftc.teamcode.util.localizers.IntegratedLocalizerIMU;
 import org.firstinspires.ftc.teamcode.util.odometry.JunctionAligner;
 
-@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOpStub1", group="!")
+@Disabled
 public class InnoTeleOp extends OpMode {
 
     private IntegratedLocalizerIMU localizer = null;

@@ -17,9 +17,9 @@ import org.firstinspires.ftc.teamcode.util.enums.JunctionType;
 import org.firstinspires.ftc.teamcode.util.MecanumDriveBase;
 
 class JunctionDistances {
-    private static final double low = 9.9;
+    private static final double low = 11;
     // Touching the pole.
-    private static final double close = 4.5;
+    private static final double close = 3.0;
 
     public static double getDistance(JunctionType junctionType){
         if (junctionType == JunctionType.HIGH) return close;
@@ -53,7 +53,7 @@ public class JunctionHomingController {
 
     private static final int SWEEP_ANGLE = 90;
     private static final double POSITION_TOLERANCE = 1.0;
-    private static final double MAX_DISTANCE = 24;
+    private static final double MAX_DISTANCE = 14;
 
     private final Telemetry telemetry;
     private final MecanumDriveBase mecanumDriveBase;
@@ -63,7 +63,7 @@ public class JunctionHomingController {
     private JunctionType junction = JunctionType.LOW;
 
     private double powerRate = 0;
-    private double power = 0.6;
+    private double power = 0.3;
     private double degrees;
     private double firstPoleEdge =0.0;
     private double secondPoleEdge =0.0;
@@ -416,8 +416,8 @@ public class JunctionHomingController {
      */
     public void handleGamepad(Gamepad driver, Gamepad accessory){
         if      (accessory.y){setJunctionType(JunctionType.HIGH);}
-        else if (accessory.x){setJunctionType(JunctionType.LOW); }
-        else if (accessory.b){setJunctionType(JunctionType.MEDIUM);}
+        else if (accessory.x){setJunctionType(JunctionType.MEDIUM); }
+        else if (accessory.b){setJunctionType(JunctionType.LOW);}
 
         if(driver.left_bumper){
             if (aligningState == AligningState.IDLE) {

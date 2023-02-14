@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 import java.security.KeyStore;
 
 @TeleOp(name="Teleop Testing", group="zz-test")
+@Disabled
 public class TeleOpTesting extends OpMode
 
 {

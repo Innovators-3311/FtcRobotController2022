@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.Autonomous;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -25,9 +26,10 @@ import org.firstinspires.ftc.teamcode.util.TeamDetection;
 
 import java.util.Locale;
 
-@Autonomous(name="TestScrewUbar", group="Exercises")
-public class TestScrewUbar extends LinearOpMode
-{
+@Autonomous(name="AutonomousHigh_DoubleSweep", group="Exercises")
+@Disabled
+public class WapaAutoHigh_DoubleSweep extends LinearOpMode{
+
     private CameraInitSingleton cameraInitSingleton;
    // private WebcamName webcam;
     private ConeDetection coneDetection;
@@ -36,7 +38,6 @@ public class TestScrewUbar extends LinearOpMode
     private TeamDetection teamDetection;
 
     private TouchSensor lowSensor;
-    private TouchSensor highSensor;
 
     private DistanceSensor distanceSensorRight;
     private DistanceSensor distanceSensorLeft;
@@ -68,10 +69,7 @@ public class TestScrewUbar extends LinearOpMode
     double LeftBackPos;
 
     boolean blueTeam = true;
-    int zone = -1; // TODO init these values
-
-    private int screwLevel;
-
+    int zone = -1;
 
     PIDController pidRotate, pidDrive, pidStrafe;
 
@@ -82,10 +80,9 @@ public class TestScrewUbar extends LinearOpMode
         initImu();
 
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
-
+        teamDetection = new TeamDetection(hardwareMap);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         coneDetection = new ConeDetection(hardwareMap, cameraInitSingleton.getWebcam());
-        teamDetection = new TeamDetection(hardwareMap);
         elapsedTime = new ElapsedTime();
 
         distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
@@ -95,7 +92,6 @@ public class TestScrewUbar extends LinearOpMode
         uBar = hardwareMap.get(DcMotor.class, "uBar");
         intake = hardwareMap.get(DcMotor.class, "intake");
         lowSensor = hardwareMap.get(TouchSensor.class, "lowSensor");
-        highSensor = hardwareMap.get(TouchSensor.class, "highSensor");
 
         screw.setDirection(DcMotor.Direction.REVERSE);
         uBar.setDirection(DcMotor.Direction.REVERSE);
@@ -116,6 +112,9 @@ public class TestScrewUbar extends LinearOpMode
 
 
         initAngle = getHeading();
+//        RobotLog.ii("WAPA initAngle:", "%d", initAngle);
+
+        blueTeam = teamDetection.showTeam(telemetry);
 
         //Code to prevent my fingers from bleeding...  (manual lowering of screw)
 //        while(!lowSensor.isPressed())
@@ -130,7 +129,6 @@ public class TestScrewUbar extends LinearOpMode
 //        uBar.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         telemetry.addData("Hit start", "");
-        telemetry.update();
     }
 
     /**
@@ -149,16 +147,11 @@ public class TestScrewUbar extends LinearOpMode
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-
-
-
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-
 
         // Set up our telemetry dashboard
         composeTelemetry();
@@ -172,154 +165,180 @@ public class TestScrewUbar extends LinearOpMode
         //Initialize
         initialize();
 
-//        testScrew();
-
         //Detecting the code before waitForStart may have been causing us issues.  At any point it
         //is not needed here, and the init preview still works and will ID the code that it sees.
-//        zone = coneDetection.detector(telemetry);
-        RobotLog.ii("Auto", "Waiting for start..");
+        RobotLog.ii("WAPA Auto", "Waiting for start..");
 
         telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
+        telemetry.addData("", "Terminal = " + blueTeam);
         telemetry.update();
 
         // Wait until we're told to go
         waitForStart();
 
-        while(opModeIsActive())
+        zone = coneDetection.detector(telemetry);
+
+        telemetry.addData("Detected zone", zone);
+        RobotLog.ii("WAPA Detected zone:", "%d", zone);
+        telemetry.update();
+//        sleep(3000);
+        //If the detection failed, then select a random zone to park in.  1/3 change of getting it
+        //correct
+        if (zone == -1)
         {
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-            telemetry.update();
-        }
-
-        //        while (opModeIsActive())
-        {
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-            telemetry.update();
-            driveScrew(800);
-            sleep(5000);
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-            telemetry.update();
-            driveScrew(500);
-            sleep(5000);
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-            telemetry.update();
-        }
-
-
-        while(opModeIsActive())
-        {
-            telemetry.addData("Screw Pos: Lowering", screw.getCurrentPosition());
-            telemetry.update();
-
-
-            // Sets direction
-            screw.setDirection(DcMotor.Direction.REVERSE);
-            screw.setTargetPosition(screwLevel);
-            // sets run mode
-            screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            // sets power
-            screw.setPower(0.05);
-
-            while ( !(lowSensor.isPressed()))
+            if (blueTeam)
             {
-                telemetry.addData("Screw Pos: Lowering", screw.getCurrentPosition());
+                zone = 1;
+            }
+            else
+            {
+                zone = 3;
+            }
+        }
+
+        //Drive forward 62 inches
+        driveStraight(ticksPerInch * 62, 1, 0.3);
+
+        //Raise screw and ubar to reach high pole
+        sleep(250);
+        driveScrew(3300);
+        sleep(4000);
+        driveUBar(-1800);
+        //driveStraight(ticksPerInch * 6, -1, 0.3);
+
+        //Back up from moving the cone.
+        driveStraight(ticksPerInch * 8, -1, 0.3);
+        sleep(250);
+        if (blueTeam)
+        {
+            //rotate to get near pole, then start a sweep for the pole
+            basicRotate(-75, 0.5, false);
+            sleep(250);
+            basicRotate(-120, 0.3, true);
+        }
+        else
+        {
+            //rotate to get near pole, then start a sweep for the pole
+            basicRotate(75, 0.5, false);
+            sleep(250);
+            basicRotate(120, 0.3, true);
+        }
+
+        //If we still see the pole after rotation...
+        double firstSweepDistance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+        if (firstSweepDistance < 24)
+        {
+/*
+            if (firstSweepDistance > 10)
+            {
+                RobotLog.ii("WAPA too far, getting closer: ", "%f", toPole);
+                driveStraight(ticksPerInch * 4, -1, 0.2);
+                basicRotate(-10, 0.5, false);
+                sleep(250);
+                basicRotate(25, 0.3, true);
+
+            }
+*/
+            toPole = distanceSensorCenter.getDistance(DistanceUnit.INCH) - 5;
+
+            telemetry.addData("Pole", toPole);
+            RobotLog.ii("WAPA distance to move to pole:", "%f", toPole);
+
+            driveStraight(ticksPerInch * toPole, -1, 0.2);
+
+            //cone away!!!!!!!!!!!!!!!!!!!!!!!!!
+            sleep(1000);
+            intake.setPower(1);
+            sleep(1000);
+            intake.setPower(0);
+
+            //back away from pole
+            //driveStraight(ticksPerInch * (toPole + 5), 1, 0.3);
+            driveStraight(ticksPerInch * (firstSweepDistance), 1, 0.2);
+        }
+
+        //Need move to park zone.  Turn to 90 degree angle of start direction.  Find current
+        //heading and turn robot to face 90 or -90.
+        double ang = getAngle();
+
+        if ((zone == 1) || (zone == 3))
+        {
+            if (blueTeam)
+            {
+                //angles.firstAngle;
+//jrm                double ang2 = 90 - angles.firstAngle + initAngle;
+                double ang3 = angleToHeading(90);
+
+                double ang2 = getCorrectedCompassHeading() - 90;
+
+                telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
+                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f corrected Head: %f", angles.firstAngle, ang2, ang3, getCorrectedCompassHeading());
+                RobotLog.ii("WAPA :", " ang3 %f", ang3);
                 telemetry.update();
-
-                // Stops if sensor is true
-                if (lowSensor.isPressed())
+                sleep(300);
+                basicRotate(ang2, 0.5, false);
+                if (zone == 1)
                 {
+                    driveStraight(ticksPerInch * 21, -1, 0.5);
+                    basicRotate(-90, 0.5, false);
+                }
+                if (zone == 3)
+                {
+                    driveStraight(ticksPerInch * 17, 1, 0.5);
 
-                    break;
                 }
             }
+            else
+            {
+                //jrm double ang2 = 90 - angles.firstAngle + initAngle;
+                double ang3 = angleToHeading(90);
 
-            screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                double ang2 = getCorrectedCompassHeading() - 90;
 
-
-/*
-            driveScrewDown(10000,0.2);
-            int lowPos = screw.getCurrentPosition();
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
+                telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3);
+                RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f", angles.firstAngle, ang2, ang3);
+                RobotLog.ii("WAPA :", " ang3 %f", ang3);
+                telemetry.update();
+                sleep(250);
+                basicRotate(ang2, 0.5, false);
+                if (zone == 1)
+                {
+                    driveStraight(ticksPerInch * 17, -1, 0.5);
+                }
+                if (zone == 3)
+                {
+                    driveStraight(ticksPerInch * 22, 1, 0.5);
+                    basicRotate(-90, 0.5, false);
+                    driveStraight(ticksPerInch * 2, 1, 0.5);
+                }
+            }
+        }
+        else if (zone == 2)
+        {
+            //TODO: need correct calculation here
+            double currHeading = checkOrientation();
+            double ang2 = 0 + angles.firstAngle + initAngle;
+            double ang3 = angleToHeading(0);
+            telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2 + " ang3: " + ang3) ;
             telemetry.update();
-            screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            RobotLog.ii("WAPA :", " heading %f ang2 = %f  ang3 = %f  initAngle %f  currHeading = %f", angles.firstAngle, ang2, ang3, initAngle, currHeading);
+            sleep(250);
+            basicRotate(-ang2, 0.5, false);
 
-            sleep(4000);
-
-            telemetry.addData("Screw Pos: rising", screw.getCurrentPosition());
-            telemetry.update();
-            driveScrewUp(50000, 0.2);
-            int highPos = screw.getCurrentPosition();
-            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-            telemetry.update();
-
-            sleep(4000);
-
-//            screw.setTargetPosition(highPos/2);
-//            screw.setPower(0.2);
-//            telemetry.addData("Screw Pos: ", screw.getCurrentPosition());
-//            telemetry.update();
-*/
+            currHeading = checkOrientation();
+            RobotLog.ii("WAPA :", " currHeading = %f", currHeading);
 
         }
 
+//        driveScrew(50);
+ //       RobotLog.ii("WAPA screw:", "%f", screw.getCurrentPosition());
+        //give time for the screw to get to location before stop()
+        driveUBar(-1600);
+        driveScrew(3400);
+        sleep(3000);
+
+        //zero position for tele-op.
         stop();
-    }
-
-    private void driveScrewUp(double screwTarget, double speed)
-    {
-        screwLevel -= screwTarget;
-        // Sets direction
-
-        screw.setDirection(DcMotor.Direction.FORWARD);
-        screw.setTargetPosition(screwLevel);
-        // sets run mode
-        screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        // sets power
-        screw.setPower(speed);
-
-        while ((screw.isBusy() && (screw.getCurrentPosition() <= screwTarget)) || (screw.isBusy() && (highSensor.isPressed())))
-        {
-            // Stops if sensor is true
-            if (highSensor.isPressed())
-            {
-                break;
-            }
-        }
-
-        // breaks the motor
-        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        screw.setPower(0);
-        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        screwLevel = 0;
-    }
-
-    private void driveScrewDown(double screwTarget, double speed)
-    {
-        // Sets target position
-        screwLevel -= screwTarget;
-
-        // Sets direction
-        screw.setDirection(DcMotor.Direction.REVERSE);
-        screw.setTargetPosition(screwLevel);
-        // sets run mode
-        screw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        // sets power
-        screw.setPower(-speed);
-
-        while ((screw.isBusy() && (screw.getCurrentPosition() <= screwTarget)) || (screw.isBusy() && (lowSensor.isPressed())))
-        {
-            // Stops if sensor is true
-            if (lowSensor.isPressed())
-            {
-                break;
-            }
-        }
-
-        // breaks the motor
-        screw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        screw.setPower(0);
-        screw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        screwLevel = 0;
     }
 
     private void mediumPoleRun()
@@ -372,8 +391,10 @@ public class TestScrewUbar extends LinearOpMode
         if ((zone == 1) || (zone == 3))
         {
             //angles.firstAngle;
-            //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
-            double ang2 = -90 - getHeading();
+            //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));  //old
+
+            //double ang2 = -90 - getHeading(); //jrm took out for testing below
+            double ang2 = 270 - getCorrectedCompassHeading();
             RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang2,angles.firstAngle);
             telemetry.addData("WapaAuto", "heading = " + angles.firstAngle + "ang2 = " + ang2) ;
             telemetry.update();
@@ -385,10 +406,11 @@ public class TestScrewUbar extends LinearOpMode
                 driveStraight(ticksPerInch * 24, -1, 0.5);
                 //double ang2 = getHeading() - (90 + (180 - Math.abs(initAngle)));
                 double ang3 = -90 - (getHeading() - 90);
-                RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang3,getHeading());
-                basicRotate(ang3, 0.5, false);
 
-                driveStraight(ticksPerInch * 5, -1, 0.5);
+                double ang4 = 180 - getCorrectedCompassHeading();
+
+                RobotLog.ii("WAPA Turn Angle:", "%f  Curr Heading %f", ang4,getHeading());
+                basicRotate(ang4, 0.5, false);
             }
             if (zone ==  3)
             {
@@ -442,7 +464,7 @@ public class TestScrewUbar extends LinearOpMode
             leftFrontPos += target;
             while (mecanumDriveBase.lf.getCurrentPosition() <= leftFrontPos)
             {
-                mecanumDriveBase.driveMotors(speed, -.01, 0, 1);
+                mecanumDriveBase.driveMotors(speed, -0.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -453,7 +475,7 @@ public class TestScrewUbar extends LinearOpMode
             while (mecanumDriveBase.lf.getCurrentPosition() >= leftFrontPos)
             {
                 //TODO: do we need turn value here as well?
-                mecanumDriveBase.driveMotors(speed, 0, 0, 1);
+                mecanumDriveBase.driveMotors(speed, 0.01, 0, 1);
                 telemetry.addData("", mecanumDriveBase.lf.getCurrentPosition());
 //                telemetry.update();
             }
@@ -504,8 +526,8 @@ public class TestScrewUbar extends LinearOpMode
         // rotate until turn is completed.
         if (!sensor)
         {
-            telemetry.addData("Simple turn", "");
-            telemetry.update();
+//            telemetry.addData("Simple turn", "");
+//            telemetry.update();
             // On right turn we have to get off zero first.
             while (opModeIsActive() && getAngle() == 0) {}
 
@@ -577,7 +599,7 @@ public class TestScrewUbar extends LinearOpMode
                 double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
+//                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
                 RobotLog.ii("WAPA Angle Correction:", "%f ", angleCorrection);
             }
             else
@@ -585,7 +607,7 @@ public class TestScrewUbar extends LinearOpMode
                 double angleCorrection = (firstPole - secondPole) / 2;
                 basicRotate(angleCorrection, 0.3, false);
                 int temp = (int)angleCorrection;
-                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
+//                telemetry.addData("Angle Correction:", angleCorrection + " int: " + temp);
                 RobotLog.ii("WAPA Angle Correction:", "%f ", angleCorrection);
             }
             telemetry.update();
@@ -636,6 +658,8 @@ public class TestScrewUbar extends LinearOpMode
         {
            heading = heading - 180;
         }
+
+        RobotLog.ii("WAPA Init Heading:", "%f ", heading);
 
         return heading;
     }
@@ -990,7 +1014,7 @@ public class TestScrewUbar extends LinearOpMode
             leftAngle = leftAngle + 360;
         }
 
-
+        RobotLog.ii("WAPA angleToHeading:", "org: " + origin + " des: " + destination + " right: " + rightAngle + " left: " + leftAngle);
         //return the faster/smaller direction.
         if (leftAngle < rightAngle)
         {
@@ -1000,15 +1024,27 @@ public class TestScrewUbar extends LinearOpMode
         {
             return rightAngle * -1;
         }
-
-        //Left-Hand Turn:   ((Origin - Destination) + 360) % 360
-        //Right-Hand Turn: ((Destination - Origin) + 360) % 360
-
-//        ((190 - 20) + 360) % 360 == 170 degree turn to the left.
-//        ((20 - 190) + 360) % 360 == 190 degree turn to the right
-
-//        90 - 135 = 45
-//        90 - 300 = -210    30
-
     }
+
+    private double checkOrientation()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        return ang.firstAngle;
+    }
+
+    private double getCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle;
+        return Math.abs(heading);
+    }
+
+    private double getCorrectedCompassHeading()
+    {
+        Orientation ang = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = 180 - ang.firstAngle - initAngle;
+        return Math.abs(heading);
+    }
+
 }
