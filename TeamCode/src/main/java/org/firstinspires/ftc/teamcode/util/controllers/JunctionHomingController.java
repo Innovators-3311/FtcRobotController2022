@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.controllers;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -61,6 +63,7 @@ public class JunctionHomingController {
     private final DistanceSensor distanceSensorCenter;
     private final RelativeDriveController relativeDrive;
     private JunctionType junction = JunctionType.LOW;
+    private FtcDashboard dashboard;
 
     private double powerRate = 0;
     private double power = 0.3;
@@ -79,8 +82,8 @@ public class JunctionHomingController {
         this.mecanumDriveBase = mecanumDriveBase;
         distanceSensorCenter = hardwareMap.get(DistanceSensor.class, "distanceSensorCenter");
         this.relativeDrive = relativeDriveController;
+        this.dashboard = FtcDashboard.getInstance();
         initImu(hardwareMap);
-
     }
 
     /**
@@ -89,7 +92,6 @@ public class JunctionHomingController {
     private void resetAngle()
     {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
         globalAngle = 0;
     }
 
@@ -116,6 +118,10 @@ public class JunctionHomingController {
         globalAngle += deltaAngle;
 
         lastAngles = angles;
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("angle", globalAngle);
+        dashboard.sendTelemetryPacket(packet);
 
         return globalAngle;
     }
@@ -260,7 +266,11 @@ public class JunctionHomingController {
      * @return double the measured distance in inches
      */
     public double getDistance(){
-        return distanceSensorCenter.getDistance(DistanceUnit.INCH);
+        TelemetryPacket packet = new TelemetryPacket();
+        double distance = distanceSensorCenter.getDistance(DistanceUnit.INCH);
+        packet.put("distance", distance);
+        dashboard.sendTelemetryPacket(packet);
+        return distance;
     }
 
     /**

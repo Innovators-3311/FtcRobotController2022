@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 
 public class CompTeleOp extends OpMode
 {
-//    private CombinedLocalizer localizer        = null;
+    private CombinedLocalizer localizer        = null;
     private MecanumDriveBase mecanumDriveBase = null;
     private TowerController towerController;
     private PacManTurnToPos pacMan;
@@ -29,7 +29,7 @@ public class CompTeleOp extends OpMode
         cameraInitSingleton = new CameraInitSingleton(hardwareMap);
         webcam = cameraInitSingleton.getWebcam();
         telemetry.addData("Status", "Initialized");
-//        localizer = new CombinedLocalizer(hardwareMap, webcam);
+        localizer = new CombinedLocalizer(hardwareMap, webcam);
         mecanumDriveBase = new MecanumDriveBase(hardwareMap);
         towerController = new TowerController(hardwareMap, telemetry);
         OdometryPodsSensor odoPods = new OdometryPodsSensor(hardwareMap);
@@ -40,8 +40,8 @@ public class CompTeleOp extends OpMode
     }
     @Override
     public void loop() {
-//        localizer.displayTelemetry(telemetry);
-//        localizer.handleTracking();
+        localizer.displayTelemetry(telemetry);
+        localizer.handleTracking();
         towerController.handleGamepad(gamepad2, telemetry);
         junctionHoming.handleGamepad(gamepad1,gamepad2);
         // If we're not homing, see what the driver wants.

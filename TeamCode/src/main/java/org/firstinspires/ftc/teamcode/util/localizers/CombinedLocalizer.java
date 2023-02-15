@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -18,7 +20,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.util.InternalIMUSensor;
 import org.firstinspires.ftc.teamcode.util.odometry.OdometryPodsSensor;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public class CombinedLocalizer implements Localizer {
     private static final float fullField = 144 * mmPerInch;
     private static final float oneAndHalfTile = 36 * mmPerInch;
     private static final float loopSpeedHT = 0.1f;
+    private static FtcDashboard dashboard;
 
     private static final String VUFORIA_KEY =
             "ATCNswP/////AAABmboo62E3M0RLvUoBrala8GQowW4hvn2lz0v4xIUqDcerBojdZbFDT7KxueF7R6JgJY9tQ+gV9sHXv6aOcnznTsupwlzsqujeV1pIN0j5/uZNqLkxZCORToVMVD/kd8XY5y58Pnml+lS3pqkZee6pSUTNWfmWgJAu/oKPGVrOm5GwCPObOM9Mx3NSbWeRVSiKcaN9o6QyqV+Knuf2xYpF87rKiH0pbWGRIFSy8JgVQ6dabuIoDCKbXpDeTwK3PJ2VtgON+8PA2TIIn95Yq8UmBYJRJc6kDyvCDyCnKJ63oPRfzth3P8DM4IchQd69ccU6vqeto4JNQbPZh5JB5KRXFS8CcmQJLkSRcHDIP92eIhv/";
@@ -53,7 +55,6 @@ public class CombinedLocalizer implements Localizer {
     private VuforiaLocalizer vuforia                = null;
     private VuforiaTrackables targets               = null;
 //    private GyroSensor gyro;
-    private InternalIMUSensor imu;
     private OdometryPodsSensor odoPods;
     private WebcamName webcamField = null;
     private List<VuforiaTrackable> allTrackables   = null;
@@ -77,13 +78,14 @@ public class CombinedLocalizer implements Localizer {
     public CombinedLocalizer(HardwareMap hardwareMap, WebcamName webcam) {
         webcamField = webcam;
 //        gyro = hardwareMap.get(GyroSensor.class, "gyro");
-        imu = new InternalIMUSensor(hardwareMap);
         try{
             stateServer = new StateServer();
         }catch (IOException e12141){
             RobotLog.ee("Localizer", "Error initializing NanoHTTPD StateServer");
         }
         odoPods = new OdometryPodsSensor(hardwareMap);
+
+        this.dashboard = FtcDashboard.getInstance();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -95,6 +97,7 @@ public class CombinedLocalizer implements Localizer {
         targets = this.vuforia.loadTrackablesFromAsset("PowerPlay"); // loads images
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
+
 
 //        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
 //        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
@@ -177,28 +180,20 @@ public class CombinedLocalizer implements Localizer {
                 .addData("x","%.1f",fieldFrame[0])
                 .addData("y","%.1f",fieldFrame[1]);
         telemetry.addData("heading","%.1f",heading);
-//        telemetry.addData("Brendan's heading","%.1f",smartAngleError(heading, 0));
-//        telemetry.addData("Vuforia Target Visible", targetWasVisible);
-    }
-    public void measureVelocity() {
-        double[] stateChange = imu.getStateChangeDegrees();
-    }
 
-    /**
-     * Measure the state change from the IMU. Currently, this function only sets x and y velocities
-     * based on the IMU. In practice, we should estimate these valoues. But the IMU implements its
-     * own integration function.
-     */
-    public void measureIMUChange() {
-        double[] stateChange = imu.getStateChangeDegrees();
-        // Converts the robot's heading in its own frame to the field's frame.
-        double fieldStateChange[] = robotToFieldFrame(stateChange[3], stateChange[4]);
-        // x velocity in inches per second
-        xVelocity = fieldStateChange[0];
-        // y velocity in inches per second
-        yVelocity = fieldStateChange[1];
-        // Heading rate in degrees per second.
-        headingRate = stateChange[5];
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("RobotX", x);
+        packet.put("RobotY", y);
+        packet.put("RobotH", heading);
+        packet.put("RobotUncertainty", positionUncertainty);
+        packet.put("Last Vuforia", lastT);
+
+        packet.fieldOverlay()
+                .setFill("blue")
+                .fillRect(x-96, y-96, 16, 16);
+
+        dashboard.sendTelemetryPacket(packet);
+
     }
 
     public void measurePodChange() {
