@@ -98,6 +98,11 @@ public class CombinedLocalizer implements Localizer {
         allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targets);
 
+        // Documentation is here:
+        //   https://acmerobotics.github.io/ftc-dashboard/features
+        // Wasn't very clear about what things implement CameraStreamSource, but apparently vuforia
+        // works.
+        FtcDashboard.getInstance().startCameraStream(vuforia, 0);
 
 //        identifyTarget(0, "Red Audience Wall", -halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, 90);
 //        identifyTarget(1, "Red Rear Wall", halfField, -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
@@ -186,11 +191,21 @@ public class CombinedLocalizer implements Localizer {
         packet.put("RobotY", y);
         packet.put("RobotH", heading);
         packet.put("RobotUncertainty", positionUncertainty);
-        packet.put("Last Vuforia", lastT);
+        packet.put("Last Vuforia", runtime.seconds() - lastT);
+
+        /* We use a system where:
+         *   x represents the inches towards the blue side from the red side and
+         *   y represents the inches towards from the front to the back.
+         * The standard system uses:
+         *   Origin is the center
+         *   x is distance towards the back (our y)
+         *   y is distance towards blue team (our -x)
+         *
+         */
 
         packet.fieldOverlay()
                 .setFill("blue")
-                .fillRect(x-96, y-96, 16, 16);
+                .fillRect(y-72, 72-x, 16, 16);
 
         dashboard.sendTelemetryPacket(packet);
 
@@ -268,7 +283,7 @@ public class CombinedLocalizer implements Localizer {
             double err = smartAngleError(vuforiaHeading, heading);
             heading += k*(err);
             headingUncertainty = (1-k)*headingUncertainty;
-
+            lastT = runtime.seconds();
         }
     }
 
@@ -294,7 +309,6 @@ public class CombinedLocalizer implements Localizer {
            x += k*((lastLocation.getTranslation().get(0)/mmPerInch)-x);
            y += k*((lastLocation.getTranslation().get(1)/mmPerInch)-y);
            positionUncertainty = (1-k)*positionUncertainty;
-
        }
     }
 
