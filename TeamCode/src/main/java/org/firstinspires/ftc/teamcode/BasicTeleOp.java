@@ -12,20 +12,20 @@ public class BasicTeleOp extends OpMode
 
 {
     private MecanumDriveBase mecanumDriveBase = null;
-    private TowerController towerController;
+//    private TowerController towerController;
     private PacManTurnToPos pacMan;
     private DriveForTest driveForTest;
 
     public void init()
     {
         telemetry.addData("Status", "Initialized");
-        towerController = new TowerController(hardwareMap, telemetry);
+//        towerController = new TowerController(hardwareMap, telemetry);
         driveForTest = new DriveForTest(hardwareMap);
     }
     @Override
     public void loop()
     {
-        towerController.handleGamepad(gamepad2, telemetry);
+//        towerController.handleGamepad(gamepad2, telemetry);
         driveForTest.drive(gamepad1);
         telemetry.update();
     }
